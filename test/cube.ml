@@ -1,33 +1,23 @@
 let animate_rotate_step = 0.05
 let animate_frame_delay = 40
 let rotate_max = 8. *. atan 1.
-let box_size = 100
-let margin   = 20
+let initial_size = 200
 
-let setup_transform cr =
+let redraw w range c =
+  let { Gtk.width = width ; Gtk.height = height } =
+    w#misc#allocation in
+  let cr = new Ocairo.cairo c in
+  let box_size = float (width + height) /. 6. in
   cr#default_matrix ;
-  let off = float (box_size + margin) in
-  cr#translate off off
-
-let expose_cb c _ =
-  let cr = c#cairo in
-  cr#rectangle 0. 0. (float box_size) (float box_size) ;
-  cr#set_rgb_color 1. 1. 1. ;
-  cr#fill ;
-  false
-
-let setup packing =
-  let size = 2 * box_size + margin in
-  let c = Ocairo_gtkcairo.cairo ~width:size ~height:size ~packing () in
-  setup_transform c#cairo ;
-  c#event#connect#after#expose (expose_cb c) ;
-  c
-
-let slider_changed range c () =
-  let cr = c#cairo in
-  setup_transform cr ;
+  let off = float width /. 2. in
+  cr#translate off off ;
   cr#rotate range#adjustment#value ;
-  c#queue_draw
+  cr#rectangle (~-. box_size) (~-. box_size) box_size box_size ;
+  cr#set_rgb_color 1. 1. 1. ;
+  cr#fill
+
+let slider_changed cr () =
+  cr#queue_draw
 
 let animate_step range () =
   let nv = range#adjustment#value +. animate_rotate_step in
@@ -39,12 +29,12 @@ let animate_toggled button range =
   fun () ->
     match !timeout with
     | None when button#active ->
-	let id = 
-	  Glib.Timeout.add animate_frame_delay
-	    (animate_step range) in
-	timeout := Some id
+	timeout := Some (
+	  Glib.Timeout.add animate_frame_delay 
+	    (animate_step range))
     | Some id when not button#active ->
-	Glib.Timeout.remove id
+	Glib.Timeout.remove id ;
+	timeout := None
     | _ -> ()
 
 
@@ -56,20 +46,23 @@ let main =
   let b = GPack.vbox ~spacing:6 ~border_width:12 
       ~packing:w#add () in
 
-  let f = GBin.frame ~shadow_type:`IN ~packing:b#pack () in
+  let f = GBin.frame ~shadow_type:`IN 
+      ~packing:(b#pack ~expand:true ~fill:true) () in
 
-  let cairo = setup f#add in
-
+  let cairo = Ocairo_gtkcairo.cairo 
+      ~width:initial_size ~height:initial_size 
+      ~packing:f#add () in
   let slider = GRange.scale `HORIZONTAL 
       ~draw_value:false ~packing:b#pack () in
   slider#adjustment#set_bounds 
     ~lower:0. ~upper:rotate_max
     ~step_incr:animate_rotate_step () ;
-  slider#connect#value_changed 
-    (slider_changed slider cairo) ;
-
   let button = GButton.check_button ~label:"Animate" 
       ~packing:b#pack () in
+
+  cairo#connect#redraw (redraw cairo slider) ;
+  slider#connect#value_changed 
+    (slider_changed cairo) ;
   button#connect#toggled (animate_toggled button slider) ;
 
   w#show () ;
