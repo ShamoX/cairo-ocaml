@@ -11,8 +11,9 @@
 	* test/Makefile, test/demo.ml: added a translation of cairo-demo.c
 
 	* src/cairo.ml, src/cairo.mli, src/ml_cairo.c, src/ml_cairo.h,
-	src/ml_cairo_lablgtk.c, src/Makefile, test/basket.ml: added
-	support for cairo_current_path and cairo_current_path_flat
+	src/ml_cairo_lablgtk.c, src/Makefile, src/ml_cairo_path.c,
+	test/basket.ml: added support for cairo_current_path and
+	cairo_current_path_flat.
 
 2003-12-17 02:15  Olivier Andrieu <oliv__a@users.sourceforge.net>
 
