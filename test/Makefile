@@ -1,14 +1,18 @@
 
 include ../config.make
 
+TARGETS = kapow
 ifdef LABLGTKDIR
 TARGETS += text demo spline basket knockout font
-ifdef GTKCAIRO_CFLAGS
-TARGETS += cube
-endif
+# ifdef GTKCAIRO_CFLAGS
+# TARGETS += cube
+# endif
 endif
 
 all : $(TARGETS)
+
+kapow : kapow.ml
+	$(OCAMLOPT) -o $@ -I ../src cairo.cmxa $^
 
 font : font.ml
 	$(OCAMLOPT) -o $@ -I ../src cairo.cmxa $^
