@@ -5,7 +5,7 @@ AC_CONFIG_AUX_DIR(support)
 AC_PROG_OCAML()
 
 # Check for LablGTK
-AC_CHECK_OCAML_MODULE(lablgtk, LABLGTKDIR, Gtk, +lablgtk +lablgtk2)
+AC_CHECK_OCAML_MODULE(lablgtk, LABLGTKDIR, Gobject, +lablgtk2 +lablgtk)
 
 # Check for cairo
 PKG_CHECK_MODULES(CAIRO, cairo >= 0.1.12)
