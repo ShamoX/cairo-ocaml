@@ -19,13 +19,6 @@ Make_Val_final_pointer(cairo_matrix_t, Ignore, cairo_matrix_destroy, 100)
 #define cairo_matrix_t_val(v) ((cairo_matrix_t *)Pointer_val(v))
 ML_0(cairo_create, Val_cairo_t)
 
-CAMLprim value
-ml_cairo_reference(value v_cr)
-{
-  cairo_reference(cairo_t_val(v_cr));
-  check_cairo_status(v_cr);
-  return Val_unit;
-}
 ML_1(cairo_destroy, cairo_t_val, Unit)
 
 CAMLprim value
@@ -600,6 +593,20 @@ Val_cairo_font_extents_t(cairo_font_extents_t * _s)
   return _v;
 }
 
+static value
+Val_cairo_text_extents_t(cairo_text_extents_t * _s)
+{
+  value _v;
+  _v = alloc_small(6 * Double_wosize, Double_array_tag);
+  Store_double_field(_v, 0, _s->x_bearing);
+  Store_double_field(_v, 1, _s->y_bearing);
+  Store_double_field(_v, 2, _s->width);
+  Store_double_field(_v, 3, _s->height);
+  Store_double_field(_v, 4, _s->x_advance);
+  Store_double_field(_v, 5, _s->y_advance);
+  return _v;
+}
+
 static inline cairo_font_weight_t
 cairo_font_weight_t_val(value _v)
 {
@@ -653,11 +660,14 @@ ml_cairo_show_text(value v_ct, value v_utf8)
 }
 
 CAMLprim value
-ml_cairo_show_glyphs(value v_ct, value v_glyphs, value v_num_glyphs)
+ml_cairo_show_glyphs(value v_ct, value v_glyphs)
 {
-  cairo_glyph_t c_glyphs;
-  cairo_glyph_t_val(&c_glyphs, v_glyphs);
-  cairo_show_glyphs(cairo_t_val(v_ct), &c_glyphs, Int_val(v_num_glyphs));
+  size_t num_glyphs = Wosize_val(v_glyphs);
+  cairo_glyph_t c_glyphs [ num_glyphs ];
+  unsigned int i;
+  for(i = 0; i < num_glyphs; i++)
+    cairo_glyph_t_val(&c_glyphs[i], Field(v_glyphs, i));
+  cairo_show_glyphs(cairo_t_val(v_ct), c_glyphs, num_glyphs);
   check_cairo_status(v_ct);
   return Val_unit;
 }
@@ -687,7 +697,50 @@ ml_cairo_set_font(value v_ct, value v_font)
   check_cairo_status(v_ct);
   return Val_unit;
 }
-ML_1(cairo_font_reference, cairo_font_t_val, Unit)
+
+CAMLprim value
+ml_cairo_text_extents(value v_ct, value v_utf8)
+{
+  cairo_text_extents_t c_extents;
+  cairo_text_extents(cairo_t_val(v_ct), String_val(v_utf8), &c_extents);
+  check_cairo_status(v_ct);
+  return Val_cairo_text_extents_t(&c_extents);
+}
+
+CAMLprim value
+ml_cairo_glyph_extents(value v_ct, value v_glyphs)
+{
+  size_t num_glyphs = Wosize_val(v_glyphs);
+  cairo_text_extents_t c_extents;
+  cairo_glyph_t c_glyphs [ num_glyphs ];
+  unsigned int i;
+  for(i = 0; i < num_glyphs; i++)
+    cairo_glyph_t_val(&c_glyphs[i], Field(v_glyphs, i));
+  cairo_glyph_extents(cairo_t_val(v_ct), c_glyphs, num_glyphs, &c_extents);
+  check_cairo_status(v_ct);
+  return Val_cairo_text_extents_t(&c_extents);
+}
+
+CAMLprim value
+ml_cairo_text_path(value v_ct, value v_utf8)
+{
+  cairo_text_path(cairo_t_val(v_ct), String_val(v_utf8));
+  check_cairo_status(v_ct);
+  return Val_unit;
+}
+
+CAMLprim value
+ml_cairo_glyph_path(value v_ct, value v_glyphs)
+{
+  size_t num_glyphs = Wosize_val(v_glyphs);
+  cairo_glyph_t c_glyphs [ num_glyphs ];
+  unsigned int i;
+  for(i = 0; i < num_glyphs; i++)
+    cairo_glyph_t_val(&c_glyphs[i], Field(v_glyphs, i));
+  cairo_glyph_path(cairo_t_val(v_ct), c_glyphs, num_glyphs);
+  check_cairo_status(v_ct);
+  return Val_unit;
+}
 
 ML_1(cairo_font_destroy, cairo_font_t_val, Unit)
 ML_2(cairo_font_set_transform, cairo_font_t_val, cairo_matrix_t_val, Unit)
@@ -838,7 +891,6 @@ ml_cairo_surface_create_for_image(value img)
 }
 ML_4(cairo_surface_create_similar, cairo_surface_t_val, cairo_format_t_val, Int_val, Int_val, Val_cairo_surface_t)
 
-ML_1(cairo_surface_reference, cairo_surface_t_val, Unit)
 ML_1(cairo_surface_destroy, cairo_surface_t_val, Unit)
 ML_2(cairo_surface_set_repeat, cairo_surface_t_val, Int_val, Val_cairo_status_t)
 ML_2(cairo_surface_set_matrix, cairo_surface_t_val, cairo_matrix_t_val, Val_cairo_status_t)

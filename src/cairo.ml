@@ -19,7 +19,6 @@ type t
 type surface
 type matrix
 external create : unit -> t = "ml_cairo_create"
-external reference : cr:t -> unit = "ml_cairo_reference"
 external destroy : cr:t -> unit = "ml_cairo_destroy"
 external save : cr:t -> unit = "ml_cairo_save"
 external restore : cr:t -> unit = "ml_cairo_restore"
@@ -129,10 +128,17 @@ external in_fill : cr:t -> x:float -> y:float -> bool = "ml_cairo_in_fill"
 external clip : cr:t -> unit = "ml_cairo_clip"
 type font
 type glyph = { index : int; glyph_x : float; glyph_y : float; }
+type text_extents = 
+  { x_bearing   : float ;
+    y_bearing   : float ;
+    text_width  : float ;
+    text_height : float ;
+    x_advance   : float ;
+    y_advance   : float }
 type font_extents =
   { ascent : float;
     descent : float;
-    height : float;
+    font_height : float;
     max_x_advance : float;
     max_y_advance : float }
 type font_weight =
@@ -150,12 +156,15 @@ external transform_font :
   cr:t -> matrix:matrix -> unit = "ml_cairo_transform_font"
 external show_text : ct:t -> utf8:string -> unit = "ml_cairo_show_text"
 external show_glyphs :
-  ct:t -> glyphs:glyph -> num_glyphs:int -> unit = "ml_cairo_show_glyphs"
+  ct:t -> glyph array -> unit = "ml_cairo_show_glyphs"
 external current_font : ct:t -> font = "ml_cairo_current_font"
 external current_font_extents :
   ct:t -> font_extents = "ml_cairo_current_font_extents"
 external set_font : ct:t -> font:font -> unit = "ml_cairo_set_font"
-external font_reference : font:font -> unit = "ml_cairo_font_reference"
+external text_extents : t -> utf8:string -> text_extents = "ml_cairo_text_extents"
+external glyph_extents : t -> glyph array -> text_extents = "ml_cairo_glyph_extents"
+external text_path : t -> utf8:string -> unit = "ml_cairo_text_path"
+external glyph_path : t -> glyph array -> unit = "ml_cairo_glyph_path"
 external font_destroy : font:font -> unit = "ml_cairo_font_destroy"
 external font_set_transform :
   font:font -> matrix:matrix -> unit = "ml_cairo_font_set_transform"
@@ -184,8 +193,6 @@ external surface_create_for_image :
 external surface_create_similar :
   other:surface -> format:format -> width:int -> height:int ->
     surface = "ml_cairo_surface_create_similar"
-external surface_reference :
-  surface:surface -> unit = "ml_cairo_surface_reference"
 external surface_destroy :
   surface:surface -> unit = "ml_cairo_surface_destroy"
 external surface_set_repeat :

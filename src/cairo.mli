@@ -159,12 +159,19 @@ external clip : cr:t -> unit = "ml_cairo_clip"
 
 type font
 type glyph = { index : int; glyph_x : float; glyph_y : float; }
+type text_extents = { 
+    x_bearing   : float ;
+    y_bearing   : float ;
+    text_width  : float ;
+    text_height : float ;
+    x_advance   : float ;
+    y_advance   : float }
 type font_extents = {
-  ascent : float;
-  descent : float;
-  height : float;
-  max_x_advance : float;
-  max_y_advance : float;
+    ascent        : float;
+    descent       : float;
+    font_height   : float;
+    max_x_advance : float;
+    max_y_advance : float;
 }
 type font_weight = 
   | FONT_WEIGHT_NORMAL 
@@ -181,11 +188,15 @@ external scale_font : cr:t -> scale:float -> unit = "ml_cairo_scale_font"
 external transform_font : cr:t -> matrix:matrix -> unit
   = "ml_cairo_transform_font"
 external show_text : ct:t -> utf8:string -> unit = "ml_cairo_show_text"
-external show_glyphs : ct:t -> glyphs:glyph -> num_glyphs:int -> unit
+external show_glyphs : ct:t -> glyph array -> unit
   = "ml_cairo_show_glyphs"
 external current_font : ct:t -> font = "ml_cairo_current_font"
 external current_font_extents : ct:t -> font_extents
   = "ml_cairo_current_font_extents"
+external text_extents : t -> utf8:string -> text_extents = "ml_cairo_text_extents"
+external glyph_extents : t -> glyph array -> text_extents = "ml_cairo_glyph_extents"
+external text_path : t -> utf8:string -> unit = "ml_cairo_text_path"
+external glyph_path : t -> glyph array -> unit = "ml_cairo_glyph_path"
 
 (** {4 Renderer state querying} *)
 

@@ -31,10 +31,17 @@ type line_cap = Cairo.line_cap = LINE_CAP_BUTT | LINE_CAP_ROUND | LINE_CAP_SQUAR
 type line_join = Cairo.line_join = LINE_JOIN_MITER | LINE_JOIN_ROUND | LINE_JOIN_BEVEL
 
 type glyph = Cairo.glyph = { index : int; glyph_x : float; glyph_y : float; }
+type text_extents = Cairo.text_extents = { 
+    x_bearing   : float ;
+    y_bearing   : float ;
+    text_width  : float ;
+    text_height : float ;
+    x_advance   : float ;
+    y_advance   : float }
 type font_extents = Cairo.font_extents = {
-  ascent : float;
-  descent : float;
-  height : float;
+  ascent        : float;
+  descent       : float;
+  font_height   : float;
   max_x_advance : float;
   max_y_advance : float;
 }
@@ -143,8 +150,12 @@ class cairo cairo =
     method scale_font s = Cairo.scale_font c s
     method transform_font (mat : matrix) = Cairo.transform_font c mat#get_matrix
     method show_text str = Cairo.show_text c str
-    method show_glyphs gl n = Cairo.show_glyphs c gl n
+    method show_glyphs gl = Cairo.show_glyphs c gl
     method font_extents = Cairo.current_font_extents c
+    method text_extents s = Cairo.text_extents c s
+    method glyph_extents gl = Cairo.glyph_extents c gl
+    method text_path s = Cairo.text_path c s
+    method glyph_path gl = Cairo.glyph_path c gl
   end
 
 and matrix = 

@@ -19,8 +19,8 @@ bigarray_kind_float(value v)
   case BIGARRAY_FLOAT64:
   case BIGARRAY_COMPLEX32:
   case BIGARRAY_COMPLEX64:
-    return Val_bool(1);
+    return Val_true;
   default:
-    return Val_bool(0);
+    return Val_false;
   }
 }

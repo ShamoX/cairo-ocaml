@@ -36,11 +36,17 @@ type line_join = Cairo.line_join =
   | LINE_JOIN_ROUND
   | LINE_JOIN_BEVEL
 type glyph = Cairo.glyph = { index : int; glyph_x : float; glyph_y : float; }
-type font_extents =
-  Cairo.font_extents = {
-  ascent : float;
-  descent : float;
-  height : float;
+type text_extents = Cairo.text_extents = { 
+    x_bearing   : float ;
+    y_bearing   : float ;
+    text_width  : float ;
+    text_height : float ;
+    x_advance   : float ;
+    y_advance   : float }
+type font_extents = Cairo.font_extents = {
+  ascent        : float;
+  descent       : float;
+  font_height   : float;
   max_x_advance : float;
   max_y_advance : float;
 }
@@ -82,6 +88,8 @@ class cairo :
     method finalise_target_ps : cr:Cairo.t -> unit
     method font_extents : Cairo.font_extents
     method get_cairo : Cairo.t
+    method glyph_extents : glyph array -> text_extents
+    method glyph_path : glyph array -> unit
     method identity_matrix : unit
     method in_stroke : float -> float -> bool
     method in_fill : float -> float -> bool
@@ -126,12 +134,14 @@ class cairo :
       Cairo_channel.t -> float -> float -> float -> float -> unit
     method set_target_surface : surface -> unit
     method set_tolerance : float -> unit
-    method show_glyphs : Cairo.glyph -> int -> unit
+    method show_glyphs : Cairo.glyph array -> unit
     method show_page : unit
     method show_surface : surface -> int -> int -> unit
     method show_text : string -> unit
     method stroke : unit
     method target_surface : surface
+    method text_extents : string -> text_extents
+    method text_path : string -> unit
     method tolerance : float
     method transform_distance : point -> unit
     method transform_font : matrix -> unit
