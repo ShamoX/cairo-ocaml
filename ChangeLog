@@ -1,3 +1,16 @@
+2005-01-26  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* configure.ac: require cairo 0.3.0
+	* support/ocaml.m4 : quote stuff to stop auto* moaning.
+
+	* src/cairo_channel.ml*: add .ml file, add convenience function
+	Cairo_channel.open_out.
+
+	* src/cairo.ml*, src/ml_cairo.c: add PDF backend, add status
+	querying functions, a Cairo.copy convenience function.
+
+	* src/*.c: some tidying.
+
 2004-11-08  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* configure.ac: require Cairo 0.2.0

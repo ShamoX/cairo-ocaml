@@ -7,6 +7,17 @@
 #include "ml_cairo_wrappers.h"
 
 #include <cairo.h>
+/* import file-based backends */
+#ifdef CAIRO_HAS_PS_SURFACE
+# include <cairo-ps.h>
+#endif
+#ifdef CAIRO_HAS_PDF_SURFACE
+# include <cairo-pdf.h>
+#endif
+#ifdef CAIRO_HAS_PNG_SURFACE
+# include <cairo-png.h>
+#endif
+
 #include "ml_cairo_channel.h"
 #include "ml_cairo_status.h"
 #include "ml_cairo.h"
@@ -39,10 +50,8 @@ Val_cairo_t (cairo_t * p)
 }
 
 Make_Val_final_pointer(cairo_surface_t, Ignore, cairo_surface_destroy, 20)
-#define cairo_surface_t_val(v) ((cairo_surface_t *)Pointer_val(v))
 
 Make_Val_final_pointer(cairo_matrix_t, Ignore, cairo_matrix_destroy, 100)
-#define cairo_matrix_t_val(v) ((cairo_matrix_t *)Pointer_val(v))
 
 Make_Val_final_pointer(cairo_pattern_t, Ignore, cairo_pattern_destroy, 20)
 #define cairo_pattern_t_val(v) ((cairo_pattern_t *)Pointer_val(v))
@@ -73,7 +82,7 @@ ml_cairo_get_suspend_exn (value v_cr)
 
 ML_0(cairo_create, Val_cairo_t)
 
-ML_1(cairo_destroy, cairo_t_val, Unit)
+/* ML_1(cairo_destroy, cairo_t_val, Unit) */
 
 CAMLprim value
 ml_cairo_save (value v_cr)
@@ -132,6 +141,25 @@ Unsupported(ml_cairo_set_target_ps)
 #endif /* CAIRO_HAS_PS_SURFACE */
 ML_bc6(cairo_set_target_ps)
 
+#ifdef CAIRO_HAS_PDF_SURFACE
+CAMLprim value
+ml_cairo_set_target_pdf (value v_cr, value v_file, value v_width_inches,
+			 value v_height_inches, value v_x_pixels_per_inch,
+			 value v_y_pixels_per_inch)
+{
+  cairo_set_target_pdf (cairo_t_val (v_cr), FILE_val (v_file),
+			Double_val (v_width_inches),
+			Double_val (v_height_inches),
+			Double_val (v_x_pixels_per_inch),
+			Double_val (v_y_pixels_per_inch));
+  check_cairo_status (v_cr);
+  return Val_unit;
+}
+#else
+Unsupported(ml_cairo_set_target_pdf)
+#endif /* CAIRO_HAS_PDF_SURFACE */
+ML_bc6(cairo_set_target_pdf)
+
 #ifdef CAIRO_HAS_PNG_SURFACE
 CAMLprim value
 ml_cairo_set_target_png (value v_cr, value v_file, value v_format,
@@ -168,17 +196,17 @@ ml_cairo_set_rgb_color (value v_cr, value v_red, value v_green, value v_blue)
 }
 
 CAMLprim value
-ml_cairo_set_alpha (value v_cr, value v_alpha)
+ml_cairo_set_pattern (value v_cr, value v_pattern)
 {
-  cairo_set_alpha (cairo_t_val (v_cr), Double_val (v_alpha));
+  cairo_set_pattern (cairo_t_val (v_cr), cairo_pattern_t_val (v_pattern));
   check_cairo_status (v_cr);
   return Val_unit;
 }
 
 CAMLprim value
-ml_cairo_set_pattern (value v_cr, value v_pattern)
+ml_cairo_set_alpha (value v_cr, value v_alpha)
 {
-  cairo_set_pattern (cairo_t_val (v_cr), cairo_pattern_t_val (v_pattern));
+  cairo_set_alpha (cairo_t_val (v_cr), Double_val (v_alpha));
   check_cairo_status (v_cr);
   return Val_unit;
 }
@@ -366,7 +394,6 @@ ml_cairo_inverse_transform_distance (value cr, value p)
   return Val_unit;
 }
 
-
 CAMLprim value
 ml_cairo_new_path (value v_cr)
 {
@@ -515,7 +542,7 @@ ml_cairo_in_stroke (value v_cr, value v_x, value v_y)
   c_ret =
     cairo_in_stroke (cairo_t_val (v_cr), Double_val (v_x), Double_val (v_y));
   check_cairo_status (v_cr);
-  return Val_int (c_ret);
+  return Val_bool (c_ret);
 }
 
 CAMLprim value
@@ -525,7 +552,7 @@ ml_cairo_in_fill (value v_cr, value v_x, value v_y)
   c_ret =
     cairo_in_fill (cairo_t_val (v_cr), Double_val (v_x), Double_val (v_y));
   check_cairo_status (v_cr);
-  return Val_int (c_ret);
+  return Val_bool (c_ret);
 }
 
 CAMLprim value
@@ -565,14 +592,6 @@ ml_cairo_fill_extents (value v_cr)
 }
 
 CAMLprim value
-ml_cairo_clip (value v_cr)
-{
-  cairo_clip (cairo_t_val (v_cr));
-  check_cairo_status (v_cr);
-  return Val_unit;
-}
-
-CAMLprim value
 ml_cairo_init_clip (value v_cr)
 {
   cairo_init_clip (cairo_t_val (v_cr));
@@ -580,13 +599,20 @@ ml_cairo_init_clip (value v_cr)
   return Val_unit;
 }
 
+CAMLprim value
+ml_cairo_clip (value v_cr)
+{
+  cairo_clip (cairo_t_val (v_cr));
+  check_cairo_status (v_cr);
+  return Val_unit;
+}
+
 Make_Val_final_pointer(cairo_font_t, Ignore, cairo_font_destroy, 20)
-#define cairo_font_t_val(v) ((cairo_font_t *)Pointer_val(v))
 
 static void
 cairo_glyph_t_val (cairo_glyph_t * _s, value _v)
 {
-  _s->index = Int_val (Field (_v, 0));
+  _s->index = Long_val (Field (_v, 0));
   _s->x = Double_val (Field (_v, 1));
   _s->y = Double_val (Field (_v, 2));
 }
@@ -677,6 +703,7 @@ ml_cairo_current_font (value cr)
 {
   cairo_font_t *f = cairo_current_font (cairo_t_val (cr));
   check_cairo_status (cr);
+  cairo_font_reference (f);
   return Val_cairo_font_t (f);
 }
 
@@ -741,7 +768,7 @@ ml_cairo_glyph_path (value v_ct, value v_glyphs)
   return Val_unit;
 }
 
-ML_1(cairo_font_destroy, cairo_font_t_val, Unit)
+/* ML_1(cairo_font_destroy, cairo_font_t_val, Unit) */
 
 ML_2(cairo_font_set_transform, cairo_font_t_val, cairo_matrix_t_val, Unit)
 ML_2(cairo_font_current_transform, cairo_font_t_val, cairo_matrix_t_val, Unit)
@@ -886,7 +913,20 @@ ml_cairo_current_target_surface (value cr)
   return Val_cairo_surface_t (s);
 }
 
-ML_1(cairo_status, cairo_t_val, Val_cairo_status_t)
+CAMLprim value
+ml_cairo_status (value v_cr)
+{
+  value v;
+  int status = cairo_status (cairo_t_val (v_cr));
+  if (status == CAIRO_STATUS_SUCCESS)
+    v = Val_unit;
+  else
+    {
+      v = alloc_small (1, 0);
+      Field (v, 0) = Val_int (status - 1);
+    }
+  return v;
+}
 ML_1(cairo_status_string, cairo_t_val, copy_string)
 
 CAMLprim value
@@ -902,7 +942,7 @@ ml_cairo_surface_create_for_image (value img)
 }
 ML_4(cairo_surface_create_similar, cairo_surface_t_val, cairo_format_t_val, Int_val, Int_val, Val_cairo_surface_t)
 
-ML_1(cairo_surface_destroy, cairo_surface_t_val, Unit)
+/* ML_1(cairo_surface_destroy, cairo_surface_t_val, Unit) */
 
 ML_2(cairo_surface_set_repeat, cairo_surface_t_val, Int_val, Val_cairo_status_t)
 ML_2(cairo_surface_set_matrix, cairo_surface_t_val, cairo_matrix_t_val, Val_cairo_status_t)
@@ -912,6 +952,7 @@ ML_2(cairo_surface_get_matrix, cairo_surface_t_val, cairo_matrix_t_val, Val_cair
 #define Val_cairo_filter_t(v) Val_int(v)
 
 ML_2(cairo_surface_set_filter, cairo_surface_t_val, cairo_filter_t_val, Val_cairo_status_t)
+ML_1(cairo_surface_get_filter, cairo_surface_t_val, Val_cairo_filter_t)
 
 ML_3(cairo_image_surface_create, cairo_format_t_val, Int_val, Int_val, Val_cairo_surface_t)
 
@@ -934,14 +975,37 @@ ML_5(cairo_ps_surface_create, FILE_val, Double_val, Double_val, Double_val, Doub
 Unsupported(ml_cairo_ps_surface_create)
 #endif /* CAIRO_HAS_PS_SURFACE */
 
+#ifdef CAIRO_HAS_PDF_SURFACE
+ML_5(cairo_pdf_surface_create, FILE_val, Double_val, Double_val, Double_val, Double_val, Val_cairo_surface_t)
+#else
+Unsupported(ml_cairo_pdf_surface_create)
+#endif /* CAIRO_HAS_PDF_SURFACE */
+
 #ifdef CAIRO_HAS_PNG_SURFACE
 ML_4(cairo_png_surface_create, FILE_val, cairo_format_t_val, Double_val, Double_val, Val_cairo_surface_t)
 #else
 Unsupported(ml_cairo_png_surface_create)
 #endif /* CAIRO_HAS_PNG_SURFACE */
 
+ML_1 (cairo_pattern_create_for_surface, cairo_surface_t_val, Val_cairo_pattern_t)
+ML_4 (cairo_pattern_create_linear, Double_val, Double_val, Double_val, Double_val, Val_cairo_pattern_t)
+ML_6 (cairo_pattern_create_radial, Double_val, Double_val, Double_val, Double_val, Double_val, Double_val, Val_cairo_pattern_t)
+ML_bc6 (cairo_pattern_create_radial)
+ML_6 (cairo_pattern_add_color_stop, cairo_pattern_t_val, Double_val, Double_val, Double_val, Double_val, Double_val, Val_cairo_status_t)
+ML_bc6 (cairo_pattern_add_color_stop)
+ML_2 (cairo_pattern_set_matrix, cairo_pattern_t_val, cairo_matrix_t_val, Val_cairo_status_t)
+ML_2 (cairo_pattern_get_matrix, cairo_pattern_t_val, cairo_matrix_t_val, Val_cairo_status_t)
+
+#define cairo_extend_t_val(v) ((cairo_extend_t) Int_val(v))
+#define Val_cairo_extend_t(v) Val_int(v)
+
+ML_2 (cairo_pattern_set_extend, cairo_pattern_t_val, cairo_extend_t_val, Val_cairo_status_t)
+ML_1 (cairo_pattern_get_extend, cairo_pattern_t_val, Val_cairo_extend_t)
+ML_2 (cairo_pattern_set_filter, cairo_pattern_t_val, cairo_filter_t_val, Val_cairo_status_t)
+ML_1 (cairo_pattern_get_filter, cairo_pattern_t_val, Val_cairo_filter_t)
+
 ML_0(cairo_matrix_create, Val_cairo_matrix_t)
-ML_1(cairo_matrix_destroy, cairo_matrix_t_val, Unit)
+/* ML_1(cairo_matrix_destroy, cairo_matrix_t_val, Unit) */
 ML_2(cairo_matrix_copy, cairo_matrix_t_val, cairo_matrix_t_val, Val_cairo_status_t)
 ML_1(cairo_matrix_set_identity, cairo_matrix_t_val, Val_cairo_status_t)
 CAMLprim value
@@ -985,25 +1049,27 @@ ML_3(cairo_matrix_multiply, cairo_matrix_t_val, cairo_matrix_t_val, cairo_matrix
 CAMLprim value
 ml_cairo_matrix_transform_distance (value m, value p)
 {
+  cairo_status_t s;
   double x, y;
   x = Double_field (p, 0);
   y = Double_field (p, 1);
-  cairo_matrix_transform_distance (cairo_matrix_t_val (m), &x, &y);
+  s = cairo_matrix_transform_distance (cairo_matrix_t_val (m), &x, &y);
   Store_double_field (p, 0, x);
   Store_double_field (p, 1, y);
-  return Val_unit;
+  return Val_cairo_status_t (s);
 }
 
 CAMLprim value
 ml_cairo_matrix_transform_point (value m, value p)
 {
+  cairo_status_t s;
   double x, y;
   x = Double_field (p, 0);
   y = Double_field (p, 1);
-  cairo_matrix_transform_point (cairo_matrix_t_val (m), &x, &y);
+  s = cairo_matrix_transform_point (cairo_matrix_t_val (m), &x, &y);
   Store_double_field (p, 0, x);
   Store_double_field (p, 1, y);
-  return Val_unit;
+  return Val_cairo_status_t (s);
 }
 
 CAMLprim value
@@ -1021,20 +1087,3 @@ ml_cairo_surface_finalise (value s)
   Store_pointer (s, NULL);
   return Val_unit;
 }
-
-ML_1 (cairo_pattern_create_for_surface, cairo_surface_t_val, Val_cairo_pattern_t)
-ML_4 (cairo_pattern_create_linear, Double_val, Double_val, Double_val, Double_val, Val_cairo_pattern_t)
-ML_6 (cairo_pattern_create_radial, Double_val, Double_val, Double_val, Double_val, Double_val, Double_val, Val_cairo_pattern_t)
-ML_bc6 (cairo_pattern_create_radial)
-ML_6 (cairo_pattern_add_color_stop, cairo_pattern_t_val, Double_val, Double_val, Double_val, Double_val, Double_val, Val_cairo_status_t)
-ML_bc6 (cairo_pattern_add_color_stop)
-ML_2(cairo_pattern_set_matrix, cairo_pattern_t_val, cairo_matrix_t_val, Val_cairo_status_t)
-ML_2(cairo_pattern_get_matrix, cairo_pattern_t_val, cairo_matrix_t_val, Val_cairo_status_t)
-
-#define cairo_extend_t_val(v) ((cairo_extend_t) Int_val(v))
-#define Val_cairo_extend_t(v) Val_int(v)
-
-ML_2 (cairo_pattern_set_extend, cairo_pattern_t_val, cairo_extend_t_val, Val_cairo_status_t)
-ML_1 (cairo_pattern_get_extend, cairo_pattern_t_val, Val_cairo_extend_t)
-ML_2 (cairo_pattern_set_filter, cairo_pattern_t_val, cairo_filter_t_val, Val_cairo_status_t)
-ML_1 (cairo_pattern_get_filter, cairo_pattern_t_val, Val_cairo_filter_t)

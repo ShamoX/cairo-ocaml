@@ -8,9 +8,16 @@
 #include "ml_cairo_wrappers.h"
 
 #include <cairo.h>
+#ifdef CAIRO_HAS_FT_FONT
+# include <cairo-ft.h>
+#endif
+
 #include "ml_cairo.h"
 #include "ml_cairo_status.h"
 
+#ifdef CAIRO_HAS_FT_FONT
+
+/* minimal Freetype interface */
 static void
 ml_raise_FT_Error (FT_Error err)
 {
@@ -65,8 +72,7 @@ ml_FT_Done_Face (value face)
   return Val_unit;
 }
 
-ML_1 (cairo_ft_font_create_for_ft_face, FT_Face_val, Val_cairo_font_t)
-
+/* minimal Fontconfig interface */
 Make_Val_final_pointer (FcPattern, Ignore, FcPatternDestroy, 10)
 #define FcPattern_val(v) (FcPattern *)Pointer_val(v)
 
@@ -85,4 +91,21 @@ ml_FcNameUnparse (value patt)
   return r;
 }
 
+/* cairo Fontconfig/Freetype font backend */
 ML_2 (cairo_ft_font_create, FT_Library_val, FcPattern_val, Val_cairo_font_t)
+ML_1 (cairo_ft_font_create_for_ft_face, FT_Face_val, Val_cairo_font_t)
+ML_1 (cairo_ft_font_pattern, cairo_font_t_val, Val_FcPattern)
+
+#else
+
+Unsupported (ml_FT_Init_FreeType)
+Unsupported (ml_FT_Done_FreeType)
+Unsupported (ml_FT_New_Face)
+Unsupported (ml_FT_Done_Face)
+Unsupported (ml_FcNameParse)
+Unsupported (ml_FcNameUnparse)
+Unsupported (ml_cairo_ft_font_create)
+Unsupported (ml_cairo_ft_font_create_for_ft_face)
+Unsupported (ml_cairo_ft_font_pattern)
+
+#endif /* CAIRO_HAS_FT_FONT */

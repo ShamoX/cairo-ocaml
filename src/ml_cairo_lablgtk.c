@@ -2,6 +2,9 @@
 #include <gdk/gdkx.h>
 
 #include <cairo.h>
+#ifdef CAIRO_HAS_XLIB_SURFACE
+# include <cairo-xlib.h>
+#endif
 
 #include <caml/mlvalues.h>
 #include <caml/alloc.h>

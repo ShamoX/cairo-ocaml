@@ -4,7 +4,8 @@
 (** {3 Error reporting} *)
 
 type status =
-    INVALID_RESTORE
+    NO_MEMORY
+  | INVALID_RESTORE
   | INVALID_POP_GROUP
   | NO_CURRENT_POINT
   | INVALID_MATRIX
@@ -34,7 +35,11 @@ type format =
 val create : unit -> t
 external save    : cr:t -> unit = "ml_cairo_save"
 external restore : cr:t -> unit = "ml_cairo_restore"
-external copy    : dest:t -> src:t -> unit = "ml_cairo_copy"
+external _copy    : dest:t -> src:t -> unit = "ml_cairo_copy"
+val copy : t -> t
+
+external status : t -> status option = "ml_cairo_status"
+external status_string : t -> string = "ml_cairo_status_string"
 
 external suspend_exn : t -> unit = "ml_cairo_suspend_exn"
 (** The functions operating on cairo values normally raise an [Error] exception 
@@ -57,6 +62,13 @@ external set_target_ps :
   height_inches:float ->
   x_pixels_per_inch:float -> y_pixels_per_inch:float -> unit
   = "ml_cairo_set_target_ps_bc" "ml_cairo_set_target_ps"
+external set_target_pdf :
+  cr:t ->
+  file:Cairo_channel.t ->
+  width_inches:float ->
+  height_inches:float ->
+  x_pixels_per_inch:float -> y_pixels_per_inch:float -> unit
+  = "ml_cairo_set_target_pdf_bc" "ml_cairo_set_target_pdf"
 external set_target_png :
   cr:t -> file:Cairo_channel.t -> format -> width:int -> height:int -> unit = "ml_cairo_set_target_png"
 external finalise_target : cr:t -> unit = "ml_cairo_finalise_target"
@@ -83,9 +95,9 @@ external set_operator : cr:t -> op:operator -> unit = "ml_cairo_set_operator"
 external set_rgb_color :
   cr:t -> red:float -> green:float -> blue:float -> unit
   = "ml_cairo_set_rgb_color"
-external set_alpha : cr:t -> alpha:float -> unit = "ml_cairo_set_alpha"
 external set_pattern : cr:t -> pattern:pattern -> unit
   = "ml_cairo_set_pattern"
+external set_alpha : cr:t -> alpha:float -> unit = "ml_cairo_set_alpha"
 external set_tolerance : cr:t -> tolerance:float -> unit
   = "ml_cairo_set_tolerance"
 type fill_rule = FILL_RULE_WINDING | FILL_RULE_EVEN_ODD
@@ -170,16 +182,6 @@ external in_fill : cr:t -> x:float -> y:float -> bool = "ml_cairo_in_fill"
 external stroke_extents : cr:t -> float * float * float * float = "ml_cairo_stroke_extents"
 external fill_extents : cr:t -> float * float * float * float = "ml_cairo_fill_extents"
 
-type flat_path = [
-  | `MOVE_TO of point
-  | `LINE_TO of point
-  | `CLOSE ]
-type basic_path = [
-  | flat_path
-  | `CURVE_TO of point * point * point ]
-external fold_current_path      : t -> ('a -> [> basic_path] -> 'a) -> 'a -> 'a = "ml_cairo_current_path"
-external fold_current_path_flat : t -> ('a -> [> flat_path] -> 'a) -> 'a -> 'a  = "ml_cairo_current_path_flat"
-
 (** {3 Misc stuff I don't know how to categorize} *)
 
 external show_surface :
@@ -239,6 +241,7 @@ external glyph_path : t -> glyph array -> unit = "ml_cairo_glyph_path"
 external current_operator : cr:t -> operator = "ml_cairo_current_operator"
 external current_rgb_color : cr:t -> float * float * float
   = "ml_cairo_current_rgb_color"
+external current_pattern : cr:t -> pattern = "ml_cairo_current_pattern"
 external current_alpha : cr:t -> float = "ml_cairo_current_alpha"
 external current_tolerance : cr:t -> float = "ml_cairo_current_tolerance"
 external current_point : cr:t -> point = "ml_cairo_current_point"
@@ -251,7 +254,16 @@ external current_matrix : cr:t -> matrix:matrix -> unit
   = "ml_cairo_current_matrix"
 external current_target_surface : cr:t -> surface
   = "ml_cairo_current_target_surface"
-external current_pattern : cr:t -> pattern = "ml_cairo_current_pattern"
+
+type flat_path = [
+  | `MOVE_TO of point
+  | `LINE_TO of point
+  | `CLOSE ]
+type basic_path = [
+  | flat_path
+  | `CURVE_TO of point * point * point ]
+external fold_current_path      : t -> ('a -> [> basic_path] -> 'a) -> 'a -> 'a = "ml_cairo_current_path"
+external fold_current_path_flat : t -> ('a -> [> flat_path] -> 'a) -> 'a -> 'a  = "ml_cairo_current_path_flat"
 
 (** {3 Surface API} *)
 
@@ -275,6 +287,8 @@ type filter =
   | FILTER_GAUSSIAN
 external surface_set_filter : surface:surface -> filter:filter -> unit
   = "ml_cairo_surface_set_filter"
+external surface_get_filter : surface:surface -> filter
+  = "ml_cairo_surface_get_filter"
 external surface_finalise : surface -> unit = "ml_cairo_surface_finalise"
 
 (** {4 Pattern functions} *)
@@ -321,6 +335,15 @@ external ps_surface_create :
   height_inches:float ->
   x_pixels_per_inch:float -> y_pixels_per_inch:float -> surface
   = "ml_cairo_ps_surface_create"
+
+(** {4 PDF surface} *)
+
+external pdf_surface_create :
+  file:Cairo_channel.t ->
+  width_inches:float ->
+  height_inches:float ->
+  x_pixels_per_inch:float -> y_pixels_per_inch:float -> surface
+  = "ml_cairo_pdf_surface_create"
 
 (** {4 PNG surface} *)
 
