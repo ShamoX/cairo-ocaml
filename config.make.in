@@ -23,6 +23,9 @@ GDK_LIBS   = $(filter-out $(FILT),@GDK_LIBS@)
 GTKCAIRO_CFLAGS = @GTKCAIRO_CFLAGS@
 GTKCAIRO_LIBS   = $(filter-out $(FILT),@GTKCAIRO_LIBS@)
 
+LIBSVG_CAIRO_CFLAGS = @LIBSVG_CAIRO_CFLAGS@
+LIBSVG_CAIRO_LIBS   = @LIBSVG_CAIRO_LIBS@
+
 cobjs     = $(patsubst %.c, %.o, $(filter %.c,$(1)))
 mlintfs   = $(patsubst %.mli, %.cmi, $(filter %.mli,$(1)))
 mlobjs    = $(patsubst %.ml, %.cmo, $(filter %.ml,$(1)))

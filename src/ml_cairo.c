@@ -49,11 +49,11 @@ Val_cairo_t (cairo_t * p)
   return ret;
 }
 
-Make_Val_final_pointer(cairo_surface_t, Ignore, cairo_surface_destroy, 20)
+Make_Val_final_pointer(cairo_surface_t, Id, cairo_surface_destroy, 20)
 
-Make_Val_final_pointer(cairo_matrix_t, Ignore, cairo_matrix_destroy, 100)
+Make_Val_final_pointer(cairo_matrix_t, Id, cairo_matrix_destroy, 100)
 
-Make_Val_final_pointer(cairo_pattern_t, Ignore, cairo_pattern_destroy, 20)
+Make_Val_final_pointer(cairo_pattern_t, Id, cairo_pattern_destroy, 20)
 #define cairo_pattern_t_val(v) ((cairo_pattern_t *)Pointer_val(v))
 
 CAMLprim value
@@ -607,7 +607,7 @@ ml_cairo_clip (value v_cr)
   return Val_unit;
 }
 
-Make_Val_final_pointer(cairo_font_t, Ignore, cairo_font_destroy, 20)
+Make_Val_final_pointer(cairo_font_t, Id, cairo_font_destroy, 20)
 
 static void
 cairo_glyph_t_val (cairo_glyph_t * _s, value _v)

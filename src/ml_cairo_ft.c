@@ -73,7 +73,7 @@ ml_FT_Done_Face (value face)
 }
 
 /* minimal Fontconfig interface */
-Make_Val_final_pointer (FcPattern, Ignore, FcPatternDestroy, 10)
+Make_Val_final_pointer (FcPattern, Id, FcPatternDestroy, 10)
 #define FcPattern_val(v) (FcPattern *)Pointer_val(v)
 
 ML_1 (FcNameParse, String_val, Val_FcPattern)

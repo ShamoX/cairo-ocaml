@@ -1,10 +1,4 @@
 
-let out_file name =
-  let oc = open_out name in
-  let channel = Cairo_channel.of_out_channel oc in
-  close_out oc ;
-  channel
-
 let pi = 4. *. atan 1.
 
 let main font_arg =
@@ -22,7 +16,7 @@ let main font_arg =
   in
 
   let cr = Cairo.create () in
-  let file = out_file "test_font.png" in
+  let file = Cairo_channel.open_out "test_font.png" in
   Cairo.set_target_png ~cr ~file Cairo.FORMAT_ARGB32 ~width:200 ~height:200 ;
 
   Cairo.set_font ~cr ~font ;

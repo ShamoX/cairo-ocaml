@@ -1,3 +1,16 @@
+2005-03-01  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/ml_svg_cairo.c, src/svg_cairo.ml, src/svg_cairo.mli : add
+	libsvg-cairo bindings
+
+	* test/svg2png.ml : ocaml version of svg2png
+
+	* * : configure stuff
+	
+2005-02-27  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* test/Makefile, test/kapow.ml : add the kapow example program.
+	
 2005-01-26  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* configure.ac: require cairo 0.3.0

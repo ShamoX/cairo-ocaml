@@ -8,8 +8,14 @@ TARGETS += text demo spline basket knockout font
 # TARGETS += cube
 # endif
 endif
+ifdef LIBSVG_CAIRO_CFLAGS
+TARGETS += svg2png 
+endif
 
 all : $(TARGETS)
+
+svg2png : svg2png.ml
+	$(OCAMLOPT) -o $@ -I ../src cairo.cmxa svg_cairo.cmxa $^
 
 kapow : kapow.ml
 	$(OCAMLOPT) -o $@ -I ../src cairo.cmxa $^

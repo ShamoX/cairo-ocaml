@@ -31,9 +31,13 @@ else
   use_gtkcairo=no
 fi
 
+# Optional libsvg-cairo support
+PKG_CHECK_MODULES(LIBSVG_CAIRO, libsvg-cairo, use_libsvg_cairo=yes, use_libsvg_cairo=no)
+
 echo
-echo "  GTK+     support: $use_gtk"
-echo "  GTKCairo support: $use_gtkcairo"
+echo "  GTK+         support: $use_gtk"
+echo "  GTKCairo     support: $use_gtkcairo"
+echo "  libsvg-cairo support: $use_libsvg_cairo"
 echo
 
 AC_OUTPUT(config.make)

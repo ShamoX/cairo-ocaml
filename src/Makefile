@@ -10,7 +10,9 @@ ifdef GTKCAIRO_CFLAGS
 TARGETS += gtkcairo
 endif
 endif
-
+ifdef LIBSVG_CAIRO_CFLAGS
+TARGETS += svgcairo
+endif
 all : $(TARGETS) $(if $(OCAMLOPT),opt)
 opt : $(addsuffix .opt,$(TARGETS))
 
@@ -20,6 +22,8 @@ lablgtk     : cairo_lablgtk.cma  libmlcairo_lablgtk.a
 lablgtk.opt : cairo_lablgtk.cmxa dllmlcairo_lablgtk.so
 gtkcairo     : gtkcairo.cma  libmlgtkcairo.a
 gtkcairo.opt : gtkcairo.cmxa dllmlgtkcairo.so
+svgcairo     : svg_cairo.cma libmlsvgcairo.a
+svgcairo.opt : svg_cairo.cmxa dllmlsvgcairo.so
 
 cairo_SRC = cairo_channel.mli cairo_channel.ml cairo.mli cairo.ml \
             cairo_bigarray.mli cairo_bigarray.ml \
@@ -54,9 +58,19 @@ gtkcairo.cmxa : $(call mloptobjs,$(gtkcairo_SRC))
 libmlgtkcairo.a dllmlgtkcairo.so : $(call cobjs,$(gtkcairo_SRC))
 	$(OCAMLMKLIB) -o gtkcairo -oc mlgtkcairo $^ $(GTKCAIRO_LIBS)
 
+svgcairo_SRC = svg_cairo.mli svg_cairo.ml ml_svg_cairo.c
+
+svg_cairo.cma : $(call mlobjs,$(svgcairo_SRC))
+	$(OCAMLMKLIB) -o svg_cairo -oc mlsvgcairo $^ $(LIBSVG_CAIRO_LIBS)
+svg_cairo.cmxa : $(call mloptobjs,$(svgcairo_SRC))
+	$(OCAMLMKLIB) -o svg_cairo -oc mlsvgcairo $^ $(LIBSVG_CAIRO_LIBS)
+libmlsvgcairo.a dllmlsvgcairo.so : $(call cobjs,$(svgcairo_SRC))
+	$(OCAMLMKLIB) -o svg_cairo -oc mlsvgcairo $^ $(LIBSVG_CAIRO_LIBS)
+
 $(call cobjs,$(cairo_SRC))    : CPPFLAGS+=$(CAIRO_CFLAGS)
 $(call cobjs,$(lablgtk_SRC))  : CPPFLAGS+=$(GDK_CFLAGS) -I$(C_LABLGTKDIR)
 $(call cobjs,$(gtkcairo_SRC)) : CPPFLAGS+=$(GTKCAIRO_CFLAGS) -I$(C_LABLGTKDIR)
+$(call cobjs,$(svgcairo_SRC))  : CPPFLAGS+=$(LIBSVG_CAIRO_CFLAGS)
 $(call mlobjs,$(lablgtk_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
 $(call mlobjs,$(gtkcairo_SRC)) : INCFLAGS=-I $(LABLGTKDIR)
 $(call mlintfs,$(lablgtk_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
@@ -81,6 +95,9 @@ DOCFILES += cairo_lablgtk.mli
 ifdef GTKCAIRO_CFLAGS
 DOCFILES += cairo_gtkcairo.mli
 endif
+endif
+ifdef LIBSVG_CAIRO_CFLAGS
+DOCFILES += svg_cairo.mli
 endif
 doc: $(DOCFILES:%.mli=%.cmi)
 	mkdir -p ../doc/html

@@ -13,7 +13,8 @@ static struct custom_operations ml_custom_##type = \
 value Val_##type (type *p) \
 { value ret; if (!p) report_null_pointer; \
   ret = alloc_custom (&ml_custom_##type, sizeof(value), adv, 1000); \
-  Field(ret,1) = (value) p; init(p); return ret; }
+  p = init(p); \
+  Field(ret,1) = Val_bp (p); return ret; }
 
 static inline value Val_ptr(void *p)
 {
@@ -29,9 +30,11 @@ static inline value Val_ptr(void *p)
 #define Double_array_length(v) (Wosize_val(v) / Double_wosize)
 
 #define Option_val(v,conv,def) (Is_long(v) ? def : conv(Field((v),0)))
+#define StringOption_val(v) Option_val(v, String_val, NULL)
 
 #define Ignore(x)
 #define Unit(x) ((x), Val_unit)
+#define Id(x) (x)
 
 #define Unsupported(fun) \
 CAMLprim value fun() { failwith("Unsupported backend"); return Val_unit; }
