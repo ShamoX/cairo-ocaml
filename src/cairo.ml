@@ -33,7 +33,7 @@ external set_target_ps :
     x_pixels_per_inch:float -> y_pixels_per_inch:float ->
     unit = "ml_cairo_set_target_ps_bc" "ml_cairo_set_target_ps"
 external set_target_png :
-  cr:t -> file:Cairo_channel.t -> format -> width:float -> height:float -> unit = "ml_cairo_set_target_png"
+  cr:t -> file:Cairo_channel.t -> format -> width:int -> height:int -> unit = "ml_cairo_set_target_png"
 
 external suspend_exn : t -> unit = "ml_cairo_suspend_exn"
 external resume_exn  : t -> unit = "ml_cairo_resume_exn"

@@ -139,7 +139,7 @@ ml_cairo_set_target_png (value v_cr, value v_file, value v_format,
 {
   cairo_set_target_png (cairo_t_val (v_cr), FILE_val (v_file),
 			cairo_format_t_val (v_format),
-			Double_val (v_width), Double_val (v_height));
+			Int_val (v_width), Int_val (v_height));
   check_cairo_status (v_cr);
   return Val_unit;
 }
