@@ -17,7 +17,7 @@ class cairo :
     val obj : 'a Gtk.obj
     method connect : cairo_signals
     method event : GObj.event_ops
-    method cairo : Ocairo.cairo
+    method cairo : Cairo.t
     method queue_draw : unit
   end
 

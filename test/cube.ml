@@ -3,18 +3,17 @@ let animate_frame_delay = 40
 let rotate_max = 8. *. atan 1.
 let initial_size = 200
 
-let redraw w range c =
+let redraw w range cr =
   let { Gtk.width = width ; Gtk.height = height } =
     w#misc#allocation in
-  let cr = new Ocairo.cairo c in
   let box_size = float (width + height) /. 6. in
-  cr#default_matrix ;
+  Cairo.default_matrix cr ;
   let off = float width /. 2. in
-  cr#translate off off ;
-  cr#rotate range#adjustment#value ;
-  cr#rectangle (~-. box_size) (~-. box_size) box_size box_size ;
-  cr#set_rgb_color 1. 1. 1. ;
-  cr#fill
+  Cairo.translate cr off off ;
+  Cairo.rotate cr range#adjustment#value ;
+  Cairo.rectangle cr (~-. box_size) (~-. box_size) box_size box_size ;
+  Cairo.set_rgb_color cr 1. 1. 1. ;
+  Cairo.fill cr
 
 let slider_changed cr () =
   cr#queue_draw
@@ -49,7 +48,7 @@ let main =
   let f = GBin.frame ~shadow_type:`IN 
       ~packing:(b#pack ~expand:true ~fill:true) () in
 
-  let cairo = Ocairo_gtkcairo.cairo 
+  let cairo = Cairo_gtkcairo.cairo 
       ~width:initial_size ~height:initial_size 
       ~packing:f#add () in
   let slider = GRange.scale `HORIZONTAL 

@@ -9,4 +9,9 @@ external set_target_drawable :
     Cairo.t -> [> `drawable] Gobject.obj -> unit 
       = "cairo_lablgtk_set_target_drawable"
 
-val create : ?target:[> `drawable] Gobject.obj -> unit -> Cairo.t
+let create ?target () =
+  let c = Cairo.create () in
+  begin match target with
+  | None -> ()
+  | Some d -> set_target_drawable c d end ;
+  c

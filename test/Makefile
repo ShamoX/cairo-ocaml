@@ -2,7 +2,7 @@
 include ../config.make
 
 ifdef LABLGTKDIR
-TARGETS += text demo spline basket knockout oknockout
+TARGETS += text demo spline basket knockout
 ifdef GTKCAIRO_CFLAGS
 TARGETS += cube
 endif
@@ -26,9 +26,6 @@ basket : basket.ml
 	$(OCAMLOPT) -o $@ -I ../src -I $(LABLGTKDIR) bigarray.cmxa cairo.cmxa lablgtk.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
 
 knockout : knockout.ml
-	$(OCAMLOPT) -w s -o $@ -I ../src -I $(LABLGTKDIR) cairo.cmxa lablgtk.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
-
-oknockout : oknockout.ml
 	$(OCAMLOPT) -w s -o $@ -I ../src -I $(LABLGTKDIR) cairo.cmxa lablgtk.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
 
 clean :

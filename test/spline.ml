@@ -1,5 +1,5 @@
 
-type point = Ocairo.point = 
+type point = Cairo.point = 
     { mutable x : float ; 
       mutable y : float }
 
@@ -8,7 +8,7 @@ type spl = {
             pt         	 : point array ;
     mutable tolerance  	 : float ;
     mutable line_width 	 : float ;
-            line_cap   	 : Ocairo.line_cap ;
+            line_cap   	 : Cairo.line_cap ;
     mutable zoom       	 : float ;
     mutable xtrans     	 : float ;
     mutable ytrans     	 : float ;
@@ -44,7 +44,7 @@ let init_spl () =
    pt = spline_copy ribbon ;
    tolerance = 0.1 ;
    line_width = 10. ; 
-   line_cap = Ocairo.LINE_CAP_ROUND ;
+   line_cap = Cairo.LINE_CAP_ROUND ;
    zoom = 1. ;
    xtrans = 0. ;
    ytrans = 0. ;
@@ -56,70 +56,70 @@ let init_spl () =
  }
 
 
-let draw_control_line ct a b w =
-  ct#save ; begin
-    ct#set_rgb_color 0. 0. 1. ;
-    ct#set_line_width w ;
-    ct#move_to a.x a.y ;
-    ct#line_to b.x b.y ;
-    ct#stroke end ;
-  ct#restore
+
+let draw_control_line cr a b w =
+  Cairo.save cr ; begin
+    Cairo.set_rgb_color cr 0. 0. 1. ;
+    Cairo.set_line_width cr w ;
+    Cairo.move_to cr a.x a.y ;
+    Cairo.line_to cr b.x b.y ;
+    Cairo.stroke cr end ;
+  Cairo.restore cr
 
 let two_pi = 8. *. atan 1.
 
-let draw_spline ct spl =
+let draw_spline cr spl =
   let drag_pt = { x = spl.drag_pt.x ; y = spl.drag_pt.y } in
-  ct#inverse_transform_point drag_pt ;
-  ct#save ; begin
-    ct#move_to  spl.pt.(0).x spl.pt.(0).y ;
-    ct#curve_to 
+  Cairo.inverse_transform_point cr drag_pt ;
+  Cairo.save cr ; begin
+    Cairo.move_to cr  spl.pt.(0).x spl.pt.(0).y ;
+    Cairo.curve_to cr 
       spl.pt.(1).x spl.pt.(1).y 
       spl.pt.(2).x spl.pt.(2).y 
       spl.pt.(3).x spl.pt.(3).y ;
     
-    if spl.click && ct#in_stroke drag_pt.x drag_pt.y
+    if spl.click && Cairo.in_stroke cr drag_pt.x drag_pt.y
     then spl.active <- 0xf ;
 
-    ct#stroke ;
+    Cairo.stroke cr ;
 
-    draw_control_line ct spl.pt.(0) spl.pt.(1) (2. /. spl.zoom) ;
-    draw_control_line ct spl.pt.(3) spl.pt.(2) (2. /. spl.zoom) ;
+    draw_control_line cr spl.pt.(0) spl.pt.(1) (2. /. spl.zoom) ;
+    draw_control_line cr spl.pt.(3) spl.pt.(2) (2. /. spl.zoom) ;
 
     for i=0 to 3 do
-      ct#save ; begin
-	ct#set_rgb_color 1. 0. 0. ;
-	ct#set_alpha 0.5 ;
-	ct#new_path ;
-	ct#arc 
+      Cairo.save cr ; begin
+	Cairo.set_rgb_color cr 1. 0. 0. ;
+	Cairo.set_alpha cr 0.5 ;
+	Cairo.new_path cr ;
+	Cairo.arc cr 
 	  spl.pt.(i).x spl.pt.(i).y
 	  (spl.line_width /. 1.25)
 	  0. two_pi ;
-	if spl.click && ct#in_fill drag_pt.x drag_pt.y
+	if spl.click && Cairo.in_fill cr drag_pt.x drag_pt.y
 	then begin
 	  spl.active <- 1 lsl i ;
 	  spl.click <- false
 	end ;
-	ct#fill end ;
-      ct#restore
+	Cairo.fill cr end ;
+      Cairo.restore cr
     done end ;
-  ct#restore
+  Cairo.restore cr
 	  
 
 let refresh spl =
-  let ct = Ocairo_lablgtk.cairo ~target:spl.pm#pixmap () in
+  let cr = Cairo_lablgtk.create ~target:spl.pm#pixmap () in
   spl.pm#rectangle ~x:0 ~y:0 
     ~width:spl.width ~height:spl.height ~filled:true () ;
-  ct#set_rgb_color 0. 0. 0. ;
-  ct#set_line_width spl.line_width ;
-  ct#set_line_cap spl.line_cap ;
-  ct#translate spl.xtrans spl.ytrans ;
-  ct#scale spl.zoom spl.zoom ;
-  ct#set_tolerance spl.tolerance ;
+  Cairo.set_rgb_color cr 0. 0. 0. ;
+  Cairo.set_line_width cr spl.line_width ;
+  Cairo.set_line_cap cr spl.line_cap ;
+  Cairo.translate cr spl.xtrans spl.ytrans ;
+  Cairo.scale cr spl.zoom spl.zoom ;
+  Cairo.set_tolerance cr spl.tolerance ;
 
-  try draw_spline ct spl
-  with Ocairo.Error _ ->
+  try draw_spline cr spl
+  with Cairo.Error _ ->
     prerr_endline "Cairo is unhappy"
-
 
 let trans_horiz_cb dir spl =
   let delta = float spl.width /. 16. in

@@ -28,7 +28,7 @@ class cairo obj =
 
     method connect = new cairo_signals obj
     method event = new GObj.event_ops obj
-    method cairo = new Ocairo.cairo (get_cairo obj)
+    method cairo = get_cairo obj
     method queue_draw =
       GtkBase.Widget.queue_draw obj
   end
