@@ -72,11 +72,7 @@ ml_cairo_set_target_ps(value v_cr, value v_file, value v_width_inches,
   return Val_unit;
 }
 #else
-CAMLprim value
-ml_cairo_set_target_ps(value v_cr, value v_file, value v_width_inches,
-		       value v_height_inches, value v_x_pixels_per_inch,
-		       value v_y_pixels_per_inch)
-{ failwith("Cairo library does not support this backend") ; return Val_unit; }
+Unsupported(ml_cairo_set_target_ps)
 #endif /* CAIRO_HAS_PS_SURFACE */
 ML_bc6(cairo_set_target_ps)
 
@@ -932,9 +928,7 @@ ml_cairo_image_surface_create_for_data(value img)
 #ifdef CAIRO_HAS_PS_SURFACE
 ML_5(cairo_ps_surface_create, FILE_val, Double_val, Double_val, Double_val, Double_val, Val_cairo_surface_t)
 #else
-CAMLprim value 
-ml_cairo_ps_surface_create(value v1, value v2, value v3, value v4, value v5)
-{ failwith("Cairo library does not support this backend") ; return Val_unit; }
+Unsupported(ml_cairo_ps_surface_create)
 #endif /* CAIRO_HAS_PS_SURFACE */
 
 ML_0(cairo_matrix_create, Val_cairo_matrix_t)
@@ -1031,10 +1025,6 @@ ml_cairo_set_target_png(value v_cr, value v_file, value v_format,
 }
 ML_4(cairo_png_surface_create, FILE_val, cairo_format_t_val, Double_val, Double_val, Val_cairo_surface_t)
 #else
-CAMLprim value
-ml_cairo_set_target_png(value v_cr, value v_file, value v_format,
-			value v_width, value v_height)
-{ failwith("Cairo library does not support this backend") ; return Val_unit; }
-ml_cairo_png_surface_create(value v1, value v2, value v3, value v4, value v5)
-{ failwith("Cairo library does not support this backend") ; return Val_unit; }
+Unsupported(ml_cairo_set_target_png)
+Unsupported(ml_cairo_png_surface_create)
 #endif /* CAIRO_HAS_PNG_SURFACE */

@@ -27,6 +27,9 @@ static inline value Val_ptr(void *p)
 #define Ignore(x)
 #define Unit(x) ((x), Val_unit)
 
+#define Unsupported(fun) \
+CAMLprim value fun() { failwith("Unsupported backend"); return Val_unit; }
+
 #define ML_0(cname, conv) \
 CAMLprim value ml_##cname (value unit) { return conv (cname ()); }
 #define ML_1(cname, conv1, conv) \

@@ -116,12 +116,7 @@ cairo_lablgtk_set_target_drawable(value cr, value d)
 
 #else
 
-CAMLprim value
-cairo_lablgtk_surface_create_for_drawable(value d, value fmt)
-{ failwith("Cairo library does not support this backend") ; return Val_unit; }
- 
-CAMLprim value
-cairo_lablgtk_set_target_drawable(value cr, value d)
-{ failwith("Cairo library does not support this backend") ; return Val_unit; }
+Unsupported(cairo_lablgtk_surface_create_for_drawable)
+Unsupported(cairo_lablgtk_set_target_drawable)
 
 #endif /* CAIRO_HAS_XLIB_SURFACE */
