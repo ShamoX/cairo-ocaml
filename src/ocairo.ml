@@ -30,7 +30,7 @@ type fill_rule = Cairo.fill_rule = FILL_RULE_WINDING | FILL_RULE_EVEN_ODD
 type line_cap = Cairo.line_cap = LINE_CAP_BUTT | LINE_CAP_ROUND | LINE_CAP_SQUARE
 type line_join = Cairo.line_join = LINE_JOIN_MITER | LINE_JOIN_ROUND | LINE_JOIN_BEVEL
 
-type glyph = Cairo.glyph = { index : int; x : float; y : float; }
+type glyph = Cairo.glyph = { index : int; glyph_x : float; glyph_y : float; }
 type font_extents = Cairo.font_extents = {
   ascent : float;
   descent : float;
@@ -118,6 +118,7 @@ class cairo cairo =
 
     method new_path = Cairo.new_path c
     method move_to x y = Cairo.move_to c x y
+    method move_to_point p = Cairo.move_to_point c p
     method line_to x y = Cairo.line_to c x y
     method curve_to x1 y1 x2 y2 x3 y3 = Cairo.curve_to c x1 y1 x2 y2 x3 y3
     method arc xc yc rad a1 a2 = Cairo.arc c xc yc rad a1 a2

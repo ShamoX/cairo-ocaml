@@ -98,6 +98,7 @@ external inverse_transform_distance :
   cr:t -> point -> unit = "ml_cairo_inverse_transform_distance"
 external new_path : cr:t -> unit = "ml_cairo_new_path"
 external move_to : cr:t -> x:float -> y:float -> unit = "ml_cairo_move_to"
+let move_to_point ~cr { x = x ; y = y } = move_to ~cr ~x ~y
 external line_to : cr:t -> x:float -> y:float -> unit = "ml_cairo_line_to"
 external curve_to :
   cr:t -> x1:float -> y1:float -> x2:float -> y2:float -> x3:float ->
@@ -127,7 +128,7 @@ external in_stroke : cr:t -> x:float -> y:float -> bool = "ml_cairo_in_stroke"
 external in_fill : cr:t -> x:float -> y:float -> bool = "ml_cairo_in_fill"
 external clip : cr:t -> unit = "ml_cairo_clip"
 type font
-type glyph = { index : int; x : float; y : float }
+type glyph = { index : int; glyph_x : float; glyph_y : float; }
 type font_extents =
   { ascent : float;
     descent : float;

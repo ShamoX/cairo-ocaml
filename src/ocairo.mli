@@ -35,7 +35,7 @@ type line_join = Cairo.line_join =
     LINE_JOIN_MITER
   | LINE_JOIN_ROUND
   | LINE_JOIN_BEVEL
-type glyph = Cairo.glyph = { index : int; x : float; y : float; }
+type glyph = Cairo.glyph = { index : int; glyph_x : float; glyph_y : float; }
 type font_extents =
   Cairo.font_extents = {
   ascent : float;
@@ -94,6 +94,7 @@ class cairo :
     method matrix : matrix
     method miter_limit : float
     method move_to : float -> float -> unit
+    method move_to_point : point -> unit
     method new_path : unit
     method operator : Cairo.operator
     method rectangle : float -> float -> float -> float -> unit

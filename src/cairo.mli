@@ -110,6 +110,7 @@ external inverse_transform_distance : cr:t -> point -> unit
 
 external new_path : cr:t -> unit = "ml_cairo_new_path"
 external move_to : cr:t -> x:float -> y:float -> unit = "ml_cairo_move_to"
+val move_to_point : cr:t -> point -> unit
 external line_to : cr:t -> x:float -> y:float -> unit = "ml_cairo_line_to"
 external curve_to :
   cr:t ->
@@ -157,7 +158,7 @@ external clip : cr:t -> unit = "ml_cairo_clip"
 (** {3 Text API} *)
 
 type font
-type glyph = { index : int; x : float; y : float; }
+type glyph = { index : int; glyph_x : float; glyph_y : float; }
 type font_extents = {
   ascent : float;
   descent : float;
