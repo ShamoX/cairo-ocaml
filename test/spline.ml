@@ -17,6 +17,7 @@ type spl = {
     mutable active       : int ;
     mutable width        : int ;
     mutable height       : int ;
+    mutable need_update  : bool ;
   }
 
 
@@ -53,6 +54,7 @@ let init_spl () =
    active = 0 ;
    width = width ;
    height = height ;
+   need_update = true ;
  }
 
 
@@ -106,7 +108,7 @@ let draw_spline cr spl =
   Cairo.restore cr
 	  
 
-let refresh spl =
+let paint spl =
   let cr = Cairo_lablgtk.create ~target:spl.pm#pixmap () in
   spl.pm#rectangle ~x:0 ~y:0 
     ~width:spl.width ~height:spl.height ~filled:true () ;
@@ -117,7 +119,7 @@ let refresh spl =
   Cairo.scale cr spl.zoom spl.zoom ;
   Cairo.set_tolerance cr spl.tolerance ;
 
-  try draw_spline cr spl
+  try draw_spline cr spl ; spl.need_update <- false
   with Cairo.Error _ ->
     prerr_endline "Cairo is unhappy"
 
@@ -194,15 +196,22 @@ let keybindings = [
 		  "Narrow line width") ;
 ]
 
+let refresh da spl =
+  spl.need_update <- true ;
+  GtkBase.Widget.queue_draw da#as_widget
+
 let grow_pixmap spl =
   spl.pm <- new_pixmap spl.width spl.height ;
-  refresh spl
+  spl.need_update <- true 
+  (* no need to queue a redraw here, an expose 
+     event should follow the configure, right ? *)
 
 let config_cb spl ev =
-  let module EC = GdkEvent.Configure in
-  let has_grown = EC.width ev > spl.width || EC.height ev > spl.height in
-  spl.width <- EC.width ev ;
-  spl.height <- EC.height ev ;
+  let w = GdkEvent.Configure.width ev in
+  let h = GdkEvent.Configure.height ev in
+  let has_grown = w > spl.width || h > spl.height in
+  spl.width <- w ;
+  spl.height <- h ;
   if has_grown
   then grow_pixmap spl ;
   true
@@ -215,12 +224,10 @@ let expose da spl x y width height =
 let expose_cb da spl ev =
   let area = GdkEvent.Expose.area ev in
   let module GR = Gdk.Rectangle in
+  if spl.need_update then paint spl ;
   expose da spl (GR.x area) (GR.y area) (GR.width area) (GR.height area) ;
   true
 
-let refresh_and_expose da spl =
-  refresh spl ;
-  expose da spl 0 0 spl.width spl.height
 
 
 let key_press_cb da spl ev =
@@ -228,8 +235,7 @@ let key_press_cb da spl ev =
     let (_, cb, _) =
       List.assoc (GdkEvent.Key.keyval ev) keybindings in
     let need_refresh = cb spl in
-    if need_refresh 
-    then refresh_and_expose da spl ;
+    if need_refresh then refresh da spl ;
     true
   with Not_found -> false
 
@@ -239,12 +245,10 @@ let button_ev da spl ev =
       spl.click <- true ;
       spl.drag_pt.x <- GdkEvent.Button.x ev ;
       spl.drag_pt.y <- GdkEvent.Button.y ev ;
-      refresh_and_expose da spl ;
       true
   | `BUTTON_RELEASE -> 
       spl.click  <- false ;
       spl.active <- 0 ;
-      refresh_and_expose da spl ;
       true
   | _ -> false
 
@@ -260,28 +264,14 @@ let motion_notify_cb da spl ev =
   done ;
   spl.drag_pt.x <- x ;
   spl.drag_pt.y <- y ;
-  refresh_and_expose da spl ;
+  refresh da spl ;
   true
 
 
 let init spl packing =
   let da = GMisc.drawing_area ~width:spl.width ~height:spl.height ~packing () in
   da#misc#set_can_focus true ;
-  begin
-    let timeout = ref None in
-    da#misc#connect#realize
-      (fun () ->
-	timeout := Some
-	    (Glib.Timeout.add 20 
-	       (fun () -> da#misc#pointer ; true))) ;
-    da#misc#connect#unrealize
-      (fun () ->
-	match !timeout with
-	| None -> ()
-	| Some id ->
-	    Glib.Timeout.remove id)
-  end ;
-  da#event#add [ `KEY_PRESS ; `POINTER_MOTION_HINT ; 
+  da#event#add [ `KEY_PRESS ;
 		 `BUTTON_MOTION ;
 		 `BUTTON_PRESS ; `BUTTON_RELEASE ] ;
   da#event#connect#expose         (expose_cb da spl) ;
@@ -289,8 +279,7 @@ let init spl packing =
   da#event#connect#button_press   (button_ev da spl) ;
   da#event#connect#button_release (button_ev da spl) ;
   da#event#connect#motion_notify  (motion_notify_cb da spl) ; 
-  da#event#connect#key_press      (key_press_cb da spl) ;
-  refresh spl
+  da#event#connect#key_press      (key_press_cb da spl)
 
 let show_help kb =
   Format.printf "@[<v>" ;
