@@ -1,3 +1,10 @@
+2004-11-08  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* configure.ac: require Cairo 0.2.0
+
+	* src/ml_cairo.c (ml_cairo_current_font): do not increase the
+	refcount.
+
 2004-11-01  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/cairo.ml, src/cairo.mli, src/ml_cairo.c: use int instead of

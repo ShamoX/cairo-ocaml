@@ -677,7 +677,6 @@ ml_cairo_current_font (value cr)
 {
   cairo_font_t *f = cairo_current_font (cairo_t_val (cr));
   check_cairo_status (cr);
-  cairo_font_reference (f);
   return Val_cairo_font_t (f);
 }
 
