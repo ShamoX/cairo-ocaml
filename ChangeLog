@@ -1,3 +1,8 @@
+2004-07-06  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/cairo_gtkcairo.ml, src/cairo_gtkcairo.mli: the signal is now
+	"paint" 
+
 2004-06-18  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/cairo.mli: doc formatting

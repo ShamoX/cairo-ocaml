@@ -62,7 +62,7 @@ let main =
   let button = GButton.check_button ~label:"Animate" 
       ~packing:b#pack () in
 
-  cairo#connect#redraw (redraw cairo slider) ;
+  cairo#connect#paint (redraw cairo slider) ;
   slider#connect#value_changed 
     (slider_changed cairo) ;
   button#connect#toggled (animate_toggled button slider) ;

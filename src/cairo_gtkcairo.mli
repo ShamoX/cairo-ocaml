@@ -7,7 +7,7 @@ class cairo_signals :
   [> gtkcairo ] Gtk.obj ->
   object
     inherit GObj.widget_signals
-    method redraw : callback:(Cairo.t -> unit) -> GtkSignal.id
+    method paint : callback:(Cairo.t -> unit) -> GtkSignal.id
   end
 
 class cairo :

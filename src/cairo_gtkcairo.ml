@@ -6,11 +6,11 @@ let init = gtkcairo_init ()
 
 external get_cairo : [>`gtkcairo] Gtk.obj -> Cairo.t = "ml_cairo_gtkcairo_get_cairo"
 
-let redraw_sig = {
-  GtkSignal.name       = "redraw" ;
+let paint_sig = {
+  GtkSignal.name       = "paint" ;
   GtkSignal.classe     = `gtkcairo ;
   GtkSignal.marshaller = 
-  let m = GtkSignal.marshal1 Gobject.Data.pointer "GtkCairo::redraw" in
+  let m = GtkSignal.marshal1 Gobject.Data.pointer "GtkCairo::paint" in
   fun cb ->
     m (function 
       | None -> raise Gpointer.Null 
@@ -19,7 +19,7 @@ let redraw_sig = {
 class cairo_signals obj = 
   object (self)
     inherit GObj.widget_signals_impl obj
-    method redraw = self#connect redraw_sig
+    method paint = self#connect paint_sig
   end
 
 class cairo obj = 
