@@ -77,6 +77,7 @@ ml_cairo_set_target_ps(value v_cr, value v_file, value v_width_inches,
   check_cairo_status(v_cr);
   return Val_unit;
 }
+ML_bc6(cairo_set_target_ps)
 
 static inline cairo_operator_t
 cairo_operator_t_val(value _v)
@@ -427,6 +428,7 @@ ml_cairo_curve_to(value v_cr, value v_x1, value v_y1, value v_x2, value v_y2,
   check_cairo_status(v_cr);
   return Val_unit;
 }
+ML_bc7(cairo_curve_to)
 
 CAMLprim value
 ml_cairo_arc(value v_cr, value v_xc, value v_yc, value v_radius,
@@ -437,6 +439,7 @@ ml_cairo_arc(value v_cr, value v_xc, value v_yc, value v_radius,
   check_cairo_status(v_cr);
   return Val_unit;
 }
+ML_bc6(cairo_arc)
 
 CAMLprim value
 ml_cairo_arc_negative(value v_cr, value v_xc, value v_yc, value v_radius,
@@ -448,6 +451,7 @@ ml_cairo_arc_negative(value v_cr, value v_xc, value v_yc, value v_radius,
   check_cairo_status(v_cr);
   return Val_unit;
 }
+ML_bc6(cairo_arc_negative)
 
 CAMLprim value
 ml_cairo_rel_move_to(value v_cr, value v_dx, value v_dy)
@@ -475,6 +479,7 @@ ml_cairo_rel_curve_to(value v_cr, value v_dx1, value v_dy1, value v_dx2,
   check_cairo_status(v_cr);
   return Val_unit;
 }
+ML_bc7(cairo_rel_curve_to)
 
 CAMLprim value
 ml_cairo_rectangle(value v_cr, value v_x, value v_y, value v_width,
