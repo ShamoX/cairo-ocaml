@@ -21,7 +21,7 @@ lablgtk.opt : cairo_lablgtk.cmxa dllmlcairo_lablgtk.so
 gtkcairo     : gtkcairo.cma  libmlgtkcairo.a
 gtkcairo.opt : gtkcairo.cmxa dllmlgtkcairo.so
 
-cairo_SRC = cairo_channel.mli cairo.mli cairo.ml \
+cairo_SRC = cairo_channel.mli cairo_channel.ml cairo.mli cairo.ml \
             cairo_bigarray.mli cairo_bigarray.ml \
 	    cairo_ft.mli cairo_ft.ml \
             ml_cairo_wrappers.c \

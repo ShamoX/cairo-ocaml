@@ -3,7 +3,7 @@ all opt doc install clean :
 	$(MAKE) -C src $@
 
 
-VERSION = 0.2
+VERSION = 0.3
 DISTSRC = aclocal.m4 config.make.in configure configure.ac Makefile Makefile.rules \
           doc support/install-sh support/ocaml.m4 \
           src/*.ml src/*.mli src/*.c src/*.h src/Makefile src/.depend_c \
