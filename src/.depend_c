@@ -1,0 +1,3 @@
+ml_cairo.o: ml_cairo_wrappers.h ml_cairo_channel.h ml_cairo_status.h ml_cairo.h
+ml_cairo_channel.o: ml_cairo_wrappers.h caml_io.h ml_cairo_channel.h
+ml_cairo_lablgtk.o: ml_cairo_status.h ml_cairo.h 
