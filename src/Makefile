@@ -58,6 +58,8 @@ $(call cobjs,$(lablgtk_SRC))  : CPPFLAGS+=$(GDK_CFLAGS) -I$(C_LABLGTKDIR)
 $(call cobjs,$(gtkcairo_SRC)) : CPPFLAGS+=$(GTKCAIRO_CFLAGS) -I$(C_LABLGTKDIR)
 $(call mlobjs,$(lablgtk_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
 $(call mlobjs,$(gtkcairo_SRC)) : INCFLAGS=-I $(LABLGTKDIR)
+$(call mlintfs,$(lablgtk_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
+$(call mlintfs,$(gtkcairo_SRC)) : INCFLAGS=-I $(LABLGTKDIR)
 $(call mloptobjs,$(lablgtk_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
 $(call mloptobjs,$(gtkcairo_SRC)) : INCFLAGS=-I $(LABLGTKDIR)
 
@@ -93,6 +95,6 @@ clean :
 -include .depend
 include .depend_c
 
-.PHONY : cairo lablgtk gtkcairo
+.PHONY : cairo lablgtk gtkcairo doc
 
 include ../Makefile.rules

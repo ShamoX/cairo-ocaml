@@ -24,5 +24,6 @@ GTKCAIRO_CFLAGS = @GTKCAIRO_CFLAGS@
 GTKCAIRO_LIBS   = $(filter-out $(FILT),@GTKCAIRO_LIBS@)
 
 cobjs     = $(patsubst %.c, %.o, $(filter %.c,$(1)))
+mlintfs   = $(patsubst %.mli, %.cmi, $(filter %.mli,$(1)))
 mlobjs    = $(patsubst %.ml, %.cmo, $(filter %.ml,$(1)))
 mloptobjs = $(patsubst %.ml, %.cmx, $(filter %.ml,$(1)))
