@@ -120,11 +120,13 @@ external new_path : cr:t -> unit = "ml_cairo_new_path"
 external move_to : cr:t -> x:float -> y:float -> unit = "ml_cairo_move_to"
 val move_to_point : cr:t -> point -> unit
 external line_to : cr:t -> x:float -> y:float -> unit = "ml_cairo_line_to"
+val line_to_point : cr:t -> point -> unit
 external curve_to :
   cr:t ->
   x1:float ->
   y1:float -> x2:float -> y2:float -> x3:float -> y3:float -> unit
   = "ml_cairo_curve_to_bc" "ml_cairo_curve_to"
+val curve_to_point : cr:t -> point -> point -> point -> unit
 external arc :
   cr:t ->
   xc:float ->

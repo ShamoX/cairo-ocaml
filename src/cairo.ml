@@ -101,9 +101,11 @@ external new_path : cr:t -> unit = "ml_cairo_new_path"
 external move_to : cr:t -> x:float -> y:float -> unit = "ml_cairo_move_to"
 let move_to_point ~cr { x = x ; y = y } = move_to ~cr ~x ~y
 external line_to : cr:t -> x:float -> y:float -> unit = "ml_cairo_line_to"
+let line_to_point ~cr { x = x ; y = y } = line_to ~cr ~x ~y
 external curve_to :
   cr:t -> x1:float -> y1:float -> x2:float -> y2:float -> x3:float ->
     y3:float -> unit = "ml_cairo_curve_to_bc" "ml_cairo_curve_to"
+let curve_to_point ~cr {x=x1; y=y1} {x=x2; y=y2} {x=x3; y=y3} = curve_to ~cr ~x1 ~y1 ~x2 ~y2 ~x3 ~y3
 external arc :
   cr:t -> xc:float -> yc:float -> radius:float -> angle1:float ->
     angle2:float -> unit = "ml_cairo_arc_bc" "ml_cairo_arc"
