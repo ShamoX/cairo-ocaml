@@ -7,13 +7,16 @@ let redraw w range cr =
   let { Gtk.width = width ; Gtk.height = height } =
     w#misc#allocation in
   let box_size = float (width + height) /. 6. in
-  Cairo.default_matrix cr ;
-  let off = float width /. 2. in
-  Cairo.translate cr off off ;
-  Cairo.rotate cr range#adjustment#value ;
-  Cairo.rectangle cr (~-. box_size) (~-. box_size) box_size box_size ;
-  Cairo.set_rgb_color cr 1. 1. 1. ;
-  Cairo.fill cr
+
+  Cairo.save cr ; begin
+    Cairo.default_matrix cr ;
+    let off = float width /. 2. in
+    Cairo.translate cr off off ;
+    Cairo.rotate cr range#adjustment#value ;
+    Cairo.rectangle cr (~-. box_size) (~-. box_size) box_size box_size ;
+    Cairo.set_rgb_color cr 1. 0. 0. ;
+    Cairo.fill cr end ;
+  Cairo.restore cr
 
 let slider_changed cr () =
   cr#queue_draw

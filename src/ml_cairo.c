@@ -1108,7 +1108,7 @@ ml_cairo_surface_finalise(value s)
 {
   cairo_surface_t *surf = cairo_surface_t_val(s);
   cairo_surface_destroy(surf);
-  cairo_surface_t_val(s) = NULL;
+  Store_pointer(s, NULL);
   return Val_unit;
 }
 

@@ -1,3 +1,10 @@
+2004-06-18  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/cairo.mli: doc formatting
+
+	* src/ml_cairo.c, src/ml_cairo_wrappers.h: silence compiler
+	warnings 
+
 2004-04-16  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/cairo.ml, src/cairo.mli: support patterns 

@@ -1,4 +1,5 @@
 #define Pointer_val(val) ((void*)Field(val,1))
+#define Store_pointer(val, p) (Field(val, 1)=Val_bp(p))
 
 #define Make_Val_final_pointer(type, init, final, adv) \
 static void ml_final_##type (value val) \

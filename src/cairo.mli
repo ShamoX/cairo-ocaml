@@ -267,6 +267,7 @@ external surface_set_filter : surface:surface -> filter:filter -> unit
 external surface_finalise : surface -> unit = "ml_cairo_surface_finalise"
 
 (** {4 Pattern functions} *)
+
 external pattern_create_for_surface : surface -> pattern = "ml_cairo_pattern_create_for_surface"
 
 external pattern_create_linear : x0:float -> y0:float -> x1:float -> y1:float -> pattern 
