@@ -1,7 +1,6 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk/gdkx.h>
 
-#include <cairo-xlib.h>
 #include <cairo.h>
 
 #include <caml/mlvalues.h>
@@ -73,6 +72,7 @@ cairo_lablgtk_shuffle_pixels(value pb)
 }
 
 
+#ifdef CAIRO_HAS_XLIB_BACKEND
 CAMLprim value
 cairo_lablgtk_surface_create_for_drawable(value d, value fmt)
 {
@@ -115,3 +115,15 @@ cairo_lablgtk_set_target_drawable(value cr, value d)
 
   return Val_unit;
 }
+
+#else
+
+CAMLprim value
+cairo_lablgtk_surface_create_for_drawable(value d, value fmt)
+{ failwith("Cairo library does not support this backend") ; return Val_unit; }
+ 
+CAMLprim value
+cairo_lablgtk_set_target_drawable(value cr, value d)
+{ failwith("Cairo library does not support this backend") ; return Val_unit; }
+
+#endif /* CAIRO_HAS_XLIB_BACKEND */
