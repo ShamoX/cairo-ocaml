@@ -243,3 +243,13 @@ external matrix_transform_point :
   matrix:matrix -> point -> unit = "ml_cairo_matrix_transform_point"
 external finalise_target : cr:t -> unit = "ml_cairo_finalise_target"
 external surface_finalise : surface -> unit = "ml_cairo_surface_finalise"
+
+type flat_path = [
+  | `MOVE_TO of point
+  | `LINE_TO of point
+  | `CLOSE ]
+type basic_path = [
+  | flat_path
+  | `CURVE_TO of point * point * point ]
+external fold_current_path      : t -> ('a -> [> basic_path] -> 'a) -> 'a -> 'a = "ml_cairo_current_path"
+external fold_current_path_flat : t -> ('a -> [> flat_path] -> 'a) -> 'a -> 'a  = "ml_cairo_current_path_flat"

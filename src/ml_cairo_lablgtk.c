@@ -14,8 +14,6 @@
 #include "ml_cairo.h"
 #include "ml_cairo_status.h"
 
-#define cairo_t_val(v)  ((cairo_t *) Field((v), 1))
-
 CAMLprim value
 cairo_lablgtk_of_pixbuf(value pb)
 {

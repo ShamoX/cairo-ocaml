@@ -12,7 +12,7 @@
 #include "ml_cairo.h"
 
 Make_Val_final_pointer(cairo_t, Ignore, cairo_destroy, 20)
-#define cairo_t_val(v) ((cairo_t *)Pointer_val(v))
+
 Make_Val_final_pointer(cairo_surface_t, Ignore, cairo_surface_destroy, 20)
 #define cairo_surface_t_val(v) ((cairo_surface_t *)Pointer_val(v))
 Make_Val_final_pointer(cairo_matrix_t, Ignore, cairo_matrix_destroy, 100)

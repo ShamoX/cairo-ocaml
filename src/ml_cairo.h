@@ -1,3 +1,5 @@
+#define cairo_t_val(v) ((cairo_t *)Pointer_val(v))
+
 static inline cairo_format_t
 cairo_format_t_val(value _v)
 {

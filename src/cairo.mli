@@ -146,6 +146,16 @@ external fill : cr:t -> unit = "ml_cairo_fill"
 external in_stroke : cr:t -> x:float -> y:float -> bool = "ml_cairo_in_stroke"
 external in_fill : cr:t -> x:float -> y:float -> bool = "ml_cairo_in_fill"
 
+type flat_path = [
+  | `MOVE_TO of point
+  | `LINE_TO of point
+  | `CLOSE ]
+type basic_path = [
+  | flat_path
+  | `CURVE_TO of point * point * point ]
+external fold_current_path      : t -> ('a -> [> basic_path] -> 'a) -> 'a -> 'a = "ml_cairo_current_path"
+external fold_current_path_flat : t -> ('a -> [> flat_path] -> 'a) -> 'a -> 'a  = "ml_cairo_current_path_flat"
+
 (** {3 Misc stuff I don't know how to categorize} *)
 
 external show_surface :
