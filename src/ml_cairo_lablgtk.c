@@ -34,7 +34,7 @@ cairo_lablgtk_of_pixbuf(value pb)
 
   v = alloc_small(5, 0);
   Field(v, 0) = Val_bp(gdk_pixbuf_get_pixels(pixbuf));
-  Field(v, 1) = Val_int(format);
+  Field(v, 1) = Val_cairo_format_t(format);
   Field(v, 2) = Val_int(gdk_pixbuf_get_width(pixbuf));
   Field(v, 3) = Val_int(gdk_pixbuf_get_height(pixbuf));
   Field(v, 4) = Val_int(gdk_pixbuf_get_rowstride(pixbuf));
