@@ -1,3 +1,11 @@
+(**************************************************************************)
+(*  cairo-ocaml -- Objective Caml bindings for Cairo                      *)
+(*  Copyright © 2004-2005 Olivier Andrieu                                 *)
+(*                                                                        *)
+(*  This code is free software and is licensed under the terms of the     *)
+(*  GNU Lesser General Public License version 2.1 (the "LGPL").           *)
+(**************************************************************************)
+
 let animate_rotate_step = 0.05
 let animate_frame_delay = 40
 let rotate_max = 8. *. atan 1.
