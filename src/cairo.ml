@@ -241,5 +241,5 @@ external matrix_transform_distance :
   matrix:matrix -> point -> unit = "ml_cairo_matrix_transform_distance"
 external matrix_transform_point :
   matrix:matrix -> point -> unit = "ml_cairo_matrix_transform_point"
-external finalise_target_ps : cr:t -> unit = "ml_cairo_finalise_target_ps"
-external ps_surface_finalise : surface -> unit = "ml_cairo_ps_surface_finalise"
+external finalise_target : cr:t -> unit = "ml_cairo_finalise_target"
+external surface_finalise : surface -> unit = "ml_cairo_surface_finalise"

@@ -19,7 +19,9 @@ static inline value Val_ptr(void *p)
   return v;
 }
 
+#ifndef ARCH_ALIGN_DOUBLE
 #define Double_array_val(v)    ((double *)(v))
+#endif
 #define Double_array_length(v) (Wosize_val(v) / Double_wosize)
 
 #define Ignore(x)

@@ -5,7 +5,7 @@ all opt doc install clean :
 
 VERSION = 0.2
 DISTSRC = aclocal.m4 config.make.in configure configure.ac Makefile Makefile.rules \
-          doc support/install-sh support/install-sh support/ocaml.m4 \
+          doc support/install-sh support/ocaml.m4 \
           src/*.ml src/*.mli src/*.c src/*.h src/Makefile src/.depend_c \
           test/Makefile test/*.ml
 dist : doc

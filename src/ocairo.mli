@@ -85,7 +85,7 @@ class cairo :
     method default_matrix : unit
     method fill : unit
     method fill_rule : Cairo.fill_rule
-    method finalise_target_ps : cr:Cairo.t -> unit
+    method finalise_target : cr:Cairo.t -> unit
     method font_extents : Cairo.font_extents
     method get_cairo : Cairo.t
     method glyph_extents : glyph array -> text_extents
@@ -177,7 +177,7 @@ and surface :
     method set_filter : Cairo.filter -> unit
     method set_matrix : matrix -> unit
     method set_repeat : bool -> unit
-    method ps_finalise : unit
+    method finalise : unit
   end
 
 val cairo : unit -> cairo

@@ -275,8 +275,18 @@ ml_cairo_set_line_join(value v_cr, value v_line_join)
 CAMLprim value
 ml_cairo_set_dash(value cr, value d, value off)
 {
+#ifndef ARCH_ALIGN_DOUBLE
   cairo_set_dash(cairo_t_val(cr), Double_array_val(d),
 		 Double_array_length(d), Double_val(off));
+#else
+  int i, ndash = Double_array_length(d);
+  double *dashes = stat_alloc(ndash * sizeof (double));
+  for (i=0; i<ndash, i++)
+    dashes[i] = Double_field(d, i);
+  cairo_set_dash(cairo_t_val(cr), dashes, ndash, Double_val(off));
+  stat_free(dashes);
+#endif
+  check_cairo_status(cr);
   return Val_unit;
 }
 
@@ -993,14 +1003,14 @@ ml_cairo_matrix_transform_point(value m, value p)
 }
 
 CAMLprim value
-ml_cairo_finalise_target_ps(value cr)
+ml_cairo_finalise_target(value cr)
 {
   cairo_set_target_surface(cairo_t_val(cr), NULL);
   return Val_unit;
 }
 
 CAMLprim value
-ml_cairo_ps_surface_finalise(value s)
+ml_cairo_surface_finalise(value s)
 {
   cairo_surface_t *surf = cairo_surface_t_val(s);
   cairo_surface_destroy(surf);

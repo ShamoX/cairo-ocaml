@@ -40,7 +40,7 @@ external set_target_ps :
   height_inches:float ->
   x_pixels_per_inch:float -> y_pixels_per_inch:float -> unit
   = "ml_cairo_set_target_ps_bc" "ml_cairo_set_target_ps"
-external finalise_target_ps : cr:t -> unit = "ml_cairo_finalise_target_ps"
+external finalise_target : cr:t -> unit = "ml_cairo_finalise_target"
 
 (** {4 Renderer state} *)
 
@@ -244,6 +244,7 @@ type filter =
   | FILTER_BILINEAR
 external surface_set_filter : surface:surface -> filter:filter -> unit
   = "ml_cairo_surface_set_filter"
+external surface_finalise : surface -> unit = "ml_cairo_surface_finalise"
 
 (** {4 Image surface} *)
 
@@ -261,7 +262,6 @@ external ps_surface_create :
   height_inches:float ->
   x_pixels_per_inch:float -> y_pixels_per_inch:float -> surface
   = "ml_cairo_ps_surface_create"
-external ps_surface_finalise : surface -> unit = "ml_cairo_ps_surface_finalise"
 
 (** {3 Matrix API} *)
 
@@ -290,7 +290,7 @@ external matrix_transform_distance : matrix:matrix -> point -> unit
 external matrix_transform_point : matrix:matrix -> point -> unit
   = "ml_cairo_matrix_transform_point"
 
-(** {4 Font API}
+(** {3 Font API}
 
    Mostly unusable ATM. It needs other libraries (freetype2/fontconfig). 
 *)

@@ -6,7 +6,7 @@ unsigned long bigarray_byte_size(struct caml_bigarray *);
 CAMLprim value
 ml_bigarray_byte_size(value b)
 {
-  return Val_int(bigarray_byte_size(Bigarray_val(b)));
+  return Val_long(bigarray_byte_size(Bigarray_val(b)));
 }
 
 CAMLprim value

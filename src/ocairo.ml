@@ -82,7 +82,7 @@ class cairo cairo =
     method set_target_image   i = Cairo.set_target_image c i
     method set_target_ps chan w h xpi ypi =
       Cairo.set_target_ps c chan w h xpi ypi
-    method finalise_target_ps = Cairo.finalise_target_ps
+    method finalise_target = Cairo.finalise_target
 
     method current_point = Cairo.current_point c
     method set_operator o = Cairo.set_operator c o
@@ -203,7 +203,7 @@ and surface surf =
 	Cairo.surface_get_matrix s m#get_matrix ;
 	m
       method set_filter f = Cairo.surface_set_filter s f
-      method ps_finalise = Cairo.ps_surface_finalise s
+      method finalise = Cairo.surface_finalise s
     end
 
 let cairo () =

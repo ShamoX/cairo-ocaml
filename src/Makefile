@@ -83,7 +83,7 @@ endif
 endif
 doc: $(DOCFILES:%.mli=%.cmi)
 	mkdir -p ../doc/html
-	ocamldoc -v -html -d ../doc/html $(if $(LABLGTKDIR),-I $(LABLGTKDIR)) $(DOCFILES) 
+	ocamldoc -v -html -d ../doc/html -t Cairo-ocaml $(if $(LABLGTKDIR),-I $(LABLGTKDIR)) $(DOCFILES) 
 
 clean :
 	rm -f *.cm* *.o *.a *.so

@@ -13,15 +13,12 @@
 #include "caml_io.h"
 #include "ml_cairo_channel.h"
 
-CAMLprim value
-ml_FILE_of_channel(value v)
+static value ml_FILE_of_fd(int fd)
 {
-  struct channel *c = Channel(v);
   int new_fd;
   FILE *f;
 
-  flush(c);
-  new_fd = dup(c->fd);
+  new_fd = dup(fd);
   if (new_fd < 0)
     goto fail;
   f = fdopen(new_fd, "w");
@@ -34,21 +31,21 @@ fail:
 }
 
 CAMLprim value
+ml_FILE_of_channel(value v)
+{
+  struct channel *c = Channel(v);
+  flush(c);
+  return ml_FILE_of_fd (c->fd);
+}
+
+CAMLprim value
 ml_FILE_of_file_descr(value v)
 {
-  int new_fd;
-  FILE *f;
-
-  new_fd = dup(Int_val(v));
-  if (new_fd < 0)
-    goto fail;
-  f = fdopen(new_fd, "w");
-  if (!f)
-    goto fail;
-  return Val_ptr(f);
-
-fail:
-  raise_sys_error(copy_string(strerror(errno)));
+#ifndef _WIN32
+  return ml_FILE_of_fd (Int_val(v));
+#else
+  return failwith("unsupported");
+#endif
 }
 
 CAMLprim value

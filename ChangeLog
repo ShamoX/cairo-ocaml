@@ -1,3 +1,15 @@
+2004-02-22  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* Makefile, src/cairo.ml, src/cairo.mli, src/ocairo.ml,
+	src/ocairo.mli, src/ml_cairo.c,	src/ml_cairo_bigarr.c,
+	src/ml_cairo_channel.c, src/ml_cairo_wrappers.h:
+		* make the code safer for exotic archs (WIN32,
+		ARCH_ALIGN_DOUBLE)
+
+		* rename ps_finalise to finalise
+
+	* test/Makefile, test/demo.ml: added a translation of cairo-demo.c
+
 2003-12-17 02:15  Olivier Andrieu <oliv__a@users.sourceforge.net>
 
 	* configure.ac, src/cairo.ml, src/cairo.mli, src/ml_cairo.c,
