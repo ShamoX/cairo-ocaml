@@ -79,6 +79,8 @@ class cairo :
     method concat_matrix : matrix -> unit
     method copy : cairo
     method copy_page : unit
+    method current_path      : ('a -> [> Cairo.basic_path] -> 'a) -> 'a -> 'a
+    method current_path_flat : ('a -> [> Cairo.flat_path]  -> 'a) -> 'a -> 'a
     method current_point : point
     method curve_to :
       float -> float -> float -> float -> float -> float -> unit

@@ -137,6 +137,10 @@ class cairo cairo =
     method close_path = Cairo.close_path c
     method stroke = Cairo.stroke c
     method fill = Cairo.fill c
+    method current_path : 'a 'b. ('a -> ([> Cairo.basic_path] as 'b) -> 'a) -> 'a -> 'a =
+      Cairo.fold_current_path c
+    method current_path_flat : 'a 'b. ('a -> ([> Cairo.flat_path] as 'b) -> 'a) -> 'a -> 'a =
+      Cairo.fold_current_path_flat c
 
     method in_stroke x y = Cairo.in_stroke c x y
     method in_fill x y = Cairo.in_fill c x y
