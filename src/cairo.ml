@@ -31,6 +31,8 @@ external set_target_ps :
   cr:t -> file:Cairo_channel.t -> width_inches:float -> height_inches:float ->
     x_pixels_per_inch:float -> y_pixels_per_inch:float ->
     unit = "ml_cairo_set_target_ps_bc" "ml_cairo_set_target_ps"
+external set_target_png :
+  cr:t -> file:Cairo_channel.t -> format -> width:float -> height:float -> unit = "ml_cairo_set_target_png"
 type operator =
     OPERATOR_CLEAR
   | OPERATOR_SRC
@@ -218,6 +220,10 @@ external ps_surface_create :
   file:Cairo_channel.t -> width_inches:float -> height_inches:float ->
     x_pixels_per_inch:float -> y_pixels_per_inch:float ->
     surface = "ml_cairo_ps_surface_create"
+external png_surface_create :
+  file:Cairo_channel.t -> format -> width:float -> height:float ->
+    surface = "ml_cairo_png_surface_create"
+
 external matrix_create : unit -> matrix = "ml_cairo_matrix_create"
 external matrix_destroy : matrix:matrix -> unit = "ml_cairo_matrix_destroy"
 external matrix_copy :

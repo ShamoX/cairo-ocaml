@@ -1017,3 +1017,24 @@ ml_cairo_surface_finalise(value s)
   cairo_surface_t_val(s) = NULL;
   return Val_unit;
 }
+
+#ifdef CAIRO_HAS_PNG_SURFACE
+CAMLprim value
+ml_cairo_set_target_png(value v_cr, value v_file, value v_format,
+			value v_width, value v_height)
+{
+  cairo_set_target_png(cairo_t_val(v_cr), FILE_val(v_file),
+		       cairo_format_t_val(v_format),
+		       Double_val(v_width), Double_val(v_height));
+  check_cairo_status(v_cr);
+  return Val_unit;
+}
+ML_4(cairo_png_surface_create, FILE_val, cairo_format_t_val, Double_val, Double_val, Val_cairo_surface_t)
+#else
+CAMLprim value
+ml_cairo_set_target_png(value v_cr, value v_file, value v_format,
+			value v_width, value v_height)
+{ failwith("Cairo library does not support this backend") ; return Val_unit; }
+ml_cairo_png_surface_create(value v1, value v2, value v3, value v4, value v5)
+{ failwith("Cairo library does not support this backend") ; return Val_unit; }
+#endif /* CAIRO_HAS_PNG_SURFACE */

@@ -22,6 +22,12 @@ type surface
 type matrix
 type image
 
+type format = 
+  | FORMAT_ARGB32 
+  | FORMAT_RGB24 
+  | FORMAT_A8 
+  | FORMAT_A1
+
 (** {3 Core API} *)
 
 val create : unit -> t
@@ -40,6 +46,8 @@ external set_target_ps :
   height_inches:float ->
   x_pixels_per_inch:float -> y_pixels_per_inch:float -> unit
   = "ml_cairo_set_target_ps_bc" "ml_cairo_set_target_ps"
+external set_target_png :
+  cr:t -> file:Cairo_channel.t -> format -> width:float -> height:float -> unit = "ml_cairo_set_target_png"
 external finalise_target : cr:t -> unit = "ml_cairo_finalise_target"
 
 (** {4 Renderer state} *)
@@ -229,12 +237,6 @@ external current_target_surface : cr:t -> surface
 
 (** {3 Surface API} *)
 
-type format = 
-  | FORMAT_ARGB32 
-  | FORMAT_RGB24 
-  | FORMAT_A8 
-  | FORMAT_A1
-
 external surface_create_for_image : image -> surface
   = "ml_cairo_surface_create_for_image"
 external surface_create_similar :
@@ -272,6 +274,13 @@ external ps_surface_create :
   height_inches:float ->
   x_pixels_per_inch:float -> y_pixels_per_inch:float -> surface
   = "ml_cairo_ps_surface_create"
+
+(** {4 PNG surface} *)
+
+external png_surface_create :
+  file:Cairo_channel.t -> format -> width:float -> height:float ->
+    surface = "ml_cairo_png_surface_create"
+
 
 (** {3 Matrix API} *)
 

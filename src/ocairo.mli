@@ -132,6 +132,8 @@ class cairo :
     method set_pattern : surface -> unit
     method set_rgb_color : float -> float -> float -> unit
     method set_target_image : Cairo.image -> unit
+    method set_target_png :
+      Cairo_channel.t -> format -> float -> float -> unit
     method set_target_ps :
       Cairo_channel.t -> float -> float -> float -> float -> unit
     method set_target_surface : surface -> unit
@@ -189,3 +191,5 @@ val image_surface_create : Cairo.format -> int -> int -> surface
 
 val ps_surface_create :
   Cairo_channel.t -> float -> float -> float -> float -> surface
+val png_surface_create :
+  Cairo_channel.t -> format -> float -> float -> surface

@@ -82,6 +82,8 @@ class cairo cairo =
     method set_target_image   i = Cairo.set_target_image c i
     method set_target_ps chan w h xpi ypi =
       Cairo.set_target_ps c chan w h xpi ypi
+    method set_target_png chan f w h =
+      Cairo.set_target_png c chan f w h
     method finalise_target = Cairo.finalise_target
 
     method current_point = Cairo.current_point c
@@ -220,3 +222,5 @@ let image_surface_create f w h =
   new surface (Cairo.image_surface_create f w h)
 let ps_surface_create chan w h xpi ypi =
   new surface (Cairo.ps_surface_create chan w h xpi ypi)
+let png_surface_create chan f w h =
+  new surface (Cairo.png_surface_create chan f w h)
