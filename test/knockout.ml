@@ -58,7 +58,7 @@ let fill_checks c width height =
       Cairo.fill c end ;
     Cairo.restore c ;
 
-    Cairo.set_pattern c check ;
+    Cairo.set_pattern c (Cairo.pattern_create_for_surface check) ;
     rect_path c 0. 0. (float width) (float height) ;
     Cairo.fill c end ;
   Cairo.restore c

@@ -20,6 +20,7 @@ type point = { mutable x : float ; mutable y : float }
 type t
 type surface
 type matrix
+type pattern
 type image
 
 type format = 
@@ -73,7 +74,7 @@ external set_rgb_color :
   cr:t -> red:float -> green:float -> blue:float -> unit
   = "ml_cairo_set_rgb_color"
 external set_alpha : cr:t -> alpha:float -> unit = "ml_cairo_set_alpha"
-external set_pattern : cr:t -> pattern:surface -> unit
+external set_pattern : cr:t -> pattern:pattern -> unit
   = "ml_cairo_set_pattern"
 external set_tolerance : cr:t -> tolerance:float -> unit
   = "ml_cairo_set_tolerance"
@@ -156,6 +157,9 @@ external fill : cr:t -> unit = "ml_cairo_fill"
 external in_stroke : cr:t -> x:float -> y:float -> bool = "ml_cairo_in_stroke"
 external in_fill : cr:t -> x:float -> y:float -> bool = "ml_cairo_in_fill"
 
+external stroke_extents : cr:t -> float * float * float * float = "ml_cairo_stroke_extents"
+external fill_extents : cr:t -> float * float * float * float = "ml_cairo_fill_extents"
+
 type flat_path = [
   | `MOVE_TO of point
   | `LINE_TO of point
@@ -173,6 +177,7 @@ external show_surface :
   = "ml_cairo_show_surface"
 external copy_page : cr:t -> unit = "ml_cairo_copy_page"
 external show_page : cr:t -> unit = "ml_cairo_show_page"
+external init_clip : cr:t -> unit = "ml_cairo_init_clip"
 external clip : cr:t -> unit = "ml_cairo_clip"
 
 (** {3 Text API} *)
@@ -235,7 +240,7 @@ external current_matrix : cr:t -> matrix:matrix -> unit
   = "ml_cairo_current_matrix"
 external current_target_surface : cr:t -> surface
   = "ml_cairo_current_target_surface"
-
+external current_pattern : cr:t -> pattern = "ml_cairo_current_pattern"
 
 (** {3 Surface API} *)
 
@@ -256,9 +261,37 @@ type filter =
   | FILTER_BEST
   | FILTER_NEAREST
   | FILTER_BILINEAR
+  | FILTER_GAUSSIAN
 external surface_set_filter : surface:surface -> filter:filter -> unit
   = "ml_cairo_surface_set_filter"
 external surface_finalise : surface -> unit = "ml_cairo_surface_finalise"
+
+(** {4 Pattern functions} *)
+external pattern_create_for_surface : surface -> pattern = "ml_cairo_pattern_create_for_surface"
+
+external pattern_create_linear : x0:float -> y0:float -> x1:float -> y1:float -> pattern 
+  = "ml_cairo_pattern_create_linear"
+external pattern_create_radial : 
+  cx0:float -> cy0:float -> radius0:float ->
+  cx1:float -> cy1:float -> radius1:float -> pattern 
+  = "ml_cairo_pattern_create_radial_bc" "ml_cairo_pattern_create_radial"
+
+external pattern_add_color_stop : 
+  pattern -> offset:float -> 
+  red:float -> green:float -> blue:float -> alpha:float -> unit 
+  = "ml_cairo_pattern_add_color_stop_bc" "ml_cairo_pattern_add_color_stop"
+
+external pattern_set_matrix : pattern -> matrix -> unit = "ml_cairo_pattern_set_matrix"
+external pattern_get_matrix : pattern -> matrix -> unit = "ml_cairo_pattern_get_matrix"
+
+type extend =
+  | EXTEND_NONE
+  | EXTEND_REPEAT
+  | EXTEND_REFLECT
+external pattern_set_extend : pattern -> extend -> unit = "ml_cairo_pattern_set_extend"
+external pattern_get_extend : pattern -> extend = "ml_cairo_pattern_get_extend"
+external pattern_set_filter : pattern -> filter -> unit = "ml_cairo_pattern_set_filter"
+external pattern_get_filter : pattern -> filter = "ml_cairo_pattern_get_filter"
 
 (** {4 Image surface} *)
 

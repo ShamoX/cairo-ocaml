@@ -15,10 +15,14 @@ Make_Val_final_pointer(cairo_t, Ignore, cairo_destroy, 20)
 
 Make_Val_final_pointer(cairo_surface_t, Ignore, cairo_surface_destroy, 20)
 #define cairo_surface_t_val(v) ((cairo_surface_t *)Pointer_val(v))
+
 Make_Val_final_pointer(cairo_matrix_t, Ignore, cairo_matrix_destroy, 100)
 #define cairo_matrix_t_val(v) ((cairo_matrix_t *)Pointer_val(v))
-ML_0(cairo_create, Val_cairo_t)
 
+Make_Val_final_pointer(cairo_pattern_t, Ignore, cairo_pattern_destroy, 20)
+#define cairo_pattern_t_val(v) ((cairo_pattern_t *)Pointer_val(v))
+
+ML_0(cairo_create, Val_cairo_t)
 ML_1(cairo_destroy, cairo_t_val, Unit)
 
 CAMLprim value
@@ -75,6 +79,21 @@ ml_cairo_set_target_ps(value v_cr, value v_file, value v_width_inches,
 Unsupported(ml_cairo_set_target_ps)
 #endif /* CAIRO_HAS_PS_SURFACE */
 ML_bc6(cairo_set_target_ps)
+
+#ifdef CAIRO_HAS_PNG_SURFACE
+CAMLprim value
+ml_cairo_set_target_png(value v_cr, value v_file, value v_format,
+			value v_width, value v_height)
+{
+  cairo_set_target_png(cairo_t_val(v_cr), FILE_val(v_file),
+		       cairo_format_t_val(v_format),
+		       Double_val(v_width), Double_val(v_height));
+  check_cairo_status(v_cr);
+  return Val_unit;
+}
+#else
+Unsupported(ml_cairo_set_target_png)
+#endif /* CAIRO_HAS_PNG_SURFACE */
 
 static inline cairo_operator_t
 cairo_operator_t_val(value _v)
@@ -153,7 +172,7 @@ ml_cairo_set_alpha(value v_cr, value v_alpha)
 CAMLprim value
 ml_cairo_set_pattern(value v_cr, value v_pattern)
 {
-  cairo_set_pattern(cairo_t_val(v_cr), cairo_surface_t_val(v_pattern));
+  cairo_set_pattern(cairo_t_val(v_cr), cairo_pattern_t_val(v_pattern));
   check_cairo_status(v_cr);
   return Val_unit;
 }
@@ -558,9 +577,53 @@ ml_cairo_in_fill(value v_cr, value v_x, value v_y)
 }
 
 CAMLprim value
+ml_cairo_stroke_extents(value v_cr)
+{
+  double x1, y1, x2, y2;
+  cairo_stroke_extents(cairo_t_val(v_cr), &x1, &y1, &x2, &y2);
+  check_cairo_status(v_cr);
+  {
+    CAMLparam0();
+    CAMLlocal1(t);
+    t = alloc_tuple(4);
+    Store_field(t, 0, copy_double(x1));
+    Store_field(t, 1, copy_double(y1));
+    Store_field(t, 2, copy_double(x2));
+    Store_field(t, 3, copy_double(y2));
+    CAMLreturn(t);
+  }
+}
+
+CAMLprim value
+ml_cairo_fill_extents(value v_cr)
+{
+  double x1, y1, x2, y2;
+  cairo_fill_extents(cairo_t_val(v_cr), &x1, &y1, &x2, &y2);
+  check_cairo_status(v_cr);
+  {
+    CAMLparam0();
+    CAMLlocal1(t);
+    t = alloc_tuple(4);
+    Store_field(t, 0, copy_double(x1));
+    Store_field(t, 1, copy_double(y1));
+    Store_field(t, 2, copy_double(x2));
+    Store_field(t, 3, copy_double(y2));
+    CAMLreturn(t);
+  }
+}
+
+CAMLprim value
 ml_cairo_clip(value v_cr)
 {
   cairo_clip(cairo_t_val(v_cr));
+  check_cairo_status(v_cr);
+  return Val_unit;
+}
+
+CAMLprim value
+ml_cairo_init_clip(value v_cr)
+{
+  cairo_init_clip(cairo_t_val(v_cr));
   check_cairo_status(v_cr);
   return Val_unit;
 }
@@ -790,6 +853,16 @@ ml_cairo_current_rgb_color(value cr)
 }
 
 CAMLprim value
+ml_cairo_current_pattern(value v_cr)
+{
+  cairo_pattern_t *c_ret;
+  c_ret = cairo_current_pattern(cairo_t_val(v_cr));
+  check_cairo_status(v_cr);
+  cairo_pattern_reference(c_ret);
+  return Val_cairo_pattern_t(c_ret);
+}
+
+CAMLprim value
 ml_cairo_current_alpha(value v_cr)
 {
   double c_ret;
@@ -907,8 +980,29 @@ cairo_filter_t_val(value _v)
 {
   const cairo_filter_t _conv_tab[] =
     { CAIRO_FILTER_FAST, CAIRO_FILTER_GOOD, CAIRO_FILTER_BEST,
-CAIRO_FILTER_NEAREST, CAIRO_FILTER_BILINEAR, };
+      CAIRO_FILTER_NEAREST, CAIRO_FILTER_BILINEAR, 
+      CAIRO_FILTER_GAUSSIAN };
   return _conv_tab[Int_val(_v)];
+}
+static inline value
+Val_cairo_filter_t(cairo_filter_t _s)
+{
+  switch(_s) 
+    {
+    case CAIRO_FILTER_FAST:
+      return Val_int(0);
+    case CAIRO_FILTER_GOOD:
+      return Val_int(1);
+    case CAIRO_FILTER_BEST:
+      return Val_int(2);
+    case CAIRO_FILTER_NEAREST:
+      return Val_int(3);
+    case CAIRO_FILTER_BILINEAR:
+      return Val_int(4);
+    case CAIRO_FILTER_GAUSSIAN:
+      return Val_int(5);
+    }
+  return 0;
 }
 ML_2(cairo_surface_set_filter, cairo_surface_t_val, cairo_filter_t_val, Val_cairo_status_t)
 
@@ -930,6 +1024,12 @@ ML_5(cairo_ps_surface_create, FILE_val, Double_val, Double_val, Double_val, Doub
 #else
 Unsupported(ml_cairo_ps_surface_create)
 #endif /* CAIRO_HAS_PS_SURFACE */
+
+#ifdef CAIRO_HAS_PNG_SURFACE
+ML_4(cairo_png_surface_create, FILE_val, cairo_format_t_val, Double_val, Double_val, Val_cairo_surface_t)
+#else
+Unsupported(ml_cairo_png_surface_create)
+#endif /* CAIRO_HAS_PNG_SURFACE */
 
 ML_0(cairo_matrix_create, Val_cairo_matrix_t)
 ML_1(cairo_matrix_destroy, cairo_matrix_t_val, Unit)
@@ -1012,19 +1112,37 @@ ml_cairo_surface_finalise(value s)
   return Val_unit;
 }
 
-#ifdef CAIRO_HAS_PNG_SURFACE
-CAMLprim value
-ml_cairo_set_target_png(value v_cr, value v_file, value v_format,
-			value v_width, value v_height)
+ML_1 (cairo_pattern_create_for_surface, cairo_surface_t_val, Val_cairo_pattern_t)
+ML_4 (cairo_pattern_create_linear, Double_val, Double_val, Double_val, Double_val, Val_cairo_pattern_t)
+ML_6 (cairo_pattern_create_radial, Double_val, Double_val, Double_val, Double_val, Double_val, Double_val, Val_cairo_pattern_t)
+ML_bc6 (cairo_pattern_create_radial)
+ML_6 (cairo_pattern_add_color_stop, cairo_pattern_t_val, Double_val, Double_val, Double_val, Double_val, Double_val, Val_cairo_status_t)
+ML_bc6 (cairo_pattern_add_color_stop)
+ML_2(cairo_pattern_set_matrix, cairo_pattern_t_val, cairo_matrix_t_val, Val_cairo_status_t)
+ML_2(cairo_pattern_get_matrix, cairo_pattern_t_val, cairo_matrix_t_val, Val_cairo_status_t)
+
+static inline cairo_extend_t
+cairo_extend_t_val(value _v)
 {
-  cairo_set_target_png(cairo_t_val(v_cr), FILE_val(v_file),
-		       cairo_format_t_val(v_format),
-		       Double_val(v_width), Double_val(v_height));
-  check_cairo_status(v_cr);
-  return Val_unit;
+  const cairo_extend_t _conv_tab[] =
+    { CAIRO_EXTEND_NONE, CAIRO_EXTEND_REPEAT, CAIRO_EXTEND_REFLECT };
+  return _conv_tab[Int_val(_v)];
 }
-ML_4(cairo_png_surface_create, FILE_val, cairo_format_t_val, Double_val, Double_val, Val_cairo_surface_t)
-#else
-Unsupported(ml_cairo_set_target_png)
-Unsupported(ml_cairo_png_surface_create)
-#endif /* CAIRO_HAS_PNG_SURFACE */
+static inline value
+Val_cairo_extend_t(cairo_extend_t _s)
+{
+  switch (_s)
+    {
+    case CAIRO_EXTEND_NONE:
+      return Val_int(0);
+    case CAIRO_EXTEND_REPEAT:
+      return Val_int(1);
+    case CAIRO_EXTEND_REFLECT:
+      return Val_int(2);
+    }
+  return 0;
+}
+ML_2 (cairo_pattern_set_extend, cairo_pattern_t_val, cairo_extend_t_val, Val_cairo_status_t)
+ML_1 (cairo_pattern_get_extend, cairo_pattern_t_val, Val_cairo_extend_t)
+ML_2 (cairo_pattern_set_filter, cairo_pattern_t_val, cairo_filter_t_val, Val_cairo_status_t)
+ML_1 (cairo_pattern_get_filter, cairo_pattern_t_val, Val_cairo_filter_t)
