@@ -8,4 +8,5 @@ struct ml_cairo {
 #define Val_cairo_format_t(v) Val_int(v)
 
 value Val_cairo_surface_t (cairo_surface_t *);
+value Val_cairo_font_t (cairo_font_t *);
 value Val_cairo_t (cairo_t *);

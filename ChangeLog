@@ -1,3 +1,13 @@
+2004-11-01  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/cairo.ml, src/cairo.mli, src/ml_cairo.c: use int instead of
+	float for the width and height of the PNG target 
+
+	* src/cairo_ft.ml, src/cairo_ft.mli, src/ml_cairo_ft.c: minimal
+	support for freetype/fontconfig font backend.
+
+	* test/font.ml: example/test program
+
 2004-10-28  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/*.c: beautify code, run it through indent.

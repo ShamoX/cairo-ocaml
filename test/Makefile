@@ -2,13 +2,16 @@
 include ../config.make
 
 ifdef LABLGTKDIR
-TARGETS += text demo spline basket knockout
+TARGETS += text demo spline basket knockout font
 ifdef GTKCAIRO_CFLAGS
 TARGETS += cube
 endif
 endif
 
 all : $(TARGETS)
+
+font : font.ml
+	$(OCAMLOPT) -o $@ -I ../src cairo.cmxa $^
 
 text : text.ml
 	$(OCAMLOPT) -w s -o $@ -I ../src -I $(LABLGTKDIR) lablgtk.cmxa cairo.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^

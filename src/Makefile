@@ -23,9 +23,11 @@ gtkcairo.opt : gtkcairo.cmxa dllmlgtkcairo.so
 
 cairo_SRC = cairo_channel.mli cairo.mli cairo.ml \
             cairo_bigarray.mli cairo_bigarray.ml \
+	    cairo_ft.mli cairo_ft.ml \
             ml_cairo_wrappers.c \
 	    ml_cairo_status.c ml_cairo_channel.c \
-            ml_cairo.c ml_cairo_bigarr.c ml_cairo_path.c
+            ml_cairo.c ml_cairo_bigarr.c ml_cairo_path.c \
+	    ml_cairo_ft.c
 
 cairo.cma : $(call mlobjs,$(cairo_SRC))
 	$(OCAMLMKLIB) -o cairo -oc mlcairo $^ $(CAIRO_LIBS)
@@ -73,7 +75,7 @@ endif
           for lib in dll*.so ; do \
             ln -s $(INSTALLDIR)/$$lib $(DESTDIR)$(OCAMLLIB)/stublibs ; done ; fi
 
-DOCFILES = cairo_channel.mli cairo.mli cairo_bigarray.mli
+DOCFILES = cairo_channel.mli cairo.mli cairo_bigarray.mli cairo_ft.mli
 ifdef LABLGTKDIR
 DOCFILES += cairo_lablgtk.mli
 ifdef GTKCAIRO_CFLAGS
@@ -93,6 +95,9 @@ clean :
 
 -include .depend
 include .depend_c
+
+depend : .depend $(wildcard *.h *.c)
+	gcc -MM -isystem $(OCAMLLIB) -isystem $(C_LABLGTKDIR) $(patsubst -I%,-isystem %,$(GDK_CFLAGS)) $(filter %.c,$^) > .depend_c
 
 .PHONY : cairo lablgtk gtkcairo doc
 

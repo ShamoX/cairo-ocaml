@@ -28,6 +28,8 @@ static inline value Val_ptr(void *p)
 #endif
 #define Double_array_length(v) (Wosize_val(v) / Double_wosize)
 
+#define Option_val(v,conv,def) (Is_long(v) ? def : conv(Field((v),0)))
+
 #define Ignore(x)
 #define Unit(x) ((x), Val_unit)
 
