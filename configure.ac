@@ -8,7 +8,7 @@ AC_PROG_OCAML()
 AC_CHECK_OCAML_MODULE(lablgtk, LABLGTKDIR, Gobject, +lablgtk2 +lablgtk)
 
 # Check for cairo
-PKG_CHECK_MODULES(CAIRO, cairo >= 0.1.14)
+PKG_CHECK_MODULES(CAIRO, cairo >= 0.1.15)
 
 # Check for gdk-pixbuf
 PKG_CHECK_MODULES(GDK, cairo gdk-2.0 gdk-pixbuf-2.0)

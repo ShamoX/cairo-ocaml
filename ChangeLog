@@ -1,0 +1,8 @@
+2003-12-05  Carl Worth  <cworth@east.isi.edu>
+
+	* src/ml_cairo_lablgtk.c
+	(cairo_lablgtk_surface_create_for_drawable): Track cairo change
+	from CAIRO_HAS_XLIB_BACKEND to CAIRO_HAS_XLIB_SURFACE.
+
+	* configure.ac: Now depend on cairo >= 0.1.15
+

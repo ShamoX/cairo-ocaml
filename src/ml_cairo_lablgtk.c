@@ -73,7 +73,7 @@ cairo_lablgtk_shuffle_pixels(value pb)
 }
 
 
-#ifdef CAIRO_HAS_XLIB_BACKEND
+#ifdef CAIRO_HAS_XLIB_SURFACE
 CAMLprim value
 cairo_lablgtk_surface_create_for_drawable(value d, value fmt)
 {
@@ -127,4 +127,4 @@ CAMLprim value
 cairo_lablgtk_set_target_drawable(value cr, value d)
 { failwith("Cairo library does not support this backend") ; return Val_unit; }
 
-#endif /* CAIRO_HAS_XLIB_BACKEND */
+#endif /* CAIRO_HAS_XLIB_SURFACE */
