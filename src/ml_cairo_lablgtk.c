@@ -1,6 +1,7 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk/gdkx.h>
 
+#include <cairo-config.h>
 #include <cairo.h>
 
 #include <caml/mlvalues.h>
