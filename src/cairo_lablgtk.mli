@@ -1,3 +1,4 @@
+(** Support for the X11 backend, via LablGTK *)
 
 external image_of_pixbuf : GdkPixbuf.pixbuf -> Cairo.image = "cairo_lablgtk_of_pixbuf"
 external shuffle_pixels  : GdkPixbuf.pixbuf -> unit = "cairo_lablgtk_shuffle_pixels"

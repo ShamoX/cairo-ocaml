@@ -1,8 +1,19 @@
+2004-10-28  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/*.c: beautify code, run it through indent.
+
+	* src/ml_cairo.[ch]: direcly map enums to caml variants.
+
+	* configure.ac: do not fail if GTK+ is missing.
+
+	* test/spline.ml: do not use POINTER_MOTION_HINT, apparently
+	that's evil.
+	
 2004-10-18  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/cairo.ml, src/cairo.mli: s/ct/cr/
 
-	* src/ml_cairo_wrappers.[ch]: add comparsion and hash function for
+	* src/ml_cairo_wrappers.[ch]: add comparison and hash function for
 	custom values.
 
 	* src/cairo.{ml,mli}, src/ml_cairo.[ch], src/ml_cairo_status.[ch]:

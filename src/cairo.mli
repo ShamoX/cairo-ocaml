@@ -228,6 +228,7 @@ external show_glyphs : cr:t -> glyph array -> unit
 external current_font : cr:t -> font = "ml_cairo_current_font"
 external current_font_extents : cr:t -> font_extents
   = "ml_cairo_current_font_extents"
+external set_font : cr:t -> font:font -> unit = "ml_cairo_set_font"
 external text_extents : t -> utf8:string -> text_extents = "ml_cairo_text_extents"
 external glyph_extents : t -> glyph array -> text_extents = "ml_cairo_glyph_extents"
 external text_path : t -> utf8:string -> unit = "ml_cairo_text_path"
@@ -360,7 +361,6 @@ external matrix_transform_point : matrix:matrix -> point -> unit
    Mostly unusable ATM. It needs other libraries (freetype2/fontconfig). 
 *)
 
-external set_font : cr:t -> font:font -> unit = "ml_cairo_set_font"
 external font_set_transform : font:font -> matrix:matrix -> unit
   = "ml_cairo_font_set_transform"
 external font_current_transform : font:font -> matrix:matrix -> unit

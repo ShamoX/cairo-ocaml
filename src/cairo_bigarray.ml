@@ -6,7 +6,7 @@ type image = {
     stride : int ;
   }
 
-let conv : image -> Cairo.image = Obj.magic
+external conv : image -> Cairo.image = "%identity"
 
 open Bigarray
 
@@ -15,8 +15,7 @@ external bigarray_kind_float : ('a, 'b, c_layout) Array2.t -> bool
 external bigarray_byte_size  : ('a, 'b, c_layout) Array2.t -> int
   = "ml_bigarray_byte_size"
 
-let bigarray_data : ('a, 'b, c_layout) Array2.t -> Obj.t = 
-  fun arr -> Obj.field (Obj.repr arr) 1
+external bigarray_data : ('a, 'b, c_layout) Array2.t -> Obj.t = "%field1"
 
 let of_bigarr arr format ~width ~height ~stride =
   if bigarray_kind_float arr
@@ -67,19 +66,21 @@ let of_bigarr_1 (arr : (int, int8_unsigned_elt, c_layout) Array2.t) =
 	 stride = w ;
        }
 
+let output_pixel oc p =
+  let r = (p lsr 16) land 0xff in
+  output_byte oc r ;
+  let g = (p lsr 8) land 0xff in
+  output_byte oc g ;
+  let b = p land 0xff in
+  output_byte oc b 
+
 let write_ppm_int32 oc (arr : (int32, int32_elt, c_layout) Array2.t) =
   let h = Array2.dim1 arr in
   let w = Array2.dim2 arr in
   Printf.fprintf oc "P6 %d %d 255\n" w h ;
   for i=0 to pred h do
     for j=0 to pred w do
-      let p = Int32.to_int arr.{i, j} in
-      let r = (p lsr 16) land 0xff in
-      output_byte oc r ;
-      let g = (p lsr 8) land 0xff in
-      output_byte oc g ;
-      let b = p land 0xff in
-      output_byte oc b 
+      output_pixel oc (Int32.to_int arr.{i, j})
     done
   done ;
   flush oc
@@ -90,13 +91,7 @@ let write_ppm_int oc (arr : (int, int_elt, c_layout) Array2.t) =
   Printf.fprintf oc "P6 %d %d 255\n" w h ;
   for i=0 to pred h do
     for j=0 to pred w do
-      let p = arr.{i, j} in
-      let r = (p lsr 16) land 0xff in
-      output_byte oc r ;
-      let g = (p lsr 8) land 0xff in
-      output_byte oc g ;
-      let b = p land 0xff in
-      output_byte oc b 
+      output_pixel oc arr.{i, j}
     done
   done ;
   flush oc

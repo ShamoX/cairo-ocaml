@@ -1,3 +1,5 @@
+(** Support for the in-memory image backend, via Bigarray *)
+
 open Bigarray
 
 val of_bigarr :
