@@ -1,3 +1,10 @@
+2005-03-08  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/ml_cairo_ft.c, src/cairo_ft.ml, src/cairo_ft.mli:
+	* src/ml_cairo.c, src/cairo.ml, src/cairo.mli: adjust to API changes
+
+	* src/ml_cairo.c (cairo_current_font): adjust reference counting 
+
 2005-03-01  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/ml_svg_cairo.c, src/svg_cairo.ml, src/svg_cairo.mli : add

@@ -100,9 +100,20 @@ ml_FcNameUnparse (value patt)
 }
 
 /* cairo Fontconfig/Freetype font backend */
-ML_2 (cairo_ft_font_create, FT_Library_val, FcPattern_val, Val_cairo_font_t)
-ML_1 (cairo_ft_font_create_for_ft_face, FT_Face_val, Val_cairo_font_t)
-ML_1 (cairo_ft_font_pattern, cairo_font_t_val, Val_FcPattern)
+ML_2 (cairo_ft_font_create, FcPattern_val, cairo_matrix_t_val, Val_cairo_font_t)
+ML_3 (cairo_ft_font_create_for_ft_face, FT_Face_val, Int_val, cairo_matrix_t_val, Val_cairo_font_t)
+ML_1 (cairo_ft_font_lock_face, cairo_font_t_val, Val_ptr)
+ML_1 (cairo_ft_font_unlock_face, cairo_font_t_val, Unit)
+CAMLprim value
+ml_cairo_ft_font_get_pattern (value font)
+{
+  FcPattern *p;
+  p = cairo_ft_font_get_pattern (cairo_font_t_val (font));
+  if (p == NULL)
+    failwith ("cairo_ft_font_get_pattern: NULL pointer");
+  FcPatternReference (p);
+  return Val_FcPattern (p);
+}
 
 #else
 
@@ -114,6 +125,8 @@ Unsupported (ml_FcNameParse)
 Unsupported (ml_FcNameUnparse)
 Unsupported (ml_cairo_ft_font_create)
 Unsupported (ml_cairo_ft_font_create_for_ft_face)
-Unsupported (ml_cairo_ft_font_pattern)
+Unsupported (ml_cairo_ft_font_lock_face)
+Unsupported (ml_cairo_ft_font_unlock_face)
+Unsupported (ml_cairo_ft_font_get_pattern)
 
 #endif /* CAIRO_HAS_FT_FONT */

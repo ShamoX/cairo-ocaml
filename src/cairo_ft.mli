@@ -28,4 +28,9 @@ external font_create : ft_library -> fc_pattern -> Cairo.font
   = "ml_cairo_ft_font_create"
 external font_create_for_ft_face : ft_face -> Cairo.font
   = "ml_cairo_ft_font_create_for_ft_face"
-external font_pattern : Cairo.font -> fc_pattern = "ml_cairo_ft_font_pattern"
+
+
+external font_lock_face : Cairo.font -> ft_face = "ml_cairo_ft_font_lock_face"
+external font_unlock_face : Cairo.font -> unit = "ml_cairo_ft_font_unlock_face"
+
+external font_get_pattern : Cairo.font -> fc_pattern = "ml_cairo_ft_font_get_pattern"

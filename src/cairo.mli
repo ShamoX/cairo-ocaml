@@ -332,7 +332,7 @@ external image_surface_create :
   format:format -> width:int -> height:int -> surface
   = "ml_cairo_image_surface_create"
 external image_surface_create_for_data : image -> surface
-  = "ml_image_surface_create_for_data"
+  = "ml_cairo_image_surface_create_for_data"
 
 (** {4 PS surface} *)
 
@@ -391,8 +391,7 @@ external matrix_transform_point : matrix:matrix -> point -> unit
    Mostly unusable ATM. It needs other libraries (freetype2/fontconfig). 
 *)
 
-external font_set_transform : font:font -> matrix:matrix -> unit
-  = "ml_cairo_font_set_transform"
-external font_current_transform : font:font -> matrix:matrix -> unit
-  = "ml_cairo_font_current_transform"
-
+external font_extents : font -> matrix -> font_extents
+   = "ml_cairo_font_extents"
+external font_glyph_extents : font -> matrix -> glyph array -> text_extents
+   = "ml_cairo_font_glyph_extents"

@@ -29,7 +29,6 @@ type surface
 type matrix
 type pattern
 external create : unit -> t = "ml_cairo_create"
-external destroy : cr:t -> unit = "ml_cairo_destroy"
 external save : cr:t -> unit = "ml_cairo_save"
 external restore : cr:t -> unit = "ml_cairo_restore"
 external _copy : dest:t -> src:t -> unit = "ml_cairo_copy"
@@ -192,11 +191,8 @@ external text_extents : t -> utf8:string -> text_extents = "ml_cairo_text_extent
 external glyph_extents : t -> glyph array -> text_extents = "ml_cairo_glyph_extents"
 external text_path : t -> utf8:string -> unit = "ml_cairo_text_path"
 external glyph_path : t -> glyph array -> unit = "ml_cairo_glyph_path"
-external font_destroy : font:font -> unit = "ml_cairo_font_destroy"
-external font_set_transform :
-  font:font -> matrix:matrix -> unit = "ml_cairo_font_set_transform"
-external font_current_transform :
-  font:font -> matrix:matrix -> unit = "ml_cairo_font_current_transform"
+external font_extents : font -> matrix -> font_extents = "ml_cairo_font_extents"
+external font_glyph_extents : font -> matrix -> glyph array -> text_extents = "ml_cairo_font_glyph_extents"
 external show_surface :
   cr:t -> surface:surface -> width:int -> height:int ->
     unit = "ml_cairo_show_surface"
@@ -225,8 +221,6 @@ external surface_create_for_image :
 external surface_create_similar :
   other:surface -> format:format -> width:int -> height:int ->
     surface = "ml_cairo_surface_create_similar"
-external surface_destroy :
-  surface:surface -> unit = "ml_cairo_surface_destroy"
 external surface_set_repeat :
   surface:surface -> repeat:bool -> unit = "ml_cairo_surface_set_repeat"
 external surface_set_matrix :
@@ -268,7 +262,7 @@ external image_surface_create :
   format:format -> width:int -> height:int ->
     surface = "ml_cairo_image_surface_create"
 external image_surface_create_for_data :
-  image -> surface = "ml_image_surface_create_for_data"
+  image -> surface = "ml_cairo_image_surface_create_for_data"
 external ps_surface_create :
   file:Cairo_channel.t -> width_inches:float -> height_inches:float ->
     x_pixels_per_inch:float -> y_pixels_per_inch:float ->
@@ -282,7 +276,6 @@ external png_surface_create :
     surface = "ml_cairo_png_surface_create"
 
 external matrix_create : unit -> matrix = "ml_cairo_matrix_create"
-external matrix_destroy : matrix:matrix -> unit = "ml_cairo_matrix_destroy"
 external matrix_copy :
   matrix:matrix -> other:matrix -> unit = "ml_cairo_matrix_copy"
 external matrix_set_identity :
