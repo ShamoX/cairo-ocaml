@@ -1,8 +1,72 @@
-2003-12-05  Carl Worth  <cworth@east.isi.edu>
+2003-12-17 02:15  Olivier Andrieu <oliv__a@users.sourceforge.net>
 
-	* src/ml_cairo_lablgtk.c
-	(cairo_lablgtk_surface_create_for_drawable): Track cairo change
-	from CAIRO_HAS_XLIB_BACKEND to CAIRO_HAS_XLIB_SURFACE.
+	* configure.ac, src/cairo.ml, src/cairo.mli, src/ml_cairo.c,
+	src/ml_cairo_bigarr.c, src/ocairo.ml, src/ocairo.mli,
+	test/Makefile, test/text.ml: text API work
 
-	* configure.ac: Now depend on cairo >= 0.1.15
+2003-12-13 15:10  Olivier Andrieu <oliv__a@users.sourceforge.net>
 
+	* configure.ac, src/ml_cairo.c: optional PS backend
+
+2003-12-05 23:34  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* src/ml_cairo_lablgtk.c: drop cairo-config.h
+
+2003-12-05 17:54  Carl Worth <cworth@east.isi.edu>
+
+	* configure.ac, src/ml_cairo_lablgtk.c, ChangeLog:
+
+	        * src/ml_cairo_lablgtk.c
+	        (cairo_lablgtk_surface_create_for_drawable): Track cairo
+	        change from CAIRO_HAS_XLIB_BACKEND to
+	CAIRO_HAS_XLIB_SURFACE.
+
+	        * configure.ac: Now depend on cairo >= 0.1.15
+
+2003-12-05 01:02  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* src/ml_cairo_lablgtk.c: add missing cairo-config include
+
+2003-12-04 19:35  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* configure.ac, src/ml_cairo_lablgtk.c: new xlib backend config
+	stuff
+
+2003-12-03 23:17  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* .cvsignore, src/ocairo_gtkcairo.ml, src/ocairo_gtkcairo.mli,
+	test/cube.ml: support redraw signal of GtkCairo
+
+2003-11-26 20:45  tag cairo-ocaml-0-2
+
+2003-11-26 20:45  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* Makefile, config.make.in, src/Makefile: added dist Makefile
+	target
+
+2003-11-22 16:28  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* support/ocaml.m4: update ocaml.m4
+
+2003-11-22 16:27  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* src/ml_cairo.c: forgot some Double_array_tag
+
+2003-11-22 16:24  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* src/: ml_cairo.h, ml_cairo_lablgtk.c: use a Val_cairo_format_t
+
+2003-11-18 20:18  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* configure.ac: check for lablgtk2 specifically
+
+2003-11-18 20:15  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* src/: cairo.ml, cairo.mli, ocairo.ml, ocairo.mli: add
+	Cairo.move_to_point and changed field names for Cairo.glyph
+
+2003-11-18 20:14  Olivier Andrieu <oliv__a@users.sourceforge.net>
+
+	* src/ml_cairo.c: missing bytecode functions
+
+2003-11-18 20:02  tag cairo-ocaml-0-1
