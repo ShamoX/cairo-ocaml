@@ -11,13 +11,13 @@
 #include "ml_cairo_status.h"
 #include "ml_cairo.h"
 
-Make_Val_final_pointer(cairo_t, Ignore, cairo_destroy, 50)
+Make_Val_final_pointer(cairo_t, Ignore, cairo_destroy, 20)
 #define cairo_t_val(v) ((cairo_t *)Pointer_val(v))
 Make_Val_final_pointer(cairo_surface_t, Ignore, cairo_surface_destroy, 20)
 #define cairo_surface_t_val(v) ((cairo_surface_t *)Pointer_val(v))
-Make_Val_final_pointer(cairo_matrix_t, Ignore, cairo_matrix_destroy, 20)
+Make_Val_final_pointer(cairo_matrix_t, Ignore, cairo_matrix_destroy, 100)
 #define cairo_matrix_t_val(v) ((cairo_matrix_t *)Pointer_val(v))
-ML_1(cairo_create, Ignore, Val_cairo_t)
+ML_0(cairo_create, Val_cairo_t)
 
 CAMLprim value
 ml_cairo_reference(value v_cr)
@@ -747,7 +747,7 @@ ml_cairo_current_point(value cr)
   double x, y;
   cairo_current_point(cairo_t_val(cr), &x, &y);
   check_cairo_status(cr);
-  v = alloc_small(2 * Double_wosize, 0);
+  v = alloc_small(2 * Double_wosize, Double_array_tag);
   Store_double_field(v, 0, x);
   Store_double_field(v, 1, y);
   return v;
@@ -860,7 +860,7 @@ ml_cairo_image_surface_create_for_data(value img)
 }
 ML_5(cairo_ps_surface_create, FILE_val, Double_val, Double_val, Double_val, Double_val, Val_cairo_surface_t)
 
-ML_1(cairo_matrix_create, Ignore, Val_cairo_matrix_t)
+ML_0(cairo_matrix_create, Val_cairo_matrix_t)
 ML_1(cairo_matrix_destroy, cairo_matrix_t_val, Unit)
 ML_2(cairo_matrix_copy, cairo_matrix_t_val, cairo_matrix_t_val, Val_cairo_status_t)
 ML_1(cairo_matrix_set_identity, cairo_matrix_t_val, Val_cairo_status_t)
@@ -886,7 +886,7 @@ ml_cairo_matrix_get_affine(value m)
   CAMLlocal1(v);
   double a, b, c, d, tx, ty;
   cairo_matrix_get_affine(cairo_matrix_t_val(m), &a, &b, &c, &d, &tx, &ty);
-  v = alloc_small(6 * Double_wosize, 0);
+  v = alloc_small(6 * Double_wosize, Double_array_tag);
   Store_double_field(v, 0, a);
   Store_double_field(v, 1, b);
   Store_double_field(v, 2, c);
