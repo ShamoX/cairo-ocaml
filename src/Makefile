@@ -23,6 +23,7 @@ gtkcairo.opt : gtkcairo.cmxa dllmlgtkcairo.so
 
 cairo_SRC = cairo_channel.mli cairo.mli cairo.ml \
             cairo_bigarray.mli cairo_bigarray.ml \
+            ml_cairo_wrappers.c \
 	    ml_cairo_status.c ml_cairo_channel.c \
             ml_cairo.c ml_cairo_bigarr.c ml_cairo_path.c
 

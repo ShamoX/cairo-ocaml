@@ -11,7 +11,30 @@
 #include "ml_cairo_status.h"
 #include "ml_cairo.h"
 
-Make_Val_final_pointer(cairo_t, Ignore, cairo_destroy, 20)
+static void 
+ml_final_cairo_t (value val)
+{ 
+  cairo_t *cr = cairo_t_val(val);
+  if (cr != NULL) cairo_destroy (cr);
+}
+
+static struct custom_operations ml_custom_cairo_t =
+{ 
+  "cairo_t/001", ml_final_cairo_t, ml_pointer_compare,
+  ml_pointer_hash, custom_serialize_default, custom_deserialize_default 
+};
+
+value Val_cairo_t (cairo_t *p)
+{ 
+  value ret; 
+  struct ml_cairo *ml_c;
+  if (p == NULL) report_null_pointer;
+  ret = alloc_custom (&ml_custom_cairo_t, sizeof (struct ml_cairo), 20, 1000);
+  ml_c = Data_custom_val(ret);
+  ml_c->cr = p;
+  ml_c->suspend_exn = 0;
+  return ret;
+}
 
 Make_Val_final_pointer(cairo_surface_t, Ignore, cairo_surface_destroy, 20)
 #define cairo_surface_t_val(v) ((cairo_surface_t *)Pointer_val(v))
@@ -21,6 +44,30 @@ Make_Val_final_pointer(cairo_matrix_t, Ignore, cairo_matrix_destroy, 100)
 
 Make_Val_final_pointer(cairo_pattern_t, Ignore, cairo_pattern_destroy, 20)
 #define cairo_pattern_t_val(v) ((cairo_pattern_t *)Pointer_val(v))
+
+CAMLprim value
+ml_cairo_suspend_exn (value v_cr)
+{
+  struct ml_cairo *ml_c = Data_custom_val(v_cr);
+  ml_c->suspend_exn = 1;
+  return Val_unit;
+}
+
+CAMLprim value
+ml_cairo_resume_exn (value v_cr)
+{
+  struct ml_cairo *ml_c = Data_custom_val(v_cr);
+  ml_c->suspend_exn = 0;
+  cairo_treat_status (cairo_status (ml_c->cr));
+  return Val_unit;
+}
+
+CAMLprim value
+ml_cairo_get_suspend_exn (value v_cr)
+{
+  struct ml_cairo *ml_c = Data_custom_val(v_cr);
+  return Val_bool(ml_c->suspend_exn);
+}
 
 ML_0(cairo_create, Val_cairo_t)
 ML_1(cairo_destroy, cairo_t_val, Unit)
@@ -637,16 +684,6 @@ cairo_glyph_t_val(cairo_glyph_t * _s, value _v)
   _s->index = Int_val(Field(_v, 0));
   _s->x = Double_val(Field(_v, 1));
   _s->y = Double_val(Field(_v, 2));
-}
-
-static void
-cairo_font_extents_t_val(cairo_font_extents_t * _s, value _v)
-{
-  _s->ascent = Double_field(_v, 0);
-  _s->descent = Double_field(_v, 1);
-  _s->height = Double_field(_v, 2);
-  _s->max_x_advance = Double_field(_v, 3);
-  _s->max_y_advance = Double_field(_v, 4);
 }
 
 static value

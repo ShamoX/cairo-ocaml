@@ -35,6 +35,10 @@ external set_target_ps :
 external set_target_png :
   cr:t -> file:Cairo_channel.t -> format -> width:float -> height:float -> unit = "ml_cairo_set_target_png"
 
+external suspend_exn : t -> unit = "ml_cairo_suspend_exn"
+external resume_exn  : t -> unit = "ml_cairo_resume_exn"
+external get_suspend_exn : t -> bool = "ml_cairo_get_suspend_exn"
+
 type operator =
     OPERATOR_CLEAR
   | OPERATOR_SRC
@@ -158,18 +162,18 @@ type font_slant =
   | FONT_SLANT_ITALIC
   | FONT_SLANT_OBLIQUE
 external select_font :
-  ct:t -> family:string -> slant:font_slant -> weight:font_weight ->
+  cr:t -> family:string -> slant:font_slant -> weight:font_weight ->
     unit = "ml_cairo_select_font"
 external scale_font : cr:t -> scale:float -> unit = "ml_cairo_scale_font"
 external transform_font :
   cr:t -> matrix:matrix -> unit = "ml_cairo_transform_font"
-external show_text : ct:t -> utf8:string -> unit = "ml_cairo_show_text"
+external show_text : cr:t -> utf8:string -> unit = "ml_cairo_show_text"
 external show_glyphs :
-  ct:t -> glyph array -> unit = "ml_cairo_show_glyphs"
-external current_font : ct:t -> font = "ml_cairo_current_font"
+  cr:t -> glyph array -> unit = "ml_cairo_show_glyphs"
+external current_font : cr:t -> font = "ml_cairo_current_font"
 external current_font_extents :
-  ct:t -> font_extents = "ml_cairo_current_font_extents"
-external set_font : ct:t -> font:font -> unit = "ml_cairo_set_font"
+  cr:t -> font_extents = "ml_cairo_current_font_extents"
+external set_font : cr:t -> font:font -> unit = "ml_cairo_set_font"
 external text_extents : t -> utf8:string -> text_extents = "ml_cairo_text_extents"
 external glyph_extents : t -> glyph array -> text_extents = "ml_cairo_glyph_extents"
 external text_path : t -> utf8:string -> unit = "ml_cairo_text_path"

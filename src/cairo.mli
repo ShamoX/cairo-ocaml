@@ -36,6 +36,16 @@ external save    : cr:t -> unit = "ml_cairo_save"
 external restore : cr:t -> unit = "ml_cairo_restore"
 external copy    : dest:t -> src:t -> unit = "ml_cairo_copy"
 
+external suspend_exn : t -> unit = "ml_cairo_suspend_exn"
+(** The functions operating on cairo values normally raise an [Error] exception 
+    immediately if the operation fails. Calling [suspend_exn] will prevent this 
+    automatic exception-raising. *)
+external resume_exn  : t -> unit = "ml_cairo_resume_exn"
+(** Switch back to exception-raising mode. If the cairo object has an error status, 
+    an exception is raised right away. *)
+external get_suspend_exn : t -> bool = "ml_cairo_get_suspend_exn"
+(** Check the current exception-raising mode. *)
+
 (** {4 Target functions} *)
 
 external set_target_surface : cr:t -> surface:surface -> unit = "ml_cairo_set_target_surface"
@@ -207,16 +217,16 @@ type font_slant =
   | FONT_SLANT_OBLIQUE
 
 external select_font :
-  ct:t -> family:string -> slant:font_slant -> weight:font_weight -> unit
+  cr:t -> family:string -> slant:font_slant -> weight:font_weight -> unit
   = "ml_cairo_select_font"
 external scale_font : cr:t -> scale:float -> unit = "ml_cairo_scale_font"
 external transform_font : cr:t -> matrix:matrix -> unit
   = "ml_cairo_transform_font"
-external show_text : ct:t -> utf8:string -> unit = "ml_cairo_show_text"
-external show_glyphs : ct:t -> glyph array -> unit
+external show_text : cr:t -> utf8:string -> unit = "ml_cairo_show_text"
+external show_glyphs : cr:t -> glyph array -> unit
   = "ml_cairo_show_glyphs"
-external current_font : ct:t -> font = "ml_cairo_current_font"
-external current_font_extents : ct:t -> font_extents
+external current_font : cr:t -> font = "ml_cairo_current_font"
+external current_font_extents : cr:t -> font_extents
   = "ml_cairo_current_font_extents"
 external text_extents : t -> utf8:string -> text_extents = "ml_cairo_text_extents"
 external glyph_extents : t -> glyph array -> text_extents = "ml_cairo_glyph_extents"
@@ -350,7 +360,7 @@ external matrix_transform_point : matrix:matrix -> point -> unit
    Mostly unusable ATM. It needs other libraries (freetype2/fontconfig). 
 *)
 
-external set_font : ct:t -> font:font -> unit = "ml_cairo_set_font"
+external set_font : cr:t -> font:font -> unit = "ml_cairo_set_font"
 external font_set_transform : font:font -> matrix:matrix -> unit
   = "ml_cairo_font_set_transform"
 external font_current_transform : font:font -> matrix:matrix -> unit

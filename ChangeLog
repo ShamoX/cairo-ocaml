@@ -1,3 +1,13 @@
+2004-10-18  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/cairo.ml, src/cairo.mli: s/ct/cr/
+
+	* src/ml_cairo_wrappers.[ch]: add comparsion and hash function for
+	custom values.
+
+	* src/cairo.{ml,mli}, src/ml_cairo.[ch], src/ml_cairo_status.[ch]:
+	allow suspending raise of exception on error.
+
 2004-07-06  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/cairo_gtkcairo.ml, src/cairo_gtkcairo.mli: the signal is now

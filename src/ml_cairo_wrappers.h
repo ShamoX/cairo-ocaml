@@ -1,12 +1,15 @@
 #define Pointer_val(val) ((void*)Field(val,1))
 #define Store_pointer(val, p) (Field(val, 1)=Val_bp(p))
 
+int ml_pointer_compare (value, value);
+long ml_pointer_hash (value);
+
 #define Make_Val_final_pointer(type, init, final, adv) \
 static void ml_final_##type (value val) \
 { if (Field(val,1)) final ((type*)Field(val,1)); } \
 static struct custom_operations ml_custom_##type = \
-{ #type "/001", ml_final_##type, custom_compare_default, \
-  custom_hash_default, custom_serialize_default, custom_deserialize_default };\
+{ #type "/001", ml_final_##type, ml_pointer_compare, \
+  ml_pointer_hash, custom_serialize_default, custom_deserialize_default };\
 value Val_##type (type *p) \
 { value ret; if (!p) report_null_pointer; \
   ret = alloc_custom (&ml_custom_##type, sizeof(value), adv, 1000); \

@@ -1,4 +1,8 @@
-#define cairo_t_val(v) ((cairo_t *)Pointer_val(v))
+struct ml_cairo {
+  cairo_t *cr;
+  int suspend_exn;
+};
+#define cairo_t_val(v) (((struct ml_cairo *) Data_custom_val(v))->cr)
 
 static inline cairo_format_t
 cairo_format_t_val(value _v)
