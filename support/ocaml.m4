@@ -1,4 +1,4 @@
-dnl autoconf macros for OCaml
+dnl -*- autoconf -*- macros for OCaml
 dnl by Olivier Andrieu
 dnl from a configure.in by Jean-Christophe Filliâtre,
 dnl from a first script by Georges Mariano
@@ -21,9 +21,9 @@ AC_DEFUN(AC_PROG_OCAML,
 [dnl
 # checking for ocamlc
 AC_CHECK_PROG(OCAMLC,ocamlc,ocamlc,AC_MSG_ERROR(Cannot find ocamlc.))
-OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
+OCAMLVERSION=$($OCAMLC -version)
 AC_MSG_RESULT(OCaml version is $OCAMLVERSION)
-OCAMLLIB=`$OCAMLC -where 2>/dev/null || $OCAMLC -v|tail -1|cut -d ' ' -f 4`
+OCAMLLIB=$($OCAMLC -where)
 AC_MSG_RESULT(OCaml library path is $OCAMLLIB)
 # checking for ocamlopt
 AC_CHECK_PROG(OCAMLOPT,ocamlopt,ocamlopt)
@@ -31,7 +31,7 @@ OCAMLBEST=byte
 if test -z "$OCAMLOPT"; then
 	AC_MSG_WARN(Cannot find ocamlopt; bytecode compilation only.)
 else
-	TMPVERSION=`$OCAMLOPT -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
+	TMPVERSION=$($OCAMLOPT -version)
 	if test "$TMPVERSION" != "$OCAMLVERSION" ; then
 	    AC_MSG_RESULT(versions differs from ocamlc; ocamlopt discarded.)
 	    unset OCAMLOPT
@@ -42,7 +42,7 @@ fi
 # checking for ocamlc.opt
 AC_CHECK_PROG(OCAMLCDOTOPT,ocamlc.opt,ocamlc.opt)
 if test "$OCAMLCDOTOPT"; then
-	TMPVERSION=`$OCAMLCDOTOPT -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
+	TMPVERSION=$($OCAMLCDOTOPT -version)
 	if test "$TMPVERSION" != "$OCAMLVERSION" ; then
 	    AC_MSG_RESULT(versions differs from ocamlc; ocamlc.opt discarded.)
 	else
@@ -53,8 +53,8 @@ fi
 if test "$OCAMLOPT" ; then
     AC_CHECK_PROG(OCAMLOPTDOTOPT,ocamlopt.opt,ocamlopt.opt)
     if test "$OCAMLOPTDOTOPT"; then
-	TMPVER=`$OCAMLOPTDOTOPT -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
-	if test "$TMPVER" != "$OCAMLVERSION" ; then
+	TMPVERSION=$($OCAMLOPTDOTOPT -version)
+	if test "$TMPVERSION" != "$OCAMLVERSION" ; then
 	    AC_MSG_RESULT(version differs from ocamlc; ocamlopt.opt discarded.)
 	else
 	    OCAMLOPT=$OCAMLOPTDOTOPT
@@ -97,7 +97,7 @@ dnl   OCAMLYACC     "ocamlyac"
 AC_DEFUN(AC_PROG_OCAML_TOOLS,
 [dnl
 # checking for ocamllex and ocamlyacc
-AC_CHECK_PROG(OCAMLLEX,ocamllex,ocamllex)
+AC_CHECK_PROG(OCAMLLEX,ocamllex,ocamllex,AC_MSG_ERROR(Cannot find ocamllex.))
 if test "$OCAMLLEX"; then
     AC_CHECK_PROG(OCAMLLEXDOTOPT,ocamllex.opt,ocamllex.opt)
     if test "$OCAMLLEXDOTOPT"; then
@@ -120,9 +120,9 @@ AC_REQUIRE([AC_PROG_OCAML])
 # checking for camlp4
 AC_CHECK_PROG(CAMLP4,camlp4,camlp4)
 if test "$CAMLP4"; then
-	TMPVERSION=`$CAMLP4 -v 2>&1| sed -n -e 's|.*version *\(.*\)$|\1|p'`
+	TMPVERSION=$($CAMLP4 -v 2>&1| sed -n -e 's|.*version *\(.*\)$|\1|p')
 	if test "$TMPVERSION" != "$OCAMLVERSION" ; then
-	    AC_MSG_WARN(versions differs from ocamlc)
+	    AC_MSG_ERROR(versions differs from ocamlc)
  	else
 	    AC_CHECK_PROG(CAMLP4O,camlp4o,camlp4o)
 	fi
@@ -140,7 +140,7 @@ AC_DEFUN(AC_PROG_FINDLIB,
 AC_ARG_WITH(findlib,[  --with-findlib	  use findlib package system],
   use_findlib="$withval")
 # checking for ocamlfind
-if test "$use_findlib" ; then 
+if test "$use_findlib" = yes ; then 
 	AC_CHECK_PROG(OCAMLFIND,ocamlfind,ocamlfind,
 	  AC_MSG_ERROR(ocamlfind not found))
 else
@@ -156,7 +156,7 @@ dnl   defines pkg_name to name
 AC_DEFUN(AC_CHECK_OCAML_PKG,
 [dnl
 AC_REQUIRE([AC_PROG_FINDLIB])
-if test "$use_findlib" ; then 
+if test "$use_findlib" = yes ; then 
 	AC_MSG_CHECKING(findlib package $1)
 	if $OCAMLFIND query $1 >/dev/null 2>/dev/null; then
 	AC_MSG_RESULT(found)
@@ -174,10 +174,8 @@ dnl AC_ARG_OCAML_INSTALLDIR adds a --with-installdir option
 AC_DEFUN(AC_ARG_OCAML_INSTALLDIR,
 [dnl
 AC_ARG_WITH(installdir,[  --with-installdir=DIR	  specify installation directory],INSTALLDIR="$withval")
-if test -z "$INSTALLDIR" ; then
-  if test -z "$use_findlib" ; then 
-    INSTALLDIR='$(OCAMLLIB)/site-lib/$(NAME)'
-  fi
+if ! test "$INSTALLDIR" -o "$use_findlib" ; then
+    INSTALLDIR='$(OCAMLLIB)/$(NAME)'
 fi
 AC_SUBST(INSTALLDIR)
 ])
@@ -202,7 +200,7 @@ for $2 in $$2 $4 ; do
     break
   fi
 done
-if test -n "$found" ; then
+if test "$found" ; then
   AC_MSG_RESULT($$2)
 else
   AC_MSG_RESULT(not found)
