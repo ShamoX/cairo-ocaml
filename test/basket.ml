@@ -50,11 +50,19 @@ let main =
 
   prerr_endline "PS" ;
   begin
-    let oc = open_out "basket.ps" in
-    let file = Cairo_channel.of_out_channel oc in
-    close_out oc ;
+    let file = Cairo_channel.open_out "basket.ps" in
     Cairo.set_target_ps c file x_inches y_inches x_ppi y_ppi ;
     draw ~print:true c ;
+    Cairo.show_page c ;
+    Cairo.finalise_target c ;
+    Cairo_channel.close file
+  end ;
+
+  prerr_endline "PDF" ;
+  begin
+    let file = Cairo_channel.open_out "basket.pdf" in
+    Cairo.set_target_pdf c file x_inches y_inches x_ppi y_ppi ;
+    draw c ;
     Cairo.show_page c ;
     Cairo.finalise_target c ;
     Cairo_channel.close file
