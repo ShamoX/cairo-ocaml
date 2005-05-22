@@ -6,52 +6,50 @@
 /*  GNU Lesser General Public License version 2.1 (the "LGPL").           */
 /**************************************************************************/
 
-#include <gdk-pixbuf/gdk-pixbuf.h>
-#include <gdk/gdkx.h>
-
-#include <cairo.h>
-#ifdef CAIRO_HAS_XLIB_SURFACE
+#include "ml_cairo.h"
+#if CAIRO_HAS_XLIB_SURFACE
 # include <cairo-xlib.h>
 #endif
 
-#include <caml/mlvalues.h>
-#include <caml/alloc.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
+#include <gdk/gdk.h>
+#include <gdk/gdkx.h>
 
 #include "wrappers.h"
 #include "ml_gobject.h"
 #include "ml_gdkpixbuf.h"
 #include "ml_gdk.h"
 
-#include "ml_cairo.h"
-#include "ml_cairo_status.h"
-
 CAMLprim value
-cairo_lablgtk_of_pixbuf(value pb)
+ml_cairo_lablgtk_of_pixbuf (value pb)
 {
-  value v;
+  static const cairo_user_data_key_t pixbuf_key;
+
   GdkPixbuf *pixbuf = GdkPixbuf_val(pb);
   cairo_format_t format;
   gboolean alpha = gdk_pixbuf_get_has_alpha(pixbuf);
   int nchan = gdk_pixbuf_get_n_channels(pixbuf);
   int bps = gdk_pixbuf_get_bits_per_sample(pixbuf);
+  cairo_surface_t *surf;
 
   if ((nchan == 4) && (bps == 8) && alpha)
     format = CAIRO_FORMAT_ARGB32;
   else 
-    failwith("bad GdkPixbuf format");
+    caml_invalid_argument ("bad GdkPixbuf format");
 
-  v = alloc_small(5, 0);
-  Field(v, 0) = Val_bp(gdk_pixbuf_get_pixels(pixbuf));
-  Field(v, 1) = Val_cairo_format_t(format);
-  Field(v, 2) = Val_int(gdk_pixbuf_get_width(pixbuf));
-  Field(v, 3) = Val_int(gdk_pixbuf_get_height(pixbuf));
-  Field(v, 4) = Val_int(gdk_pixbuf_get_rowstride(pixbuf));
+  surf = cairo_image_surface_create_for_data (gdk_pixbuf_get_pixels (pixbuf),
+					      format,
+					      gdk_pixbuf_get_width(pixbuf),
+					      gdk_pixbuf_get_height(pixbuf),
+					      gdk_pixbuf_get_rowstride(pixbuf));
 
-  return v;
+  ml_cairo_surface_set_user_data (surf, &pixbuf_key, ml_cairo_make_root (pb));
+
+  return Val_cairo_surface_t (surf);
 }
 
 CAMLprim value
-cairo_lablgtk_shuffle_pixels(value pb)
+ml_cairo_lablgtk_shuffle_pixels (value pb)
 {
   GdkPixbuf *pixbuf = GdkPixbuf_val(pb);
   guint w, h, s, i, j;
@@ -61,10 +59,10 @@ cairo_lablgtk_shuffle_pixels(value pb)
 			(gdk_pixbuf_get_n_channels(pixbuf) == 4) &&
 			(gdk_pixbuf_get_bits_per_sample(pixbuf) == 8), Val_unit);
 
-  w = gdk_pixbuf_get_width(pixbuf);
-  h = gdk_pixbuf_get_height(pixbuf);
-  s = gdk_pixbuf_get_rowstride(pixbuf);
-  pixels = gdk_pixbuf_get_pixels(pixbuf);
+  w = gdk_pixbuf_get_width (pixbuf);
+  h = gdk_pixbuf_get_height (pixbuf);
+  s = gdk_pixbuf_get_rowstride (pixbuf);
+  pixels = gdk_pixbuf_get_pixels (pixbuf);
 
   for (i=0; i<h; i++) {
     p = pixels;
@@ -81,53 +79,50 @@ cairo_lablgtk_shuffle_pixels(value pb)
 }
 
 
-#ifdef CAIRO_HAS_XLIB_SURFACE
+#if CAIRO_HAS_XLIB_SURFACE
 CAMLprim value
-cairo_lablgtk_surface_create_for_drawable(value d, value fmt)
+ml_cairo_xlib_surface_create (value d)
 {
-  GdkDrawable *draw = GdkDrawable_val(d);
-  cairo_surface_t *s;
+  static const cairo_user_data_key_t drawable_key;
+
+  cairo_surface_t *surface;
+  gint width, height;
+  GdkDrawable *drawable = GdkDrawable_val(d);
+  GdkVisual *visual = gdk_drawable_get_visual (drawable);
   
-  s = cairo_xlib_surface_create (
-				 GDK_DRAWABLE_XDISPLAY(draw),
-				 GDK_DRAWABLE_XID(draw),
-				 GDK_VISUAL_XVISUAL(gdk_drawable_get_visual(draw)),
-				 cairo_format_t_val(fmt),
-				 GDK_COLORMAP_XCOLORMAP(gdk_drawable_get_colormap(draw)));
-  return Val_cairo_surface_t(s);
-}
+  gdk_drawable_get_size (drawable, &width, &height);
 
-CAMLprim value
-cairo_lablgtk_set_target_drawable(value cr, value d)
-{
-  cairo_t *c = cairo_t_val(cr);
-  GdkDrawable *draw = GdkDrawable_val(d);
-  GdkDrawable *real_drawable;
-  gint x_offset, y_offset;
-
-  if (GDK_IS_WINDOW(draw))
-    gdk_window_get_internal_paint_info(GDK_WINDOW(draw),
-				       &real_drawable,
-				       &x_offset, &y_offset);
+  if (visual) 
+    surface = cairo_xlib_surface_create (GDK_DRAWABLE_XDISPLAY (drawable),
+					 GDK_DRAWABLE_XID (drawable),
+					 GDK_VISUAL_XVISUAL (visual),
+					 width, height);
+  else if (gdk_drawable_get_depth (drawable) == 1)
+    surface = 
+      cairo_xlib_surface_create_for_bitmap (GDK_PIXMAP_XDISPLAY (drawable),
+					    GDK_PIXMAP_XID (drawable),
+					    width, height);
   else {
-    real_drawable = draw;
-    x_offset = 0;
-    y_offset = 0;
+    g_warning ("Using Cairo rendering requires the drawable argument to\n"
+	       "have a specified colormap. All windows have a colormap,\n"
+	       "however, pixmaps only have colormap by default if they\n"
+	       "were created with a non-NULL window argument. Otherwise\n"
+	       "a colormap must be set on them with "
+	       "gdk_drawable_set_colormap");
+    surface = NULL;
   }
-    
-  cairo_set_target_drawable(c,
-			    GDK_DRAWABLE_XDISPLAY(real_drawable),
-			    GDK_DRAWABLE_XID(real_drawable));
-  check_cairo_status(cr);
-  cairo_translate(c, -x_offset, -y_offset);
-  check_cairo_status(cr);
 
-  return Val_unit;
+  if (surface != NULL)
+    ml_cairo_surface_set_user_data (surface, &drawable_key, ml_cairo_make_root (d));
+
+  return Val_cairo_surface_t (surface);
 }
+
+ML_3 (cairo_xlib_surface_set_size, cairo_surface_t_val, Int_val, Int_val, Unit)
 
 #else
 
-Unsupported(cairo_lablgtk_surface_create_for_drawable)
-Unsupported(cairo_lablgtk_set_target_drawable)
+Cairo_Unsupported(cairo_xlib_surface_create, "Xlib backend not supported");
+Cairo_Unsupported(cairo_xlib_surface_set_size, "Xlib backend not supported");
 
 #endif /* CAIRO_HAS_XLIB_SURFACE */

@@ -6,6 +6,8 @@
 /*  GNU Lesser General Public License version 2.1 (the "LGPL").           */
 /**************************************************************************/
 
+#include "ml_cairo.h"
+
 #include <caml/bigarray.h>
 
 unsigned long bigarray_byte_size (struct caml_bigarray *);
@@ -17,7 +19,7 @@ ml_bigarray_byte_size (value b)
 }
 
 CAMLprim value
-bigarray_kind_float (value v)
+ml_bigarray_kind_float (value v)
 {
   struct caml_bigarray *ba = Bigarray_val (v);
 
@@ -31,4 +33,19 @@ bigarray_kind_float (value v)
     default:
       return Val_false;
     }
+}
+
+CAMLprim value
+ml_cairo_image_surface_create_for_data (value img, value fmt, value w, value h, value stride)
+{
+  static const cairo_user_data_key_t image_data_key;
+  cairo_surface_t *surf;
+  surf = cairo_image_surface_create_for_data (Data_bigarray_val (img),
+					      cairo_format_t_val (fmt),
+					      Int_val (w),
+					      Int_val (h),
+					      Int_val (stride));
+  ml_cairo_surface_set_user_data (surf, &image_data_key, ml_cairo_make_root (img));
+
+  return Val_cairo_surface_t (surf);
 }

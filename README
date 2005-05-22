@@ -14,8 +14,8 @@ Compiling
 Dependencies
 ============
 
- ocaml          3.08 (may work with 3.07 or even 3.06)
- cairo          0.3.0
+ ocaml          3.08
+ cairo          0.5.0
  libsvg-cairo   optional 0.1.5
  LablGTK        optional
 

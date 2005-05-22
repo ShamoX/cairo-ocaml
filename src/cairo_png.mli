@@ -6,13 +6,17 @@
 (*  GNU Lesser General Public License version 2.1 (the "LGPL").           *)
 (**************************************************************************)
 
-type t
-external of_out_channel : out_channel -> t = "ml_FILE_of_channel"
-external of_file_descr : Unix.file_descr -> t = "ml_FILE_of_file_descr"
-external close : t -> unit = "ml_fclose"
+(** PNG reading/writing functions *)
 
-let open_out fname =
-  let oc = Pervasives.open_out fname in
-  let c = of_out_channel oc in
-  close_out oc ;
-  c
+external image_surface_create_from_file : 
+  string -> Cairo.image_surface = "ml_cairo_image_surface_create_from_png"
+
+external image_surface_create_from_stream : 
+  (string -> unit) -> Cairo.image_surface = "ml_cairo_image_surface_create_from_stream"
+
+
+external surface_write_to_file : 
+  'a Cairo.surface -> string -> unit = "ml_cairo_surface_write_to_png"
+
+external surface_write_to_stream : 
+  'a Cairo.surface -> (string -> unit) -> unit = "ml_cairo_surface_write_to_png_stream"

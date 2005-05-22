@@ -6,35 +6,34 @@
 /*  GNU Lesser General Public License version 2.1 (the "LGPL").           */
 /**************************************************************************/
 
-#include <caml/alloc.h>
-#include <caml/memory.h>
-#include <caml/fail.h>
-#include <caml/callback.h>
-#include <caml/custom.h>
+#define CAML_NAME_SPACE
+
+#include "ml_cairo.h"
 
 #include <svg-cairo.h>
 
-#define report_null_pointer failwith("null pointer")
-#include "ml_cairo_wrappers.h"
-#include "ml_cairo.h"
+static value ml_svg_cairo_status (svg_cairo_status_t) Noreturn;
 
 static value
 ml_svg_cairo_status (svg_cairo_status_t s)
 {
   static value *exn;
-  if (s == SVG_CAIRO_STATUS_SUCCESS)
-    return Val_unit;
+  assert (s != SVG_CAIRO_STATUS_SUCCESS);
+
   if (exn == NULL)
     {
       exn = caml_named_value ("svg_cairo_status_exn");
       if (exn == NULL)
-	failwith ("Svg_cairo exception not registered");
+	caml_failwith ("svg-cairo exception");
     }
-  raise_with_arg (*exn, Val_int (s - 1));
+
+  caml_raise_with_arg (*exn, Val_int (s - 1));
 }
 
-Make_Val_final_pointer (svg_cairo_t, Id, svg_cairo_destroy, 100)
-#define svg_cairo_t_val(v) (svg_cairo_t *)Pointer_val(v)
+#define check_svg_cairo_status(s)	if (s != SVG_CAIRO_STATUS_SUCCESS) ml_svg_cairo_status (s)
+
+wMake_Val_final_pointer (svg_cairo_t, svg_cairo_destroy, 0)
+#define svg_cairo_t_val(v)	wPointer_val(svg_cairo_t, v)
 
 CAMLprim value
 ml_svg_cairo_create (value unit)
@@ -42,32 +41,80 @@ ml_svg_cairo_create (value unit)
   svg_cairo_status_t status;
   svg_cairo_t *s;
   status = svg_cairo_create (&s);
-  ml_svg_cairo_status (status);
+  check_svg_cairo_status (status);
   return Val_svg_cairo_t (s);
 }
 
-ML_2 (svg_cairo_parse, svg_cairo_t_val, String_val, ml_svg_cairo_status)
-
 CAMLprim value
-ml_svg_cairo_parse_buffer (value s, value b)
+ml_svg_cairo_parse (value v, value f)
 {
-  return ml_svg_cairo_status (svg_cairo_parse_buffer (svg_cairo_t_val (s),
-						      String_val (b),
-						      string_length (b)));
+  svg_cairo_status_t status;
+  status = svg_cairo_parse (svg_cairo_t_val (v), String_val (f));
+  check_svg_cairo_status (status);
+  return Val_unit;
 }
 
-ML_1 (svg_cairo_parse_chunk_begin, svg_cairo_t_val, ml_svg_cairo_status)
 CAMLprim value
-ml_svg_cairo_parse_chunk (value s, value b)
+ml_svg_cairo_parse_buffer (value v, value b)
 {
-  return ml_svg_cairo_status (svg_cairo_parse_chunk (svg_cairo_t_val (s),
-						     String_val (b),
-						     string_length (b)));
+  svg_cairo_status_t status;
+  status = svg_cairo_parse_buffer (svg_cairo_t_val (v), 
+				   String_val (b),
+				   caml_string_length (b));
+  check_svg_cairo_status (status);
+  return Val_unit;
 }
-ML_1 (svg_cairo_parse_chunk_end, svg_cairo_t_val, ml_svg_cairo_status)
 
-ML_2 (svg_cairo_render, svg_cairo_t_val, cairo_t_val, ml_svg_cairo_status)
-ML_3 (svg_cairo_set_viewport_dimension, svg_cairo_t_val, Unsigned_int_val, Unsigned_int_val, ml_svg_cairo_status)
+CAMLprim value
+ml_svg_cairo_parse_chunk_begin (value v)
+{
+  svg_cairo_status_t status;
+  status = svg_cairo_parse_chunk_begin (svg_cairo_t_val (v));
+  check_svg_cairo_status (status);
+  return Val_unit;
+}
+
+CAMLprim value
+ml_svg_cairo_parse_chunk (value v, value b, value o, value l)
+{
+  svg_cairo_status_t status;
+  if (Unsigned_int_val (o) + Unsigned_int_val (l) > caml_string_length (b))
+    caml_invalid_argument ("Svg_cairo.parse_chunk: invalid substring");
+  status = svg_cairo_parse_chunk (svg_cairo_t_val (v), 
+				  String_val (b) + Unsigned_int_val (o),
+				  Unsigned_int_val (l));
+  check_svg_cairo_status (status);
+  return Val_unit;
+}
+
+CAMLprim value
+ml_svg_cairo_parse_chunk_end (value v)
+{
+  svg_cairo_status_t status;
+  status = svg_cairo_parse_chunk_end (svg_cairo_t_val (v));
+  check_svg_cairo_status (status);
+  return Val_unit;
+}
+
+CAMLprim value
+ml_svg_cairo_render (value v, value cr)
+{
+  svg_cairo_status_t status;
+  status = svg_cairo_render (svg_cairo_t_val (v), cairo_t_val (cr));
+  check_svg_cairo_status (status);
+  return Val_unit;
+}
+
+CAMLprim value
+ml_svg_cairo_set_viewport_dimension (value v, value w, value h)
+{
+  svg_cairo_status_t status;
+  status = svg_cairo_set_viewport_dimension (svg_cairo_t_val (v),
+					     Unsigned_int_val (w),
+					     Unsigned_int_val (h));
+  check_svg_cairo_status (status);
+  return Val_unit;
+}
 
 CAMLprim value
 ml_svg_cairo_get_size (value s)
@@ -75,7 +122,7 @@ ml_svg_cairo_get_size (value s)
   int w, h;
   value r;
   svg_cairo_get_size (svg_cairo_t_val (s), &w, &h);
-  r = alloc_small (2, 0);
+  r = caml_alloc_small (2, 0);
   Field (r, 0) = Val_int (w);
   Field (r, 1) = Val_int (h);
   return r;

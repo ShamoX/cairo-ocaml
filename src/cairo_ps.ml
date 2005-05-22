@@ -6,12 +6,17 @@
 (*  GNU Lesser General Public License version 2.1 (the "LGPL").           *)
 (**************************************************************************)
 
-(** Xlib backend, via LablGTK *)
+type surface = [`Any|`PS] Cairo.surface
 
-type surface = [`Any|`Xlib] Cairo.surface
+external surface_create : 
+  string -> 
+  width_in_points:float -> 
+  height_in_points:float -> surface = "ml_cairo_ps_surface_create"
 
-external image_of_pixbuf : GdkPixbuf.pixbuf -> Cairo.image_surface = "ml_cairo_lablgtk_of_pixbuf"
-external shuffle_pixels  : GdkPixbuf.pixbuf -> unit = "ml_cairo_lablgtk_shuffle_pixels"
+external surface_create_for_stream :
+  (string -> unit) ->
+  width_in_points:float -> 
+  height_in_points:float -> surface = "ml_cairo_ps_surface_create_for_stream"
 
-external surface_create : [> `drawable] Gobject.obj -> surface = "ml_cairo_xlib_surface_create"
-external surface_set_size : [> `Xlib] Cairo.surface -> int -> int -> unit = "ml_cairo_xlib_surface_set_size"
+(* external set_dpi : *)
+(*   [> `PS] Cairo.surface -> x_dpi:float -> y_dpi:float -> unit = "ml_cairo_ps_surface_set_dpi" *)

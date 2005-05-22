@@ -12,7 +12,7 @@ let text = "hello, world"
 let box_text cr txt x y =
   Cairo.save cr ; begin
     let ext = Cairo.text_extents cr text in
-    let line_width = Cairo.current_line_width cr in
+    let line_width = Cairo.get_line_width cr in
     Cairo.rectangle cr
       (x +. ext.Cairo.x_bearing -. line_width)
       (y +. ext.Cairo.y_bearing -. line_width)
@@ -23,7 +23,7 @@ let box_text cr txt x y =
     Cairo.move_to cr x y ;
     Cairo.show_text cr txt ;
     Cairo.text_path cr txt ;
-    Cairo.set_rgb_color cr 1. 0. 0. ;
+    Cairo.set_source_rgb cr 1. 0. 0. ;
     Cairo.set_line_width cr 1.0 ;
     Cairo.stroke cr end ;
 
@@ -33,7 +33,7 @@ let box_text cr txt x y =
 let box_glyphs cr gly x y =
   Cairo.save cr ; begin
     let ext = Cairo.glyph_extents cr gly in
-    let line_width = Cairo.current_line_width cr in
+    let line_width = Cairo.get_line_width cr in
     Cairo.rectangle cr
       (x +. ext.Cairo.x_bearing -. line_width)
       (y +. ext.Cairo.y_bearing -. line_width)
@@ -48,26 +48,26 @@ let box_glyphs cr gly x y =
 	gly in
     Cairo.show_glyphs cr gly ;
     Cairo.glyph_path cr gly ;
-    Cairo.set_rgb_color cr 1. 0. 0. ;
+    Cairo.set_source_rgb cr 1. 0. 0. ;
     Cairo.set_line_width cr 1. ;
     Cairo.stroke cr end ;
   Cairo.restore cr
 
 let draw cr w h = 
-  Cairo.set_rgb_color cr 0. 0. 0. ;
+  Cairo.set_source_rgb cr 0. 0. 0. ;
   Cairo.set_line_width cr 2. ;
 
   Cairo.save cr ; begin
-    Cairo.set_rgb_color cr 1. 1. 1. ;
+    Cairo.set_source_rgb cr 1. 1. 1. ;
     Cairo.rectangle cr 0. 0. w h ;
-    Cairo.set_operator cr Cairo.OPERATOR_SRC ;
+    Cairo.set_operator cr Cairo.OPERATOR_SOURCE ;
     Cairo.fill cr end ;
   Cairo.restore cr ;
 
-  Cairo.select_font cr "serif" Cairo.FONT_SLANT_NORMAL Cairo.FONT_WEIGHT_NORMAL ;
-  Cairo.scale_font cr 40. ;
+  Cairo.select_font_face cr "serif" Cairo.FONT_SLANT_NORMAL Cairo.FONT_WEIGHT_NORMAL ;
+  Cairo.set_font_size cr 40. ;
   let { Cairo.font_height = height } as f_ext = 
-    Cairo.current_font_extents cr in
+    Cairo.font_extents cr in
   
   let glyphs =
     begin
@@ -96,9 +96,8 @@ let draw cr w h =
 
   Cairo.translate cr 0. (2. *. height) ;
   Cairo.save cr ; begin
-    let m = Cairo.matrix_create () in
-    Cairo.matrix_rotate m (10. *. atan 1. /. 45.) ;
-    Cairo.transform_font cr m ;
+    let m = Cairo.Matrix.init_rotate (10. *. atan 1. /. 45.) in
+    Cairo.set_font_matrix cr m ;
     box_text cr text 10. height end ;
   Cairo.restore cr ;
 
@@ -126,8 +125,8 @@ let main () =
   w#connect#destroy GMain.quit ;
 
   let p = GDraw.pixmap ~width ~height ~window:w () in
-  let cr = Cairo.create () in
-  Cairo_lablgtk.set_target_drawable cr p#pixmap ;
+  let s = Cairo_lablgtk.surface_create p#pixmap in
+  let cr = Cairo.create s in
   draw cr (float width) (float height) ;
   GMisc.pixmap p ~packing:w#add () ;
 

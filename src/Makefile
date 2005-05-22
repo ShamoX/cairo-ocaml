@@ -25,13 +25,16 @@ gtkcairo.opt : gtkcairo.cmxa dllmlgtkcairo.so
 svgcairo     : svg_cairo.cma libmlsvgcairo.a
 svgcairo.opt : svg_cairo.cmxa dllmlsvgcairo.so
 
-cairo_SRC = cairo_channel.mli cairo_channel.ml cairo.mli cairo.ml \
+cairo_SRC = cairo.mli cairo.ml \
             cairo_bigarray.mli cairo_bigarray.ml \
-	    cairo_ft.mli cairo_ft.ml \
+	    cairo_png.mli cairo_png.ml \
+	    cairo_pdf.mli cairo_pdf.ml \
+	    cairo_ps.mli cairo_ps.ml \
             ml_cairo_wrappers.c \
-	    ml_cairo_status.c ml_cairo_channel.c \
-            ml_cairo.c ml_cairo_bigarr.c ml_cairo_path.c \
-	    ml_cairo_ft.c
+            ml_cairo.c ml_cairo_status.c ml_cairo_bigarr.c ml_cairo_path.c \
+	    ml_cairo_surface.c ml_cairo_pattern.c ml_cairo_matrix.c \
+	    ml_cairo_font.c \
+	    ml_cairo_png.c ml_cairo_pdf.c ml_cairo_ps.c
 
 cairo.cma : $(call mlobjs,$(cairo_SRC))
 	$(OCAMLMKLIB) -o cairo -oc mlcairo $^ $(CAIRO_LIBS)
@@ -89,7 +92,7 @@ endif
           for lib in dll*.so ; do \
             ln -s $(INSTALLDIR)/$$lib $(DESTDIR)$(OCAMLLIB)/stublibs ; done ; fi
 
-DOCFILES = cairo_channel.mli cairo.mli cairo_bigarray.mli cairo_ft.mli
+DOCFILES = cairo.mli cairo_bigarray.mli cairo_png.mli cairo_pdf.mli cairo_ps.mli
 ifdef LABLGTKDIR
 DOCFILES += cairo_lablgtk.mli
 ifdef GTKCAIRO_CFLAGS
@@ -111,7 +114,7 @@ clean :
 	@$(OCAMLDEP) $^ > $@
 
 -include .depend
-include .depend_c
+-include .depend_c
 
 depend : .depend $(wildcard *.h *.c)
 	gcc -MM -isystem $(OCAMLLIB) -isystem $(C_LABLGTKDIR) $(patsubst -I%,-isystem %,$(GDK_CFLAGS)) $(filter %.c,$^) > .depend_c

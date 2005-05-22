@@ -6,24 +6,11 @@
 /*  GNU Lesser General Public License version 2.1 (the "LGPL").           */
 /**************************************************************************/
 
-#include <caml/mlvalues.h>
-#include <caml/alloc.h>
-#include <caml/memory.h>
-#include <caml/fail.h>
-#include <caml/custom.h>
-#include <caml/callback.h>
-
-#include "ml_cairo_wrappers.h"
-
-#include <cairo.h>
-#ifdef CAIRO_HAS_FT_FONT
-# include <cairo-ft.h>
-#endif
 
 #include "ml_cairo.h"
-#include "ml_cairo_status.h"
 
-#ifdef CAIRO_HAS_FT_FONT
+#if CAIRO_HAS_FT_FONT
+# include <cairo-ft.h>
 
 /* minimal Freetype interface */
 static void

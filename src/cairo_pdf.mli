@@ -6,11 +6,19 @@
 (*  GNU Lesser General Public License version 2.1 (the "LGPL").           *)
 (**************************************************************************)
 
-(** Support module for file-based backends (PostScript, PDF and PNG) *)
+(** PDF backend *)
 
-type t
+type surface = [`Any|`PDF] Cairo.surface
 
-val open_out : string -> t
-external of_out_channel : out_channel -> t = "ml_FILE_of_channel"
-external of_file_descr : Unix.file_descr -> t = "ml_FILE_of_file_descr"
-external close : t -> unit = "ml_fclose"
+external surface_create : 
+  string -> 
+  width_in_points:float -> 
+  height_in_points:float -> surface = "ml_cairo_pdf_surface_create"
+
+external surface_create_for_stream :
+  (string -> unit) ->
+  width_in_points:float -> 
+  height_in_points:float -> surface = "ml_cairo_pdf_surface_create_for_stream"
+
+external set_dpi :
+  [> `PDF] Cairo.surface -> x_dpi:float -> y_dpi:float -> unit = "ml_cairo_pdf_surface_set_dpi"

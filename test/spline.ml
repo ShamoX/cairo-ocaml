@@ -7,8 +7,8 @@
 (**************************************************************************)
 
 type point = Cairo.point = 
-    { mutable x : float ; 
-      mutable y : float }
+    { x : float ; 
+      y : float }
 
 type spl = {
     mutable pm           : GDraw.pixmap ;
@@ -20,7 +20,7 @@ type spl = {
     mutable xtrans     	 : float ;
     mutable ytrans     	 : float ;
     mutable click      	 : bool ;
-            drag_pt    	 : point ;
+    mutable drag_pt    	 : point ;
     mutable active       : int ;
     mutable width        : int ;
     mutable height       : int ;
@@ -68,7 +68,7 @@ let init_spl () =
 
 let draw_control_line cr a b w =
   Cairo.save cr ; begin
-    Cairo.set_rgb_color cr 0. 0. 1. ;
+    Cairo.set_source_rgb cr 0. 0. 1. ;
     Cairo.set_line_width cr w ;
     Cairo.move_to cr a.x a.y ;
     Cairo.line_to cr b.x b.y ;
@@ -79,7 +79,7 @@ let two_pi = 8. *. atan 1.
 
 let draw_spline cr spl =
   let drag_pt = { x = spl.drag_pt.x ; y = spl.drag_pt.y } in
-  Cairo.inverse_transform_point cr drag_pt ;
+  let drag_pt = Cairo.device_to_user cr drag_pt in
   Cairo.save cr ; begin
     Cairo.move_to cr  spl.pt.(0).x spl.pt.(0).y ;
     Cairo.curve_to cr 
@@ -87,7 +87,7 @@ let draw_spline cr spl =
       spl.pt.(2).x spl.pt.(2).y 
       spl.pt.(3).x spl.pt.(3).y ;
     
-    if spl.click && Cairo.in_stroke cr drag_pt.x drag_pt.y
+    if spl.click && Cairo.in_stroke cr drag_pt
     then spl.active <- 0xf ;
 
     Cairo.stroke cr ;
@@ -97,14 +97,13 @@ let draw_spline cr spl =
 
     for i=0 to 3 do
       Cairo.save cr ; begin
-	Cairo.set_rgb_color cr 1. 0. 0. ;
-	Cairo.set_alpha cr 0.5 ;
+	Cairo.set_source_rgba cr 1. 0. 0. 0.5 ;
 	Cairo.new_path cr ;
 	Cairo.arc cr 
 	  spl.pt.(i).x spl.pt.(i).y
 	  (spl.line_width /. 1.25)
 	  0. two_pi ;
-	if spl.click && Cairo.in_fill cr drag_pt.x drag_pt.y
+	if spl.click && Cairo.in_fill cr drag_pt
 	then begin
 	  spl.active <- 1 lsl i ;
 	  spl.click <- false
@@ -116,10 +115,10 @@ let draw_spline cr spl =
 	  
 
 let paint spl =
-  let cr = Cairo_lablgtk.create ~target:spl.pm#pixmap () in
+  let cr = Cairo.create (Cairo_lablgtk.surface_create spl.pm#pixmap) in
   spl.pm#rectangle ~x:0 ~y:0 
     ~width:spl.width ~height:spl.height ~filled:true () ;
-  Cairo.set_rgb_color cr 0. 0. 0. ;
+  Cairo.set_source_rgb cr 0. 0. 0. ;
   Cairo.set_line_width cr spl.line_width ;
   Cairo.set_line_cap cr spl.line_cap ;
   Cairo.translate cr spl.xtrans spl.ytrans ;
@@ -250,8 +249,7 @@ let button_ev da spl ev =
   match GdkEvent.get_type ev with
   | `BUTTON_PRESS ->
       spl.click <- true ;
-      spl.drag_pt.x <- GdkEvent.Button.x ev ;
-      spl.drag_pt.y <- GdkEvent.Button.y ev ;
+      spl.drag_pt <- { x = GdkEvent.Button.x ev ; y = GdkEvent.Button.y ev } ;
       true
   | `BUTTON_RELEASE -> 
       spl.click  <- false ;
@@ -265,12 +263,12 @@ let motion_notify_cb da spl ev =
   for i=0 to 3 do
     if (1 lsl i) land spl.active != 0
     then begin
-      spl.pt.(i).x <- spl.pt.(i).x +. (x -. spl.drag_pt.x) /. spl.zoom ;
-      spl.pt.(i).y <- spl.pt.(i).y +. (y -. spl.drag_pt.y) /. spl.zoom
+      let x = spl.pt.(i).x +. (x -. spl.drag_pt.x) /. spl.zoom in
+      let y = spl.pt.(i).y +. (y -. spl.drag_pt.y) /. spl.zoom in
+      spl.pt.(i) <- { x = x ; y = y }
     end
   done ;
-  spl.drag_pt.x <- x ;
-  spl.drag_pt.y <- y ;
+  spl.drag_pt <- { x = x ; y = y } ;
   refresh da spl ;
   true
 

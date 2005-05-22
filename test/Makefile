@@ -1,12 +1,12 @@
 
 include ../config.make
 
-TARGETS = kapow
+TARGETS = basket kapow
 ifdef LABLGTKDIR
-TARGETS += text demo spline basket knockout font
-# ifdef GTKCAIRO_CFLAGS
-# TARGETS += cube
-# endif
+TARGETS += text demo spline knockout # font
+ifdef GTKCAIRO_CFLAGS
+TARGETS += cube
+endif
 endif
 ifdef LIBSVG_CAIRO_CFLAGS
 TARGETS += svg2png 
@@ -36,10 +36,13 @@ spline : spline.ml
 	$(OCAMLOPT) -w s -o $@ -I ../src -I $(LABLGTKDIR) lablgtk.cmxa cairo.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
 
 basket : basket.ml
-	$(OCAMLOPT) -o $@ -I ../src -I $(LABLGTKDIR) bigarray.cmxa cairo.cmxa lablgtk.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
+	$(OCAMLOPT) -o $@ -I ../src -I $(LABLGTKDIR) bigarray.cmxa cairo.cmxa $^
+
+basket.b : basket.ml
+	$(OCAMLC) -g -o $@ -I ../src -I $(LABLGTKDIR) bigarray.cma cairo.cma $^
 
 knockout : knockout.ml
-	$(OCAMLOPT) -w s -o $@ -I ../src -I $(LABLGTKDIR) cairo.cmxa lablgtk.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
+	$(OCAMLOPT) -o $@ -I ../src -I $(LABLGTKDIR) cairo.cmxa lablgtk.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
 
 clean :
 	rm -f *.cm* *.o $(TARGETS) *.ps *.ppm *.png

@@ -6,19 +6,10 @@
 (*  GNU Lesser General Public License version 2.1 (the "LGPL").           *)
 (**************************************************************************)
 
-external image_of_pixbuf : GdkPixbuf.pixbuf -> Cairo.image = "cairo_lablgtk_of_pixbuf"
-external shuffle_pixels  : GdkPixbuf.pixbuf -> unit = "cairo_lablgtk_shuffle_pixels"
+type surface = [`Any|`Xlib] Cairo.surface
 
-external surface_create_for_drawable : 
-    [> `drawable] Gobject.obj ->
-    Cairo.format -> Cairo.surface = "cairo_lablgtk_surface_create_for_drawable"
-external set_target_drawable :
-    Cairo.t -> [> `drawable] Gobject.obj -> unit 
-      = "cairo_lablgtk_set_target_drawable"
+external image_of_pixbuf : GdkPixbuf.pixbuf -> Cairo.image_surface = "ml_cairo_lablgtk_of_pixbuf"
+external shuffle_pixels  : GdkPixbuf.pixbuf -> unit = "ml_cairo_lablgtk_shuffle_pixels"
 
-let create ?target () =
-  let c = Cairo.create () in
-  begin match target with
-  | None -> ()
-  | Some d -> set_target_drawable c d end ;
-  c
+external surface_create : [> `drawable] Gobject.obj -> surface = "ml_cairo_xlib_surface_create"
+external surface_set_size : [> `Xlib] Cairo.surface -> int -> int -> unit = "ml_cairo_xlib_surface_set_size"

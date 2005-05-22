@@ -63,7 +63,7 @@ let make_text_path cr x y text =
   Cairo.move_to cr x y ;
   Cairo.text_path cr text ;
   ignore 
-    (Cairo.fold_current_path_flat cr
+    (Cairo.fold_path_flat cr
        (fun first -> function
 	 | `MOVE_TO p -> 
 	     if first then Cairo.new_path cr ;
@@ -75,57 +75,53 @@ let make_text_path cr x y text =
        true)
     
 let draw text =
-  let file = Cairo_channel.open_out filename in
-  let cr = Cairo.create () in
-  Cairo.set_target_png cr file Cairo.FORMAT_ARGB32 (int_of_float width) (int_of_float height) ;
+  let cr = 
+    Cairo.create 
+      (Cairo.image_surface_create 
+	 Cairo.FORMAT_ARGB32 
+	 (int_of_float width) (int_of_float height))in
   Cairo.set_line_width cr 2. ;
 
   Cairo.save cr ; begin
     Cairo.translate cr shadow_offset shadow_offset ;
     make_star_path cr ;
-    Cairo.set_alpha cr 0.5 ;
-    Cairo.set_rgb_color cr 0. 0. 0. ;
-    Cairo.fill cr ; end ;
+    Cairo.set_source_rgba cr 0. 0. 0. 0.5 ;
+    Cairo.fill cr end ;
   Cairo.restore cr ;
 
   make_star_path cr ;
-  Cairo.set_alpha cr 1. ;
-
-  let pattern = Cairo.pattern_create_radial 
+  let pattern = Cairo.Pattern.create_radial 
       (width /. 2.) (height /. 2.) 10.
       (width /. 2.) (height /. 2.) 230. in
-  Cairo.pattern_add_color_stop pattern 0. 1. 1. 0.2 1. ;
-  Cairo.pattern_add_color_stop pattern 1. 1. 0. 0.  1. ;
-  Cairo.set_pattern cr pattern ;
+  Cairo.Pattern.add_color_stop_rgba pattern 0. 1. 1. 0.2 1. ;
+  Cairo.Pattern.add_color_stop_rgba pattern 1. 1. 0. 0.  1. ;
+  Cairo.set_source cr pattern ;
   Cairo.fill cr ;
 
   make_star_path cr ;
-  Cairo.set_rgb_color cr 0. 0. 0. ;
+  Cairo.set_source_rgb cr 0. 0. 0. ;
   Cairo.stroke cr ;
 
-  Cairo.select_font cr fontname Cairo.FONT_SLANT_NORMAL Cairo.FONT_WEIGHT_BOLD ;
-  Cairo.scale_font cr 50. ;
+  Cairo.select_font_face cr fontname Cairo.FONT_SLANT_NORMAL Cairo.FONT_WEIGHT_BOLD ;
+  Cairo.set_font_size cr 50. ;
   let extents = Cairo.text_extents cr text in
   let x = width /. 2. -. (extents.Cairo.text_width /. 2. +. extents.Cairo.x_bearing) in
   let y = height /. 2. -. (extents.Cairo.text_height /. 2. +. extents.Cairo.y_bearing) in
   make_text_path cr x y text ;
   
-  let pattern = Cairo.pattern_create_linear 
+  let pattern = Cairo.Pattern.create_linear 
       (width /. 2. -. 10.) (height /. 4.)
       (width /. 2. +. 10.) (3. *. height /. 4.) in
-  Cairo.pattern_add_color_stop pattern 0. 1. 1. 1.  1. ;
-  Cairo.pattern_add_color_stop pattern 1. 0. 0. 0.4 1. ;
-  Cairo.set_pattern cr pattern ;
+  Cairo.Pattern.add_color_stop_rgba pattern 0. 1. 1. 1.  1. ;
+  Cairo.Pattern.add_color_stop_rgba pattern 1. 0. 0. 0.4 1. ;
+  Cairo.set_source cr pattern ;
   Cairo.fill cr ;
 
   make_text_path cr x y text ;
-  Cairo.set_rgb_color cr 0. 0. 0. ;
+  Cairo.set_source_rgb cr 0. 0. 0. ;
   Cairo.stroke cr ;
 
-  Cairo.show_page cr ;
-  Cairo.finalise_target cr ;
-
-  Cairo_channel.close file
+  Cairo_png.surface_write_to_file (Cairo.get_target cr) filename
 
 let _ =
   draw

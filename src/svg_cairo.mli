@@ -6,6 +6,9 @@
 (*  GNU Lesser General Public License version 2.1 (the "LGPL").           *)
 (**************************************************************************)
 
+(** Rendering SVG documents with
+ cairo *)
+
 type status =
     NO_MEMORY
   | IO_ERROR
@@ -20,12 +23,16 @@ type t
 
 external create  : unit -> t = "ml_svg_cairo_create"
 
+(** {3 Parsing} *)
+
 external parse        : t -> string -> unit = "ml_svg_cairo_parse"
 external parse_string : t -> string -> unit = "ml_svg_cairo_parse_buffer"
 
 external parse_chunk_begin : t -> unit = "ml_svg_cairo_parse_chunk_begin"
-external parse_chunk       : t -> string -> unit = "ml_svg_cairo_parse_chunk"
+external parse_chunk       : t -> string -> int -> int -> unit = "ml_svg_cairo_parse_chunk"
 external parse_chunk_end   : t -> unit = "ml_svg_cairo_parse_chunk_end"
+
+(** {3 Rendering} *)
 
 external render : t -> Cairo.t -> unit = "ml_svg_cairo_render"
 

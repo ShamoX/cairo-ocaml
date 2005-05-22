@@ -64,12 +64,11 @@ let redraw (px : GDraw.pixmap) =
     let width, height = px#size in
     px#rectangle ~x:0 ~y:0 ~width ~height ~filled:true ()
   end ;
-  let cr = Cairo.create () in
-  Cairo_lablgtk.set_target_drawable cr px#pixmap ;
-  Cairo.set_rgb_color cr 1. 1. 1. ;
+  let cr = Cairo.create (Cairo_lablgtk.surface_create px#pixmap) in
+  Cairo.set_source_rgb cr 1. 1. 1. ;
 
   Cairo.save cr ; begin 
-    Cairo.scale_font cr 20. ;
+    Cairo.set_font_size cr 20. ;
     Cairo.move_to cr 10. 10. ;
     Cairo.rotate cr (pi /. 2.) ;
     Cairo.show_text cr "Hello World !" end ;
@@ -101,7 +100,7 @@ let redraw (px : GDraw.pixmap) =
   Cairo.set_line_join cr Cairo.LINE_JOIN_BEVEL ;
   draw_shapes cr 0. 0. true ;
 
-  Cairo.set_rgb_color cr 1. 0. 0. ;
+  Cairo.set_source_rgb cr 1. 0. 0. ;
   draw_shapes cr 0. 0. false
 
 

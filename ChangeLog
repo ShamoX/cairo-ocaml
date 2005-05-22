@@ -1,3 +1,13 @@
+2005-05-22  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/*: adjust to big API shakeup. Remove Cairo_channel module,
+	add Cairo_ps, Cairo_pdf, Cairo_png. GtkCairo and Cairo_ft disabled
+	for now.
+
+	* test/*: adjust to big API shakeup.
+
+	* configure.ac, README: require cairo 0.5.0
+
 2005-03-08  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/ml_cairo_ft.c, src/cairo_ft.ml, src/cairo_ft.mli:
