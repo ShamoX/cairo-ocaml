@@ -20,7 +20,6 @@ type status =
   | WRITE_ERROR
   | SURFACE_FINISHED
   | SURFACE_TYPE_MISMATCH
-  | BAD_NESTING
 exception Error of status
 let init = Callback.register_exception "cairo_status_exn" (Error NULL_POINTER)
 

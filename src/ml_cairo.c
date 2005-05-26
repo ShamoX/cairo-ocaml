@@ -509,6 +509,32 @@ ml_cairo_read_func (void *closure, unsigned char *data, unsigned int length)
   return CAIRO_STATUS_SUCCESS;
 }
 
+cairo_status_t
+ml_cairo_unsafe_write_func (void *closure, const unsigned char *data, unsigned int length)
+{
+  value res, *c = closure;
+  res = caml_callback2_exn (Field (*c, 0), Val_bp (data), Val_int (length));
+  if (Is_exception_result (res))
+    {
+      Store_field (*c, 1, res);
+      return CAIRO_STATUS_WRITE_ERROR;
+    }
+  return CAIRO_STATUS_SUCCESS;
+}
+
+cairo_status_t
+ml_cairo_unsafe_read_func (void *closure, unsigned char *data, unsigned int length)
+{
+  value res, *c = closure;
+  res = caml_callback2_exn (Field (*c, 0), Val_bp (data), Val_int (length));
+  if (Is_exception_result (res))
+    {
+      Store_field (*c, 1, res);
+      return CAIRO_STATUS_READ_ERROR;
+    }
+  return CAIRO_STATUS_SUCCESS;
+}
+
 
 
 wML_3(cairo_image_surface_create, cairo_format_t_val, Int_val, Int_val, Val_cairo_surface_t)

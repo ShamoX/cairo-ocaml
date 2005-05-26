@@ -8,10 +8,19 @@
 
 type surface = [`Any|`PS] Cairo.surface
 
-external surface_create : 
-  string -> 
+external surface_create_for_stream_unsafe : 
+  (string -> int -> unit) ->
   width_in_points:float -> 
-  height_in_points:float -> surface = "ml_cairo_ps_surface_create"
+  height_in_points:float -> surface = "ml_cairo_ps_surface_create_for_stream_unsafe"
+
+let unsafe_output_string oc s n =
+  for i = 0 to n - 1 do
+    output_char oc (String.unsafe_get s i)
+  done
+
+let surface_create_for_channel oc ~width_in_points ~height_in_points =
+  surface_create_for_stream_unsafe
+    (unsafe_output_string oc) ~width_in_points ~height_in_points
 
 external surface_create_for_stream :
   (string -> unit) ->

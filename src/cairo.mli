@@ -24,7 +24,6 @@ type status =
   | WRITE_ERROR
   | SURFACE_FINISHED
   | SURFACE_TYPE_MISMATCH
-  | BAD_NESTING
 exception Error of status
 val init : unit
 

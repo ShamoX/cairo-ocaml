@@ -8,15 +8,21 @@
 
 (** PNG reading/writing functions *)
 
-external image_surface_create_from_file : 
-  string -> Cairo.image_surface = "ml_cairo_image_surface_create_from_png"
+val image_surface_create_from_channel : 
+  in_channel -> Cairo.image_surface
+
+val image_surface_create_from_file : 
+  string -> Cairo.image_surface
 
 external image_surface_create_from_stream : 
-  (string -> unit) -> Cairo.image_surface = "ml_cairo_image_surface_create_from_stream"
+  (string -> unit) -> Cairo.image_surface = "ml_cairo_image_surface_create_from_png_stream"
 
 
-external surface_write_to_file : 
-  'a Cairo.surface -> string -> unit = "ml_cairo_surface_write_to_png"
+val surface_write_to_channel : 
+  'a Cairo.surface -> out_channel -> unit
+
+val surface_write_to_file : 
+  'a Cairo.surface -> string -> unit
 
 external surface_write_to_stream : 
   'a Cairo.surface -> (string -> unit) -> unit = "ml_cairo_surface_write_to_png_stream"

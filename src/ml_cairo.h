@@ -70,5 +70,8 @@ value	       *ml_cairo_make_closure	(value);
 value	       *ml_cairo_make_root	(value);
 cairo_status_t	ml_cairo_write_func	(void *, const unsigned char *, unsigned int);
 cairo_status_t	ml_cairo_read_func	(void *, unsigned char *, unsigned int);
+cairo_status_t	ml_cairo_unsafe_write_func	(void *, const unsigned char *, unsigned int);
+cairo_status_t	ml_cairo_unsafe_read_func	(void *, unsigned char *, unsigned int);
 
-void		ml_cairo_surface_set_user_data	(cairo_surface_t *, const cairo_user_data_key_t *, value *);
+void		ml_cairo_surface_set_stream_data	(cairo_surface_t *, value *);
+void		ml_cairo_surface_set_image_data		(cairo_surface_t *, value);

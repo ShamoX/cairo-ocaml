@@ -1,3 +1,16 @@
+2005-05-27  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/cairo.ml, src/cairo.mli: remove BAD_NESTING error status
+	
+	* src/cairo_pdf.*, src/cairo_ps.*, src/cairo_png.*: surface
+	creation function take an ocaml channel as argument
+
+	* src/ml_cairo.c: new stream functions for ocaml channels support
+
+	* src/ml_cairo_*.c: adapt, some code cleanups
+
+	* test/basket.ml: adapt, some fixes
+
 2005-05-22  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/*: adjust to big API shakeup. Remove Cairo_channel module,

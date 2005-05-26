@@ -43,7 +43,15 @@ let draw ?(print=false) c =
   Cairo.set_source_rgb c 0. 0. 0. ;
   Cairo.stroke c
 
-
+let do_file_out fname f =
+  let oc = open_out fname in
+  try
+    let r = f oc in
+    close_out oc ;
+    r
+  with exn ->
+    close_out_noerr oc ;
+    raise exn
 
 let x_inches = 8.
 let y_inches = 3.
@@ -52,53 +60,54 @@ let main () =
 
   begin
     prerr_endline "PS" ;
-    let s = Cairo_ps.surface_create "basket.ps" (x_inches *. 72.) (y_inches *. 72.) in
-    let c = Cairo.create s in
-    draw ~print:true c ;
-    Cairo.show_page c ;
-    Cairo.surface_finish s
+    do_file_out "basket.ps"
+      (fun oc ->
+	let s = Cairo_ps.surface_create_for_channel oc (x_inches *. 72.) (y_inches *. 72.) in
+	let c = Cairo.create s in
+	draw ~print:true c ;
+	Cairo.show_page c ;
+	Cairo.surface_finish s)
   end ;
 
   begin
     prerr_endline "PDF" ;
-    let s = Cairo_pdf.surface_create "basket.pdf" (x_inches *. 72.) (y_inches *. 72.) in
-    let c = Cairo.create s in
-    draw c ;
-    Cairo.show_page c ;
-    Cairo.surface_finish s
+    do_file_out "basket.pdf"
+      (fun oc ->
+	let s = Cairo_pdf.surface_create_for_channel oc (x_inches *. 72.) (y_inches *. 72.) in
+	let c = Cairo.create s in
+	draw c ;
+	Cairo.show_page c ;
+	Cairo.surface_finish s)
   end ;
 
   begin
-    prerr_endline "Bigarray, PPM and PNG" ;
+    prerr_endline "Bigarray, PPM and PNG (ARGB32) " ;
     let arr = 
-      Bigarray.Array2.create Bigarray.int Bigarray.c_layout
-	(int_of_float x_inches * 72) (int_of_float y_inches * 72) in
-    Bigarray.Array2.fill arr 0xffffff ;
-    let s = Cairo_bigarray.of_bigarr_24 arr in
+      Bigarray.Array2.create Bigarray.int32 Bigarray.c_layout
+	(int_of_float y_inches * 72) (int_of_float x_inches * 72) in
+    Bigarray.Array2.fill arr 0xffffffl ;
+    let s = Cairo_bigarray.of_bigarr_32 ~alpha:true arr in
     let c = Cairo.create s in
     draw c ;
-    begin
-      let oc = open_out "basket.ppm" in
-      Cairo_bigarray.write_ppm_int oc arr ;
-      close_out oc
-    end ;
+    do_file_out "basket.ppm"
+      (fun oc -> Cairo_bigarray.write_ppm_int32 oc arr) ;
     Cairo_png.surface_write_to_file s "basket.png"
   end
 
 (*
-  begin
-    prerr_endline "GdkPixbuf and PNG" ;
-    let pb = GdkPixbuf.create
-	~width:(int_of_float width)
-	~height:(int_of_float height) ~bits:8 ~has_alpha:true () in
-    GdkPixbuf.fill pb (Int32.of_string "0xffffffff") ;
-    let img = Cairo_lablgtk.image_of_pixbuf pb in
-    Cairo.set_target_image c img ;
-    draw c ;
-    Cairo_lablgtk.shuffle_pixels pb ;
-    GdkPixbuf.save ~filename:"basket.png" ~typ:"png" pb
-  end
-*)
+   begin
+   prerr_endline "GdkPixbuf and PNG" ;
+   let pb = GdkPixbuf.create
+   ~width:(int_of_float width)
+   ~height:(int_of_float height) ~bits:8 ~has_alpha:true () in
+   GdkPixbuf.fill pb (Int32.of_string "0xffffffff") ;
+   let img = Cairo_lablgtk.image_of_pixbuf pb in
+   Cairo.set_target_image c img ;
+   draw c ;
+   Cairo_lablgtk.shuffle_pixels pb ;
+   GdkPixbuf.save ~filename:"basket.png" ~typ:"png" pb
+   end
+ *)
 
 let () = 
   try main () 

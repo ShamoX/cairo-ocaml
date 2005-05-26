@@ -23,8 +23,6 @@
 CAMLprim value
 ml_cairo_lablgtk_of_pixbuf (value pb)
 {
-  static const cairo_user_data_key_t pixbuf_key;
-
   GdkPixbuf *pixbuf = GdkPixbuf_val(pb);
   cairo_format_t format;
   gboolean alpha = gdk_pixbuf_get_has_alpha(pixbuf);
@@ -43,7 +41,7 @@ ml_cairo_lablgtk_of_pixbuf (value pb)
 					      gdk_pixbuf_get_height(pixbuf),
 					      gdk_pixbuf_get_rowstride(pixbuf));
 
-  ml_cairo_surface_set_user_data (surf, &pixbuf_key, ml_cairo_make_root (pb));
+  ml_cairo_surface_set_image_data (surf, pb);
 
   return Val_cairo_surface_t (surf);
 }
@@ -83,8 +81,6 @@ ml_cairo_lablgtk_shuffle_pixels (value pb)
 CAMLprim value
 ml_cairo_xlib_surface_create (value d)
 {
-  static const cairo_user_data_key_t drawable_key;
-
   cairo_surface_t *surface;
   gint width, height;
   GdkDrawable *drawable = GdkDrawable_val(d);
@@ -113,7 +109,7 @@ ml_cairo_xlib_surface_create (value d)
   }
 
   if (surface != NULL)
-    ml_cairo_surface_set_user_data (surface, &drawable_key, ml_cairo_make_root (d));
+    ml_cairo_surface_set_image_data (surface, d);
 
   return Val_cairo_surface_t (surface);
 }

@@ -10,10 +10,10 @@
 
 type surface = [`Any|`PDF] Cairo.surface
 
-external surface_create : 
-  string -> 
+val surface_create_for_channel : 
+  out_channel -> 
   width_in_points:float -> 
-  height_in_points:float -> surface = "ml_cairo_pdf_surface_create"
+  height_in_points:float -> surface
 
 external surface_create_for_stream :
   (string -> unit) ->

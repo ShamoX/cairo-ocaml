@@ -26,23 +26,48 @@ ml_cairo_surface_finish (value surf)
   return Val_unit;
 }
 
-static void ml_cairo_destroy_user_data (void *data)
+static void
+ml_cairo_destroy_user_data (void *data)
 {
   caml_remove_global_root (data);
   caml_stat_free (data);
 }
 
 void
-ml_cairo_surface_set_user_data (cairo_surface_t *surf, const cairo_user_data_key_t *key, value *v)
+ml_cairo_surface_set_stream_data (cairo_surface_t *surf, value *root)
 {
+  static const cairo_user_data_key_t ml_cairo_stream_data_key;
+
   cairo_status_t s;
-  s = cairo_surface_set_user_data (surf,
-				   key, v,
+
+  s = cairo_surface_set_user_data (surf, 
+				   &ml_cairo_stream_data_key, root, 
 				   ml_cairo_destroy_user_data);
   if (s != CAIRO_STATUS_SUCCESS) 
     {
       cairo_surface_destroy (surf);
-      ml_cairo_destroy_user_data (v);
+      ml_cairo_destroy_user_data (root);
+      cairo_treat_status (s);
+    }
+}
+
+void
+ml_cairo_surface_set_image_data (cairo_surface_t *surf, value v)
+{
+  static const cairo_user_data_key_t ml_cairo_image_data_key;
+
+  cairo_status_t s;
+  value *root;
+
+  root = ml_cairo_make_root (v);
+
+  s = cairo_surface_set_user_data (surf, 
+				   &ml_cairo_image_data_key, root, 
+				   ml_cairo_destroy_user_data);
+  if (s != CAIRO_STATUS_SUCCESS) 
+    {
+      cairo_surface_destroy (surf);
+      ml_cairo_destroy_user_data (root);
       cairo_treat_status (s);
     }
 }

@@ -38,14 +38,13 @@ ml_bigarray_kind_float (value v)
 CAMLprim value
 ml_cairo_image_surface_create_for_data (value img, value fmt, value w, value h, value stride)
 {
-  static const cairo_user_data_key_t image_data_key;
   cairo_surface_t *surf;
   surf = cairo_image_surface_create_for_data (Data_bigarray_val (img),
 					      cairo_format_t_val (fmt),
 					      Int_val (w),
 					      Int_val (h),
 					      Int_val (stride));
-  ml_cairo_surface_set_user_data (surf, &image_data_key, ml_cairo_make_root (img));
+  ml_cairo_surface_set_image_data (surf, img);
 
   return Val_cairo_surface_t (surf);
 }
