@@ -10,7 +10,8 @@
  cairo *)
 
 type status =
-    NO_MEMORY
+    SUCCESS
+  | NO_MEMORY
   | IO_ERROR
   | FILE_NOT_FOUND
   | INVALID_VALUE

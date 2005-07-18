@@ -101,50 +101,56 @@ CAMLprim value ml_##cname##_bc (value *argv, int argn) \
 CAMLprim value ml_##cname##_bc (value *argv, int argn) \
 { return ml_##cname(argv[0],argv[1],argv[2],argv[3],argv[4],argv[5],argv[6]); }
 
+#ifndef W_CHECK_STATUS
+# define W_CHECK_STATUS check_cairo_status
+#endif
+#ifndef W_CONV_CAIRO
+# define W_CONV_CAIRO cairo_t_val
+#endif
+
 #define wML_0_cairo(cname) \
 CAMLprim value ml_cairo_##cname (value v_cr) \
-{ cairo_##cname (cairo_t_val (v_cr)); \
-  check_cairo_status (v_cr); \
+{ cairo_##cname (W_CONV_CAIRO(v_cr)); \
+  W_CHECK_STATUS(v_cr); \
   return Val_unit; \
 }
 #define wML_1_cairo(cname, conv1) \
 CAMLprim value ml_cairo_##cname (value v_cr, value arg1) \
-{ cairo_##cname (cairo_t_val (v_cr), conv1 (arg1)); \
-  check_cairo_status (v_cr); \
+{ cairo_##cname (W_CONV_CAIRO(v_cr), conv1 (arg1)); \
+  W_CHECK_STATUS(v_cr); \
   return Val_unit; \
 }
 #define wML_2_cairo(cname, conv1, conv2) \
 CAMLprim value ml_cairo_##cname (value v_cr, value arg1, value arg2) \
-{ cairo_##cname (cairo_t_val (v_cr), conv1 (arg1), conv2 (arg2)); \
-  check_cairo_status (v_cr); \
+{ cairo_##cname (W_CONV_CAIRO(v_cr), conv1 (arg1), conv2 (arg2)); \
+  W_CHECK_STATUS(v_cr); \
   return Val_unit; \
 }
 #define wML_3_cairo(cname, conv1, conv2, conv3) \
 CAMLprim value ml_cairo_##cname (value v_cr, value arg1, value arg2, value arg3) \
-{ cairo_##cname (cairo_t_val (v_cr), conv1 (arg1), conv2 (arg2), conv3 (arg3)); \
-  check_cairo_status (v_cr); \
+{ cairo_##cname (W_CONV_CAIRO(v_cr), conv1 (arg1), conv2 (arg2), conv3 (arg3)); \
+  W_CHECK_STATUS(v_cr); \
   return Val_unit; \
 }
 #define wML_4_cairo(cname, conv1, conv2, conv3, conv4) \
 CAMLprim value ml_cairo_##cname (value v_cr, value arg1, value arg2, value arg3, value arg4) \
-{ cairo_##cname (cairo_t_val (v_cr), conv1 (arg1), conv2 (arg2), conv3 (arg3), conv4 (arg4)); \
-  check_cairo_status (v_cr); \
+{ cairo_##cname (W_CONV_CAIRO(v_cr), conv1 (arg1), conv2 (arg2), conv3 (arg3), conv4 (arg4)); \
+  W_CHECK_STATUS(v_cr); \
   return Val_unit; \
 }
 #define wML_5_cairo(cname, conv1, conv2, conv3, conv4, conv5) \
 CAMLprim value ml_cairo_##cname (value v_cr, value arg1, value arg2, value arg3, value arg4, value arg5) \
-{ cairo_##cname (cairo_t_val (v_cr), conv1 (arg1), conv2 (arg2), conv3 (arg3), conv4 (arg4), conv5 (arg5)); \
-  check_cairo_status (v_cr); \
+{ cairo_##cname (W_CONV_CAIRO(v_cr), conv1 (arg1), conv2 (arg2), conv3 (arg3), conv4 (arg4), conv5 (arg5)); \
+  W_CHECK_STATUS(v_cr); \
   return Val_unit; \
 } \
 CAMLprim value ml_cairo_##cname##_bc (value *argv, int argn) \
 { return ml_cairo_##cname (argv[0],argv[1],argv[2],argv[3],argv[4],argv[5]); }
 #define wML_6_cairo(cname, conv1, conv2, conv3, conv4, conv5, conv6) \
 CAMLprim value ml_cairo_##cname (value v_cr, value arg1, value arg2, value arg3, value arg4, value arg5, value arg6) \
-{ cairo_##cname (cairo_t_val (v_cr), conv1 (arg1), conv2 (arg2), conv3 (arg3), conv4 (arg4), conv5 (arg5), conv6 (arg6)); \
-  check_cairo_status (v_cr); \
+{ cairo_##cname (W_CONV_CAIRO(v_cr), conv1 (arg1), conv2 (arg2), conv3 (arg3), conv4 (arg4), conv5 (arg5), conv6 (arg6)); \
+  W_CHECK_STATUS(v_cr); \
   return Val_unit; \
 } \
 CAMLprim value ml_cairo_##cname##_bc (value *argv, int argn) \
 { return ml_cairo_##cname (argv[0],argv[1],argv[2],argv[3],argv[4],argv[5], argv[6]); }
-

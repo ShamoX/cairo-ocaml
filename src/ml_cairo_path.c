@@ -20,6 +20,8 @@ ml_cairo_fold_path (cairo_path_t *path, value f, value acc)
   CAMLlocal5(var, t, p1, p2, p3);
   int i;
 
+  cairo_treat_status (path->status);
+
   for (i = 0; i < path->num_data; i += path->data[i].header.length)
     {
       cairo_path_data_t *data = &path->data[i];

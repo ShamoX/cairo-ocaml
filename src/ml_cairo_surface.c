@@ -10,8 +10,20 @@
 
 wMake_Val_final_pointer(cairo_surface_t, cairo_surface_destroy, 0)
 
+static cairo_content_t
+cairo_content_t_val (value v)
+{
+  switch (Long_val (v))
+    {
+    case 0: return CAIRO_CONTENT_COLOR;
+    case 1: return CAIRO_CONTENT_ALPHA;
+    case 2: return CAIRO_CONTENT_COLOR_ALPHA;
+    default: assert (0);
+    }
+}
+
 wML_4(cairo_surface_create_similar, \
-     cairo_surface_t_val, cairo_format_t_val, \
+     cairo_surface_t_val, cairo_content_t_val, \
      Int_val, Int_val, Val_cairo_surface_t)
 
 /* surface_reference */

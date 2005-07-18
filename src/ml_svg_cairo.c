@@ -20,6 +20,9 @@ ml_svg_cairo_status (svg_cairo_status_t s)
   static value *exn;
   assert (s != SVG_CAIRO_STATUS_SUCCESS);
 
+  if (s == SVG_CAIRO_STATUS_NO_MEMORY)
+    caml_raise_out_of_memory ();
+
   if (exn == NULL)
     {
       exn = caml_named_value ("svg_cairo_status_exn");
@@ -27,7 +30,7 @@ ml_svg_cairo_status (svg_cairo_status_t s)
 	caml_failwith ("svg-cairo exception");
     }
 
-  caml_raise_with_arg (*exn, Val_int (s - 1));
+  caml_raise_with_arg (*exn, Val_int (s));
 }
 
 #define check_svg_cairo_status(s)	if (s != SVG_CAIRO_STATUS_SUCCESS) ml_svg_cairo_status (s)
@@ -119,11 +122,11 @@ ml_svg_cairo_set_viewport_dimension (value v, value w, value h)
 CAMLprim value
 ml_svg_cairo_get_size (value s)
 {
-  int w, h;
+  unsigned int w, h;
   value r;
   svg_cairo_get_size (svg_cairo_t_val (s), &w, &h);
   r = caml_alloc_small (2, 0);
-  Field (r, 0) = Val_int (w);
-  Field (r, 1) = Val_int (h);
+  Field (r, 0) = Val_long (w);
+  Field (r, 1) = Val_long (h);
   return r;
 }

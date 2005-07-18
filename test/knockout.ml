@@ -25,7 +25,7 @@ let fill_checks c x y width height =
     let check = 
       Cairo.surface_create_similar
 	(Cairo.get_target c)
-	Cairo.FORMAT_RGB24 (2 * check_size) (2 * check_size) in
+	Cairo.CONTENT_COLOR (2 * check_size) (2 * check_size) in
 
     begin
       let f_size = float check_size in
@@ -72,9 +72,9 @@ let draw c width height =
   let yc = float height /. 2. in
 
   let sur = Cairo.get_target c in
-  let overlay = Cairo.surface_create_similar sur Cairo.FORMAT_ARGB32 width height in
-  let punch = Cairo.surface_create_similar sur Cairo.FORMAT_A8 width height in
-  let circles = Cairo.surface_create_similar sur Cairo.FORMAT_ARGB32 width height in
+  let overlay = Cairo.surface_create_similar sur Cairo.CONTENT_COLOR_ALPHA width height in
+  let punch = Cairo.surface_create_similar sur Cairo.CONTENT_ALPHA width height in
+  let circles = Cairo.surface_create_similar sur Cairo.CONTENT_COLOR_ALPHA width height in
 
   fill_checks c 0. 0. width height ;
 

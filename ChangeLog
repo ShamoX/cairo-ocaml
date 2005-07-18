@@ -1,3 +1,12 @@
+2005-07-18  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* configure.ac, README: require cairo 0.5.2
+	
+	* src/*: adapt to cairo 0.5.1 and 0.5.2 API changes (new status
+	values and functions, new pattern functions)
+
+	* test/knockout.ml: adapt to API change
+
 2005-05-27  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/cairo.ml, src/cairo.mli: remove BAD_NESTING error status

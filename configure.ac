@@ -5,7 +5,7 @@ AC_CONFIG_AUX_DIR(support)
 AC_PROG_OCAML()
 
 # Check for cairo
-PKG_CHECK_MODULES(CAIRO, cairo >= 0.5.0)
+PKG_CHECK_MODULES(CAIRO, cairo >= 0.5.2)
 
 # Optional GTK support (for the X11 backend)
 AC_ARG_WITH(gtk, 

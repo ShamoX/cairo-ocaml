@@ -10,7 +10,13 @@
 
 wMake_Val_final_pointer(cairo_t, cairo_destroy, 0)
 
-wML_1(cairo_create, cairo_surface_t_val, Val_cairo_t)
+CAMLprim value
+ml_cairo_create (value surf)
+{
+  cairo_t *p = cairo_create (cairo_surface_t_val (surf));
+  cairo_treat_status (cairo_status (p));
+  return Val_cairo_t (p);
+}
 
 /* cairo_reference */
 /* cairo_destroy   */

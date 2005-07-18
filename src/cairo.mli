@@ -11,12 +11,13 @@
 (** {3 Error reporting} *)
 
 type status =
-    NO_MEMORY
+    SUCCESS
+  | NO_MEMORY
   | INVALID_RESTORE
   | INVALID_POP_GROUP
   | NO_CURRENT_POINT
   | INVALID_MATRIX
-  | NO_TARGET_SURFACE
+  | INVALID_STATUS
   | NULL_POINTER
   | INVALID_STRING
   | INVALID_PATH_DATA
@@ -24,6 +25,7 @@ type status =
   | WRITE_ERROR
   | SURFACE_FINISHED
   | SURFACE_TYPE_MISMATCH
+  | PATTERN_TYPE_MISMATCH
 exception Error of status
 val init : unit
 
@@ -47,8 +49,9 @@ val create : 'a surface -> t
 external save    : t -> unit = "ml_cairo_save"
 external restore : t -> unit = "ml_cairo_restore"
 
-external status : t -> status option = "ml_cairo_status"
-external status_string : t -> string = "ml_cairo_status_string"
+external status : t -> status = "ml_cairo_status"
+external pattern_status : [> `Any] pattern -> status = "ml_cairo_pattern_status"
+external string_of_status : status -> string = "ml_cairo_status_to_string"
 
 (** {4 Renderer state} *)
 
@@ -219,13 +222,12 @@ val append_path : t -> [< path] -> unit
 
 (** {3 Surface API} *)
 
-type format =
-    FORMAT_ARGB32
-  | FORMAT_RGB24
-  | FORMAT_A8
-  | FORMAT_A1
+type content =
+    CONTENT_COLOR
+  | CONTENT_ALPHA
+  | CONTENT_COLOR_ALPHA
 
-external surface_create_similar : 'a surface -> format -> width:int -> height:int -> 'a surface = "ml_cairo_surface_create_similar"
+external surface_create_similar : 'a surface -> content -> width:int -> height:int -> 'a surface = "ml_cairo_surface_create_similar"
 
 external surface_finish : 'a surface -> unit = "ml_cairo_surface_finish"
 
@@ -235,12 +237,19 @@ external surface_set_device_offset : 'a surface -> float -> float -> unit = "ml_
 
 type image_surface = [`Any|`Image] surface
 
+type format =
+    FORMAT_ARGB32
+  | FORMAT_RGB24
+  | FORMAT_A8
+  | FORMAT_A1
+
 external image_surface_create : format -> width:int -> height:int -> image_surface = "ml_cairo_image_surface_create"
 external image_surface_get_width  : [>`Image] surface -> int = "ml_cairo_image_surface_get_width"
 external image_surface_get_height : [>`Image] surface -> int = "ml_cairo_image_surface_get_height"
 
 (** {4 Patterns} *)
 
+type solid_pattern = [`Any|`Solid] pattern
 type surface_pattern  = [`Any|`Surface] pattern
 type gradient_pattern = [`Any|`Gradient] pattern
 
@@ -259,6 +268,8 @@ type filter =
 
 (** Patterns functions *)
 module Pattern : sig
+external create_rgb  : red:float -> green:float -> blue:float -> solid_pattern = "ml_cairo_pattern_create_rgb"
+external create_rgba : red:float -> green:float -> blue:float -> alpha:float -> solid_pattern = "ml_cairo_pattern_create_rgba"
 external create_for_surface : 'a surface -> surface_pattern = "ml_cairo_pattern_create_for_surface"
 external create_linear : x0:float -> y0:float -> x1:float -> y1:float -> gradient_pattern = "ml_cairo_pattern_create_linear"
 external create_radial : cx0:float -> cy0:float -> radius0:float -> cx1:float -> cy1:float -> radius1:float -> gradient_pattern = "ml_cairo_pattern_create_radial_bc" "ml_cairo_pattern_create_radial"

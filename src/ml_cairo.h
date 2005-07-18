@@ -63,6 +63,7 @@ value	Val_cairo_text_extents	(cairo_text_extents_t *);
 void ml_cairo_treat_status (cairo_status_t) Noreturn;
 #define cairo_treat_status(s)   if (s != CAIRO_STATUS_SUCCESS) ml_cairo_treat_status (s)
 #define check_cairo_status(cr)	cairo_treat_status (cairo_status (cairo_t_val (cr)))
+#define check_pattern_status(cr)	cairo_treat_status (cairo_pattern_status (cairo_pattern_t_val (cr)))
 #define report_null_pointer()	ml_cairo_treat_status (CAIRO_STATUS_NULL_POINTER)
 
 /* stream callbacks */
