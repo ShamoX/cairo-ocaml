@@ -19,10 +19,10 @@ external image_surface_create_from_stream :
 
 
 val surface_write_to_channel : 
-  'a Cairo.surface -> out_channel -> unit
+  [> `Any] Cairo.surface -> out_channel -> unit
 
 val surface_write_to_file : 
-  'a Cairo.surface -> string -> unit
+  [> `Any] Cairo.surface -> string -> unit
 
 external surface_write_to_stream : 
-  'a Cairo.surface -> (string -> unit) -> unit = "ml_cairo_surface_write_to_png_stream"
+  [> `Any] Cairo.surface -> (string -> unit) -> unit = "ml_cairo_surface_write_to_png_stream"

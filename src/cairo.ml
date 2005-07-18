@@ -28,7 +28,7 @@ let init = Callback.register_exception "cairo_status_exn" (Error NULL_POINTER)
 type t
 type -'a surface
 type -'a pattern
-type font_face
+type -'a font_face
 
 type point = { x : float ; y : float }
 type matrix = {
@@ -37,7 +37,7 @@ type matrix = {
     x0 : float ; y0 : float 
   }
 
-external create : 'a surface -> t = "ml_cairo_create"
+external create : [> `Any] surface -> t = "ml_cairo_create"
 external save : t -> unit = "ml_cairo_save"
 external restore : t -> unit = "ml_cairo_restore"
 
@@ -64,8 +64,8 @@ external set_operator : t -> operator -> unit = "ml_cairo_set_operator"
 
 external set_source_rgb  : t -> red:float -> green:float -> blue:float -> unit = "ml_cairo_set_source_rgb"
 external set_source_rgba : t -> red:float -> green:float -> blue:float -> alpha:float ->unit = "ml_cairo_set_source_rgba"
-external set_source : t -> 'a pattern -> unit = "ml_cairo_set_source"
-external set_source_surface : t -> 'a surface -> float -> float -> unit = "ml_cairo_set_source_surface"
+external set_source : t -> [> `Any] pattern -> unit = "ml_cairo_set_source"
+external set_source_surface : t -> [> `Any] surface -> float -> float -> unit = "ml_cairo_set_source_surface"
 
 external set_tolerance : t -> float -> unit = "ml_cairo_set_tolerance"
 
@@ -115,8 +115,8 @@ external close_path : t -> unit = "ml_cairo_close_path"
 external paint : t -> unit = "ml_cairo_paint"
 external paint_with_alpha : t -> float -> unit = "ml_cairo_paint_with_alpha"
 
-external mask : t -> 'a pattern -> unit = "ml_cairo_mask"
-external mask_surface : t -> 'a surface -> surface_x:float -> surface_y:float -> unit = "ml_cairo_mask_surface"
+external mask : t -> [> `Any] pattern -> unit = "ml_cairo_mask"
+external mask_surface : t -> [> `Any] surface -> surface_x:float -> surface_y:float -> unit = "ml_cairo_mask_surface"
 
 external stroke : t -> unit = "ml_cairo_stroke"
 external stroke_preserve : t -> unit = "ml_cairo_stroke_preserve"
@@ -162,16 +162,16 @@ external set_font_matrix : t -> matrix -> unit = "ml_cairo_set_font_matrix"
 external get_font_matrix : t -> matrix = "ml_cairo_get_font_matrix"
 external show_text : t -> string -> unit = "ml_cairo_show_text"
 external show_glyphs : t -> glyph array -> unit = "ml_cairo_show_glyphs"
-external get_font_face : t -> font_face = "ml_cairo_get_font_face"
+external get_font_face : t -> [`Any] font_face = "ml_cairo_get_font_face"
 external font_extents : t -> font_extents = "ml_cairo_font_extents"
-external set_font_face : t -> font_face -> unit = "ml_cairo_set_font_face"
+external set_font_face : t -> [> `Any] font_face -> unit = "ml_cairo_set_font_face"
 external text_extents : t -> string -> text_extents = "ml_cairo_text_extents"
 external glyph_extents : t -> glyph array -> text_extents = "ml_cairo_glyph_extents"
 external text_path : t -> string -> unit = "ml_cairo_text_path"
 external glyph_path : t -> glyph array -> unit = "ml_cairo_glyph_path"
 
 external get_operator : t -> operator = "ml_cairo_get_operator"
-external get_source : t -> 'a pattern = "ml_cairo_get_source"
+external get_source : t -> [`Any] pattern = "ml_cairo_get_source"
 external get_tolerance : t -> float = "ml_cairo_get_tolerance"
 external get_current_point : t -> point = "ml_cairo_get_current_point"
 external get_fill_rule : t -> fill_rule = "ml_cairo_get_fill_rule"
@@ -180,7 +180,7 @@ external get_line_cap : t -> line_cap = "ml_cairo_get_line_cap"
 external get_line_join : t -> line_join = "ml_cairo_get_line_join"
 external get_miter_limit : t -> float = "ml_cairo_get_miter_limit"
 external get_matrix : t -> matrix = "ml_cairo_get_matrix"
-external get_target : t -> 'a surface = "ml_cairo_get_target"
+external get_target : t -> [`Any] surface = "ml_cairo_get_target"
 
 type flat_path = [
   | `MOVE_TO of point
@@ -210,11 +210,11 @@ type content =
   | CONTENT_ALPHA
   | CONTENT_COLOR_ALPHA
 
-external surface_create_similar : 'a surface -> content -> width:int -> height:int -> 'a surface = "ml_cairo_surface_create_similar"
+external surface_create_similar : [> `Any] surface -> content -> width:int -> height:int -> [`Any] surface = "ml_cairo_surface_create_similar"
 
-external surface_finish : 'a surface -> unit = "ml_cairo_surface_finish"
+external surface_finish : [> `Any] surface -> unit = "ml_cairo_surface_finish"
 
-external surface_set_device_offset : 'a surface -> float -> float -> unit = "ml_cairo_surface_set_device_offset"
+external surface_set_device_offset : [> `Any] surface -> float -> float -> unit = "ml_cairo_surface_set_device_offset"
 
 
 type image_surface = [`Any|`Image] surface
@@ -252,15 +252,15 @@ type gradient_pattern = [`Any|`Gradient] pattern
 module Pattern = struct
 external create_rgb  : red:float -> green:float -> blue:float -> solid_pattern = "ml_cairo_pattern_create_rgb"
 external create_rgba : red:float -> green:float -> blue:float -> alpha:float -> solid_pattern = "ml_cairo_pattern_create_rgba"
-external create_for_surface : 'a surface -> surface_pattern = "ml_cairo_pattern_create_for_surface"
+external create_for_surface : [> `Any] surface -> surface_pattern = "ml_cairo_pattern_create_for_surface"
 external create_linear : x0:float -> y0:float -> x1:float -> y1:float -> gradient_pattern = "ml_cairo_pattern_create_linear"
 external create_radial : cx0:float -> cy0:float -> radius0:float -> cx1:float -> cy1:float -> radius1:float -> gradient_pattern = "ml_cairo_pattern_create_radial_bc" "ml_cairo_pattern_create_radial"
 
 external add_color_stop_rgb  : [>`Gradient] pattern -> off:float -> red:float -> green:float -> blue:float -> unit = "ml_cairo_pattern_add_color_stop_rgb"
 external add_color_stop_rgba : [>`Gradient] pattern -> off:float -> red:float -> green:float -> blue:float -> alpha:float -> unit = "ml_cairo_pattern_add_color_stop_rgba_bc" "ml_cairo_pattern_add_color_stop_rgba"
 
-external set_matrix : 'a pattern -> matrix -> unit = "ml_cairo_pattern_set_matrix"
-external get_matrix : 'a pattern -> matrix = "ml_cairo_pattern_get_matrix"
+external set_matrix : [> `Any] pattern -> matrix -> unit = "ml_cairo_pattern_set_matrix"
+external get_matrix : [> `Any] pattern -> matrix = "ml_cairo_pattern_get_matrix"
 
 external set_extend : [> `Surface] pattern -> extend -> unit = "ml_cairo_pattern_set_extend"
 external get_extend : [> `Surface] pattern -> extend = "ml_cairo_pattern_get_extend"
@@ -294,9 +294,9 @@ end
 
 (* fonts *)
 module Scaled_Font = struct
-type t
+type -'a t
 
-external create : font_face -> matrix -> matrix -> t = "ml_cairo_scaled_font_create"
-external font_extents : t -> font_extents = "ml_cairo_scaled_font_extents"
-external glyph_extents : t -> glyph array -> text_extents = "ml_cairo_scaled_font_glyph_extents"
+external create : ([>`Any] as 'a) font_face -> matrix -> matrix -> 'a t = "ml_cairo_scaled_font_create"
+external font_extents : [> `Any] t -> font_extents = "ml_cairo_scaled_font_extents"
+external glyph_extents : [> `Any] t -> glyph array -> text_extents = "ml_cairo_scaled_font_glyph_extents"
 end

@@ -1,5 +1,15 @@
 2005-07-18  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
+	* src/cairo_ft.ml, src/cairo_ft.mli, src/ml_cairo_ft.c: re-enable
+	freetype font backend bindings
+
+	* test/font.ml: adapt
+
+	* src/cairo.mli, src/cairo_png.mli: use `Any surface instead of 'a
+	surface everywhere
+
+2005-07-18  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
 	* configure.ac, README: require cairo 0.5.2
 	
 	* src/*: adapt to cairo 0.5.1 and 0.5.2 API changes (new status

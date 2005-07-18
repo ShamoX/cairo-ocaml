@@ -24,13 +24,21 @@ ml_raise_FT_Error (FT_Error err)
     {
       caml_exn = caml_named_value ("FT_exn");
       if (caml_exn == NULL)
-	failwith ("freetype error");
+	caml_failwith ("freetype error");
     }
 
-  raise_with_arg (*caml_exn, Val_int (err));
+  caml_raise_with_arg (*caml_exn, Val_int (err));
 }
 
-#define FT_Library_val(v) (FT_Library)Pointer_val(v)
+static value
+Val_ptr (void *p)
+{
+  value v = caml_alloc_small (1, Abstract_tag);
+  Field (v, 0) = Val_bp (p);
+  return v;
+}
+
+#define FT_Library_val(v) (FT_Library)(Field(v, 0))
 
 CAMLprim value
 ml_FT_Init_FreeType (value unit)
@@ -47,13 +55,13 @@ ml_FT_Done_FreeType (value lib)
   return Val_unit;
 }
 
-#define FT_Face_val(v) (FT_Face)Pointer_val(v)
+#define FT_Face_val(v) (FT_Face)(Field(v, 0))
 
 CAMLprim value
 ml_FT_New_Face (value lib, value o_index, value path)
 {
   FT_Face face;
-  FT_Long index = Option_val(o_index, Long_val, 0);
+  FT_Long index = Is_block(o_index) ? Long_val(Field(o_index, 0)) : 0;
   ml_raise_FT_Error (FT_New_Face (FT_Library_val (lib),
 				  String_val (path),
 				  index, &face));
@@ -68,10 +76,23 @@ ml_FT_Done_Face (value face)
 }
 
 /* minimal Fontconfig interface */
-Make_Val_final_pointer (FcPattern, Id, FcPatternDestroy, 10)
-#define FcPattern_val(v) (FcPattern *)Pointer_val(v)
+wMake_Val_final_pointer (FcPattern, FcPatternDestroy, 10)
+#define FcPattern_val(v) wPointer_val(FcPattern,v)
 
-ML_1 (FcNameParse, String_val, Val_FcPattern)
+#define UString_val(v) ((unsigned char *) (v))
+
+CAMLprim value
+ml_FcNameParse (value s)
+{
+  FcPattern *p1, *p2;
+  FcResult res;
+  p1 = FcNameParse (UString_val(s));
+  FcConfigSubstitute (NULL, p1, FcMatchPattern);
+  FcDefaultSubstitute (p1);
+  p2 = FcFontMatch (NULL, p1, &res);
+  FcPatternDestroy (p1);
+  return Val_FcPattern (p2);
+}
 
 CAMLprim value
 ml_FcNameUnparse (value patt)
@@ -80,27 +101,17 @@ ml_FcNameUnparse (value patt)
   value r;
   s = FcNameUnparse (FcPattern_val (patt));
   if (s == NULL)
-    failwith ("FcNameUnparse");
-  r = copy_string (s);
+    caml_failwith ("FcNameUnparse");
+  r = caml_copy_string ((char *) s);
   free (s);
   return r;
 }
 
 /* cairo Fontconfig/Freetype font backend */
-ML_2 (cairo_ft_font_create, FcPattern_val, cairo_matrix_t_val, Val_cairo_font_t)
-ML_3 (cairo_ft_font_create_for_ft_face, FT_Face_val, Int_val, cairo_matrix_t_val, Val_cairo_font_t)
-ML_1 (cairo_ft_font_lock_face, cairo_font_t_val, Val_ptr)
-ML_1 (cairo_ft_font_unlock_face, cairo_font_t_val, Unit)
-CAMLprim value
-ml_cairo_ft_font_get_pattern (value font)
-{
-  FcPattern *p;
-  p = cairo_ft_font_get_pattern (cairo_font_t_val (font));
-  if (p == NULL)
-    failwith ("cairo_ft_font_get_pattern: NULL pointer");
-  FcPatternReference (p);
-  return Val_FcPattern (p);
-}
+wML_1 (cairo_ft_font_face_create_for_pattern, FcPattern_val, Val_cairo_font_face_t)
+wML_2 (cairo_ft_font_face_create_for_ft_face, FT_Face_val, Int_val, Val_cairo_font_face_t)
+wML_1 (cairo_ft_scaled_font_lock_face, cairo_scaled_font_t_val, Val_ptr)
+wML_1 (cairo_ft_scaled_font_unlock_face, cairo_scaled_font_t_val, Unit)
 
 #else
 
@@ -110,10 +121,9 @@ Unsupported (ml_FT_New_Face)
 Unsupported (ml_FT_Done_Face)
 Unsupported (ml_FcNameParse)
 Unsupported (ml_FcNameUnparse)
-Unsupported (ml_cairo_ft_font_create)
+Unsupported (ml_cairo_ft_font_create_for_pattern)
 Unsupported (ml_cairo_ft_font_create_for_ft_face)
-Unsupported (ml_cairo_ft_font_lock_face)
-Unsupported (ml_cairo_ft_font_unlock_face)
-Unsupported (ml_cairo_ft_font_get_pattern)
+Unsupported (ml_cairo_ft_scaled_font_lock_face)
+Unsupported (ml_cairo_ft_scaled_font_unlock_face)
 
 #endif /* CAIRO_HAS_FT_FONT */

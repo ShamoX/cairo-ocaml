@@ -14,34 +14,32 @@ let main font_arg =
     if Sys.file_exists font_arg
     then
       let face = Cairo_ft.new_face ft font_arg in
-      let font = Cairo_ft.font_create_for_ft_face face in
+      let font = Cairo_ft.font_face_create_for_ft_face face 0 in
       (font, (fun () -> Cairo_ft.done_face face))
-    else
+    else begin
       let pattern = Cairo_ft.fc_name_parse font_arg in
-      let font = Cairo_ft.font_create ft pattern in
+      let font = Cairo_ft.font_face_create_for_pattern pattern in
       (font, ignore)
+    end
   in
 
-  let cr = Cairo.create () in
-  let file = Cairo_channel.open_out "test_font.png" in
-  Cairo.set_target_png ~cr ~file Cairo.FORMAT_ARGB32 ~width:200 ~height:200 ;
+  let s = Cairo.image_surface_create Cairo.FORMAT_ARGB32 ~width:200 ~height:200 in
+  let cr = Cairo.create s in
 
-  Cairo.set_font ~cr ~font ;
+  Cairo.set_font_face cr font ;
 
-  Cairo.scale_font cr 20. ;
+  Cairo.set_font_size cr 20. ;
   Cairo.move_to cr 10. 10. ;
   Cairo.rotate cr (pi /. 2.) ;
   Cairo.show_text cr "Hello World !" ;
 
-  Cairo.finalise_target ~cr ;
-  Cairo_channel.close file ;
+  Cairo_png.surface_write_to_file s "test_font.png" ;
 
   clean_up () ;
   Cairo_ft.done_freetype ft
 
 let _ =
   if Array.length Sys.argv < 2 then exit 1 ;
-  main Sys.argv.(1)
-
-
-
+  try main Sys.argv.(1)
+  with Cairo.Error s ->
+    Printf.eprintf "Cairo error: '%s'\n%!" (Cairo.string_of_status s)

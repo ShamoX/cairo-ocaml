@@ -32,7 +32,7 @@ external image_surface_create_from_stream :
 
 
 external surface_write_to_stream_unsafe : 
-  'a Cairo.surface -> (string -> int -> unit) -> unit = "ml_cairo_surface_write_to_png_stream_unsafe"
+  [> `Any] Cairo.surface -> (string -> int -> unit) -> unit = "ml_cairo_surface_write_to_png_stream_unsafe"
 
 let unsafe_output_string oc s n =
   for i = 0 to n - 1 do
@@ -45,7 +45,7 @@ let surface_write_to_channel surf oc =
     (unsafe_output_string oc)
 
 let surface_write_to_file surf fname =
-  let oc = open_out fname in
+  let oc = open_out_bin fname in
   try
     surface_write_to_channel surf oc ;
     close_out oc
@@ -54,4 +54,4 @@ let surface_write_to_file surf fname =
     raise exn
 
 external surface_write_to_stream : 
-  'a Cairo.surface -> (string -> unit) -> unit = "ml_cairo_surface_write_to_png_stream"
+  [> `Any] Cairo.surface -> (string -> unit) -> unit = "ml_cairo_surface_write_to_png_stream"

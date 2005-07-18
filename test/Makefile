@@ -3,7 +3,7 @@ include ../config.make
 
 TARGETS = basket kapow
 ifdef LABLGTKDIR
-TARGETS += text demo spline knockout # font
+TARGETS += text demo spline knockout font
 ifdef GTKCAIRO_CFLAGS
 TARGETS += cube
 endif
