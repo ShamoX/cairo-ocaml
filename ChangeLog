@@ -1,3 +1,10 @@
+2005-08-11  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/* : adapt to cairo-0.6.0
+	
+	* Makefile, config.make.in, configure.ac: 
+	specify version number in the configure.ac file
+
 2005-07-18  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/cairo_ft.ml, src/cairo_ft.mli, src/ml_cairo_ft.c: re-enable
