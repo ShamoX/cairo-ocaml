@@ -313,6 +313,9 @@ ml_cairo_get_font_matrix (value v_cr)
 #endif
 }
 
+wML_1_cairo (set_font_options, cairo_font_options_t_val)
+wML_1_cairo (get_font_options, cairo_font_options_t_val)
+
 wML_1_cairo(show_text, String_val)
 
 cairo_glyph_t *

@@ -78,47 +78,71 @@ ml_cairo_lablgtk_shuffle_pixels (value pb)
 
 
 #if CAIRO_HAS_XLIB_SURFACE
+/* copied from pycairo, who got it from GTK+ */
+static cairo_surface_t *
+ml_gdk_cairo_surface_create (GdkDrawable *target)
+{
+    int width, height;
+    int x_off=0, y_off=0;
+    cairo_surface_t *surface;
+    GdkDrawable *drawable = target;
+    GdkVisual *visual;
+
+    if (GDK_IS_WINDOW(target)) {
+        /* query the window's backbuffer if it has one */
+	GdkWindow *window = GDK_WINDOW(target);
+	gdk_window_get_internal_paint_info (window,
+					    &drawable, &x_off, &y_off);
+    }
+    visual = gdk_drawable_get_visual (drawable);
+    gdk_drawable_get_size (drawable, &width, &height);
+
+    if (visual) {
+	surface = cairo_xlib_surface_create (GDK_DRAWABLE_XDISPLAY (drawable),
+					     GDK_DRAWABLE_XID (drawable),
+					     GDK_VISUAL_XVISUAL (visual),
+					     width, height);
+    } else if (gdk_drawable_get_depth (drawable) == 1) {
+	surface = cairo_xlib_surface_create_for_bitmap
+	    (GDK_PIXMAP_XDISPLAY (drawable),
+	     GDK_PIXMAP_XID (drawable),
+	     GDK_SCREEN_XSCREEN (gdk_drawable_get_screen (drawable)),
+	     width, height);
+    } else {
+	g_warning ("Using Cairo rendering requires the drawable argument to\n"
+		   "have a specified colormap. All windows have a colormap,\n"
+		   "however, pixmaps only have colormap by default if they\n"
+		   "were created with a non-NULL window argument. Otherwise\n"
+		   "a colormap must be set on them with "
+		   "gdk_drawable_set_colormap");
+	return NULL;
+    }
+    cairo_surface_set_device_offset (surface, -x_off, -y_off);
+    return surface;
+}
+
 CAMLprim value
 ml_cairo_xlib_surface_create (value d)
 {
-  cairo_surface_t *surface;
-  gint width, height;
-  GdkDrawable *drawable = GdkDrawable_val(d);
-  GdkVisual *visual = gdk_drawable_get_visual (drawable);
-  
-  gdk_drawable_get_size (drawable, &width, &height);
-
-  if (visual) 
-    surface = cairo_xlib_surface_create (GDK_DRAWABLE_XDISPLAY (drawable),
-					 GDK_DRAWABLE_XID (drawable),
-					 GDK_VISUAL_XVISUAL (visual),
-					 width, height);
-  else if (gdk_drawable_get_depth (drawable) == 1)
-    surface = 
-      cairo_xlib_surface_create_for_bitmap (GDK_PIXMAP_XDISPLAY (drawable),
-					    GDK_PIXMAP_XID (drawable),
-					    width, height);
-  else {
-    g_warning ("Using Cairo rendering requires the drawable argument to\n"
-	       "have a specified colormap. All windows have a colormap,\n"
-	       "however, pixmaps only have colormap by default if they\n"
-	       "were created with a non-NULL window argument. Otherwise\n"
-	       "a colormap must be set on them with "
-	       "gdk_drawable_set_colormap");
-    surface = NULL;
-  }
-
-  if (surface != NULL)
-    ml_cairo_surface_set_image_data (surface, d);
-
-  return Val_cairo_surface_t (surface);
+  return Val_cairo_surface_t (ml_gdk_cairo_surface_create (GdkDrawable_val(d)));
 }
 
 ML_3 (cairo_xlib_surface_set_size, cairo_surface_t_val, Int_val, Int_val, Unit)
+
+CAMLprim value
+ml_cairo_xlib_surface_set_drawable (value s, value d, value w, value h)
+{
+  cairo_xlib_surface_set_drawable (cairo_surface_t_val (s),
+				   GDK_DRAWABLE_XID (GdkDrawable_val (d)),
+				   Int_val (w),
+				   Int_val (h));
+  return Val_unit;
+}
 
 #else
 
 Cairo_Unsupported(cairo_xlib_surface_create, "Xlib backend not supported");
 Cairo_Unsupported(cairo_xlib_surface_set_size, "Xlib backend not supported");
+Cairo_Unsupported(cairo_xlib_surface_set_drawable, "Xlib backend not supported");
 
 #endif /* CAIRO_HAS_XLIB_SURFACE */

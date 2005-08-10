@@ -26,6 +26,10 @@ type status =
   | SURFACE_FINISHED
   | SURFACE_TYPE_MISMATCH
   | PATTERN_TYPE_MISMATCH
+  | INVALID_CONTENT
+  | INVALID_FORMAT
+  | INVALID_VISUAL
+  | FILE_NOT_FOUND
 exception Error of status
 val init : unit
 
@@ -50,10 +54,12 @@ external save    : t -> unit = "ml_cairo_save"
 external restore : t -> unit = "ml_cairo_restore"
 
 external status : t -> status = "ml_cairo_status"
+external surface_status : [> `Any] surface -> status = "ml_cairo_surface_status"
 external pattern_status : [> `Any] pattern -> status = "ml_cairo_pattern_status"
+external font_face_status : [> `Any] font_face -> status = "ml_cairo_font_face_status"
 external string_of_status : status -> string = "ml_cairo_status_to_string"
 
-(** {4 Renderer state} *)
+(** {3 Renderer state} *)
 
 type operator =
     OPERATOR_CLEAR
@@ -101,7 +107,7 @@ external set_line_join : t -> line_join -> unit = "ml_cairo_set_line_join"
 external set_dash : t -> float array -> float -> unit = "ml_cairo_set_dash"
 external set_miter_limit : t -> float -> unit = "ml_cairo_set_miter_limit"
 
-(** {4 Transformations} *)
+(** {3 Transformations} *)
 
 external translate : t -> tx:float -> ty:float -> unit = "ml_cairo_translate"
 external scale : t -> sx:float -> sy:float -> unit = "ml_cairo_scale"
@@ -115,7 +121,7 @@ external user_to_device_distance : t -> point -> point = "ml_cairo_user_to_devic
 external device_to_user : t -> point -> point = "ml_cairo_device_to_user"
 external device_to_user_distance : t -> point -> point = "ml_cairo_device_to_user_distance"
 
-(** {4 Paths} *)
+(** {3 Paths} *)
 
 external new_path : t -> unit = "ml_cairo_new_path"
 external move_to : t -> x:float -> y:float -> unit = "ml_cairo_move_to"
@@ -172,18 +178,80 @@ type font_extents = {
     max_x_advance : float;
     max_y_advance : float;
 }
-type font_weight = 
-  | FONT_WEIGHT_NORMAL 
-  | FONT_WEIGHT_BOLD
 type font_slant = 
   | FONT_SLANT_NORMAL 
   | FONT_SLANT_ITALIC 
   | FONT_SLANT_OBLIQUE
+type font_weight = 
+  | FONT_WEIGHT_NORMAL 
+  | FONT_WEIGHT_BOLD
+
+type antialias =
+    ANTIALIAS_DEFAULT
+  | ANTIALIAS_NONE
+  | ANTIALIAS_GRAY
+  | ANTIALIAS_SUBPIXEL
+type subpixel_order =
+    SUBPIXEL_ORDER_DEFAULT
+  | SUBPIXEL_ORDER_RGB
+  | SUBPIXEL_ORDER_BGR
+  | SUBPIXEL_ORDER_VRGB
+  | SUBPIXEL_ORDER_VBGR
+type hint_style =
+    HINT_STYLE_DEFAULT
+  | HINT_STYLE_NONE
+  | HINT_STYLE_SLIGHT
+  | HINT_STYLE_MEDIUM
+  | HINT_STYLE_FULL
+type hint_metrics =
+    HINT_METRICS_DEFAULT
+  | HINT_METRICS_OFF
+  | HINT_METRICS_ON
+
+(** {4 Font options} *)
+
+(** Font options functions *)
+module Font_Options : sig
+  type t
+  external create : unit -> t = "ml_cairo_font_options_create"
+  external merge : t -> t -> unit = "ml_cairo_font_options_merge"
+  external get_antialias : t -> antialias = "ml_cairo_font_options_get_antialias"
+  external set_antialias : t -> antialias -> unit = "ml_cairo_font_options_set_antialias"
+  external get_subpixel_order : t -> subpixel_order = "ml_cairo_font_options_get_subpixel_order"
+  external set_subpixel_order : t -> subpixel_order -> unit = "ml_cairo_font_options_set_subpixel_order"
+  external get_hint_style : t -> hint_style = "ml_cairo_font_options_get_hint_style"
+  external set_hint_style : t -> hint_style -> unit = "ml_cairo_font_options_set_hint_style"
+  external get_hint_metrics : t -> hint_metrics = "ml_cairo_font_options_get_hint_metrics"
+  external set_hint_metrics : t -> hint_metrics -> unit = "ml_cairo_font_options_set_hint_metrics"
+
+  type all = [
+      `ANTIALIAS_DEFAULT
+    | `ANTIALIAS_GRAY
+    | `ANTIALIAS_NONE
+    | `ANTIALIAS_SUBPIXEL
+    | `HINT_METRICS_DEFAULT
+    | `HINT_METRICS_OFF
+    | `HINT_METRICS_ON
+    | `HINT_STYLE_DEFAULT
+    | `HINT_STYLE_FULL
+    | `HINT_STYLE_MEDIUM
+    | `HINT_STYLE_NONE
+    | `HINT_STYLE_SLIGHT
+    | `SUBPIXEL_ORDER_BGR
+    | `SUBPIXEL_ORDER_DEFAULT
+    | `SUBPIXEL_ORDER_RGB
+    | `SUBPIXEL_ORDER_VBGR
+    | `SUBPIXEL_ORDER_VRGB ] 
+  val make : [< all] list -> t
+end
 
 external select_font_face : t -> string -> font_slant -> font_weight -> unit = "ml_cairo_select_font_face"
 external set_font_size : t -> float -> unit = "ml_cairo_set_font_size"
 external set_font_matrix : t -> matrix -> unit = "ml_cairo_set_font_matrix"
 external get_font_matrix : t -> matrix = "ml_cairo_get_font_matrix"
+external set_font_options : t -> Font_Options.t -> unit = "ml_cairo_set_font_matrix"
+val merge_font_options : t -> Font_Options.t -> unit
+val get_font_options : t -> Font_Options.t
 external show_text : t -> string -> unit = "ml_cairo_show_text"
 external show_glyphs : t -> glyph array -> unit = "ml_cairo_show_glyphs"
 external get_font_face : t -> [`Any] font_face = "ml_cairo_get_font_face"
@@ -194,7 +262,18 @@ external glyph_extents : t -> glyph array -> text_extents = "ml_cairo_glyph_exte
 external text_path : t -> string -> unit = "ml_cairo_text_path"
 external glyph_path : t -> glyph array -> unit = "ml_cairo_glyph_path"
 
-(** {4 Renderer state querying} *)
+(** {4 Scaled Fonts API} *)
+
+(** Scaled fonts functions *)
+module Scaled_Font : sig
+type -'a t
+
+external create : ([>`Any] as 'a) font_face -> matrix -> matrix -> Font_Options.t -> 'a t = "ml_cairo_scaled_font_create"
+external font_extents : [> `Any] t -> font_extents = "ml_cairo_scaled_font_extents"
+external glyph_extents : [>`Any] t -> glyph array -> text_extents = "ml_cairo_scaled_font_glyph_extents"
+end
+
+(** {3 Renderer state querying} *)
 
 external get_operator : t -> operator = "ml_cairo_get_operator"
 external get_source : t -> [`Any] pattern = "ml_cairo_get_source"
@@ -247,7 +326,7 @@ external image_surface_create : format -> width:int -> height:int -> image_surfa
 external image_surface_get_width  : [>`Image] surface -> int = "ml_cairo_image_surface_get_width"
 external image_surface_get_height : [>`Image] surface -> int = "ml_cairo_image_surface_get_height"
 
-(** {4 Patterns} *)
+(** {3 Patterns} *)
 
 type solid_pattern = [`Any|`Solid] pattern
 type surface_pattern  = [`Any|`Surface] pattern
@@ -304,15 +383,4 @@ external multiply  : matrix -> matrix -> matrix = "ml_cairo_matrix_multiply"
 
 external transform_distance : matrix -> point -> point = "ml_cairo_matrix_transform_distance"
 external transform_point    : matrix -> point -> point = "ml_cairo_matrix_transform_point"
-end
-
-(** {3 Scaled Fonts API} *)
-
-(** Scaled fonts functions *)
-module Scaled_Font : sig
-type -'a t
-
-external create : ([>`Any] as 'a) font_face -> matrix -> matrix -> 'a t = "ml_cairo_scaled_font_create"
-external font_extents : [> `Any] t -> font_extents = "ml_cairo_scaled_font_extents"
-external glyph_extents : [>`Any] t -> glyph array -> text_extents = "ml_cairo_scaled_font_glyph_extents"
 end

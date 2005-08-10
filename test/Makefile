@@ -36,10 +36,10 @@ spline : spline.ml
 	$(OCAMLOPT) -w s -o $@ -I ../src -I $(LABLGTKDIR) lablgtk.cmxa cairo.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
 
 basket : basket.ml
-	$(OCAMLOPT) -o $@ -I ../src -I $(LABLGTKDIR) bigarray.cmxa cairo.cmxa $^
+	$(OCAMLOPT) -o $@ -I ../src bigarray.cmxa cairo.cmxa $^
 
 basket.b : basket.ml
-	$(OCAMLC) -g -o $@ -I ../src -I $(LABLGTKDIR) bigarray.cma cairo.cma $^
+	$(OCAMLC) -g -o $@ -I ../src bigarray.cma cairo.cma $^
 
 knockout : knockout.ml
 	$(OCAMLOPT) -o $@ -I ../src -I $(LABLGTKDIR) cairo.cmxa lablgtk.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^

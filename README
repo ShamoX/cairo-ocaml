@@ -10,12 +10,18 @@ Compiling
  $ ./configure
  $ make
 
+configure will try to detect a LablGTK installation by scanning some
+directories (+lablgtk2 and +lablgtk). If LablGTK is installed
+elsewhere, specify the path with the LABLGTKDIR environment variable. 
+
+If you want to disable LablGTK support, run configure with
+--without-gtk option.
 
 Dependencies
 ============
 
  ocaml          3.08
- cairo          0.5.2
+ cairo          0.6.0
  libsvg-cairo   optional 0.1.5
  LablGTK        optional
 

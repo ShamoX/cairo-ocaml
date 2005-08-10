@@ -32,9 +32,8 @@ wML_4(cairo_surface_create_similar, \
 CAMLprim value
 ml_cairo_surface_finish (value surf)
 {
-  cairo_status_t s;
-  s = cairo_surface_finish (cairo_surface_t_val (surf));
-  cairo_treat_status (s);
+  cairo_surface_finish (cairo_surface_t_val (surf));
+  check_surface_status (surf);
   return Val_unit;
 }
 
@@ -85,5 +84,7 @@ ml_cairo_surface_set_image_data (cairo_surface_t *surf, value v)
 }
 
 /* surface_get_user_data */
+
+wML_2(cairo_surface_get_font_options, cairo_surface_t_val, cairo_font_options_t_val, Unit)
 
 wML_3(cairo_surface_set_device_offset, cairo_surface_t_val, Double_val, Double_val, Unit)

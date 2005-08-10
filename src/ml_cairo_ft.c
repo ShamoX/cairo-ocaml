@@ -82,12 +82,16 @@ wMake_Val_final_pointer (FcPattern, FcPatternDestroy, 10)
 #define UString_val(v) ((unsigned char *) (v))
 
 CAMLprim value
-ml_FcNameParse (value s)
+ml_FcNameParse (value fo, value s)
 {
   FcPattern *p1, *p2;
   FcResult res;
   p1 = FcNameParse (UString_val(s));
   FcConfigSubstitute (NULL, p1, FcMatchPattern);
+  if (Is_block (fo))
+    {
+      cairo_ft_font_options_substitute (cairo_font_options_t_val (Field (fo, 0)), p1);
+    }
   FcDefaultSubstitute (p1);
   p2 = FcFontMatch (NULL, p1, &res);
   FcPatternDestroy (p1);

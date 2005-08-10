@@ -13,3 +13,7 @@ external shuffle_pixels  : GdkPixbuf.pixbuf -> unit = "ml_cairo_lablgtk_shuffle_
 
 external surface_create : [> `drawable] Gobject.obj -> surface = "ml_cairo_xlib_surface_create"
 external surface_set_size : [> `Xlib] Cairo.surface -> int -> int -> unit = "ml_cairo_xlib_surface_set_size"
+external surface_set_drawable :
+  [> `Xlib] Cairo.surface -> 
+  [> `drawable] Gobject.obj -> 
+  int -> int -> unit = "ml_cairo_xlib_surface_set_drawable"

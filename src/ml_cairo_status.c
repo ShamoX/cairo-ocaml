@@ -9,7 +9,11 @@
 #include "ml_cairo.h"
 
 wML_1 (cairo_status, cairo_t_val, Val_int)
+wML_1 (cairo_surface_status, cairo_surface_t_val, Val_int)
 wML_1 (cairo_pattern_status, cairo_pattern_t_val, Val_int)
+wML_1 (cairo_font_face_status, cairo_font_face_t_val, Val_int)
+wML_1 (cairo_scaled_font_status, cairo_scaled_font_t_val, Val_int)
+wML_1 (cairo_font_options_status, cairo_font_options_t_val, Val_int)
 
 wML_1 (cairo_status_to_string, Int_val, caml_copy_string)
 

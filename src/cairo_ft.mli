@@ -21,8 +21,12 @@ external new_face : ft_library -> ?index:int -> string -> ft_face
 external done_face : ft_face -> unit = "ml_FT_Done_Face"
 
 type fc_pattern
-external fc_name_parse : string -> fc_pattern = "ml_FcNameParse"
-(** this is a hack: this actually calls FcNameParse, FcConfigSubstitute, 
+external fc_name_parse : 
+  ?options:Cairo.Font_Options.t -> 
+  string -> fc_pattern = "ml_FcNameParse"
+(** this is a hack: this actually calls 
+    FcNameParse, FcConfigSubstitute, 
+    cairo_ft_font_options_substitute,
     FcDefaultSubstitute and FcFontMatch *)
 external fc_name_unparse : fc_pattern -> string = "ml_FcNameUnparse"
 

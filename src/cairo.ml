@@ -22,6 +22,10 @@ type status =
   | SURFACE_FINISHED
   | SURFACE_TYPE_MISMATCH
   | PATTERN_TYPE_MISMATCH
+  | INVALID_CONTENT
+  | INVALID_FORMAT
+  | INVALID_VISUAL
+  | FILE_NOT_FOUND
 exception Error of status
 let init = Callback.register_exception "cairo_status_exn" (Error NULL_POINTER)
 
@@ -149,17 +153,104 @@ type font_extents =
     font_height : float;
     max_x_advance : float;
     max_y_advance : float }
-type font_weight =
-    FONT_WEIGHT_NORMAL
-  | FONT_WEIGHT_BOLD
 type font_slant =
     FONT_SLANT_NORMAL
   | FONT_SLANT_ITALIC
   | FONT_SLANT_OBLIQUE
+type font_weight =
+    FONT_WEIGHT_NORMAL
+  | FONT_WEIGHT_BOLD
+type antialias =
+    ANTIALIAS_DEFAULT
+  | ANTIALIAS_NONE
+  | ANTIALIAS_GRAY
+  | ANTIALIAS_SUBPIXEL
+type subpixel_order =
+    SUBPIXEL_ORDER_DEFAULT
+  | SUBPIXEL_ORDER_RGB
+  | SUBPIXEL_ORDER_BGR
+  | SUBPIXEL_ORDER_VRGB
+  | SUBPIXEL_ORDER_VBGR
+type hint_style =
+    HINT_STYLE_DEFAULT
+  | HINT_STYLE_NONE
+  | HINT_STYLE_SLIGHT
+  | HINT_STYLE_MEDIUM
+  | HINT_STYLE_FULL
+type hint_metrics =
+    HINT_METRICS_DEFAULT
+  | HINT_METRICS_OFF
+  | HINT_METRICS_ON
+
+module Font_Options = struct
+  type t
+  external create : unit -> t = "ml_cairo_font_options_create"
+  external merge : t -> t -> unit = "ml_cairo_font_options_merge"
+  external get_antialias : t -> antialias = "ml_cairo_font_options_get_antialias"
+  external set_antialias : t -> antialias -> unit = "ml_cairo_font_options_set_antialias"
+  external get_subpixel_order : t -> subpixel_order = "ml_cairo_font_options_get_subpixel_order"
+  external set_subpixel_order : t -> subpixel_order -> unit = "ml_cairo_font_options_set_subpixel_order"
+  external get_hint_style : t -> hint_style = "ml_cairo_font_options_get_hint_style"
+  external set_hint_style : t -> hint_style -> unit = "ml_cairo_font_options_set_hint_style"
+  external get_hint_metrics : t -> hint_metrics = "ml_cairo_font_options_get_hint_metrics"
+  external set_hint_metrics : t -> hint_metrics -> unit = "ml_cairo_font_options_set_hint_metrics"
+    type all =
+      [ `ANTIALIAS_DEFAULT
+      | `ANTIALIAS_GRAY
+      | `ANTIALIAS_NONE
+      | `ANTIALIAS_SUBPIXEL
+      | `HINT_METRICS_DEFAULT
+      | `HINT_METRICS_OFF
+      | `HINT_METRICS_ON
+      | `HINT_STYLE_DEFAULT
+      | `HINT_STYLE_FULL
+      | `HINT_STYLE_MEDIUM
+      | `HINT_STYLE_NONE
+      | `HINT_STYLE_SLIGHT
+      | `SUBPIXEL_ORDER_BGR
+      | `SUBPIXEL_ORDER_DEFAULT
+      | `SUBPIXEL_ORDER_RGB
+      | `SUBPIXEL_ORDER_VBGR
+      | `SUBPIXEL_ORDER_VRGB ]
+  let make l =
+    let o = create () in
+    List.iter (function
+      | `ANTIALIAS_DEFAULT -> set_antialias o ANTIALIAS_DEFAULT
+      | `ANTIALIAS_NONE -> set_antialias o ANTIALIAS_NONE
+      | `ANTIALIAS_GRAY -> set_antialias o ANTIALIAS_GRAY
+      | `ANTIALIAS_SUBPIXEL -> set_antialias o ANTIALIAS_SUBPIXEL
+      | `SUBPIXEL_ORDER_DEFAULT -> set_subpixel_order o SUBPIXEL_ORDER_DEFAULT
+      | `SUBPIXEL_ORDER_RGB -> set_subpixel_order o SUBPIXEL_ORDER_RGB
+      | `SUBPIXEL_ORDER_BGR -> set_subpixel_order o SUBPIXEL_ORDER_BGR
+      | `SUBPIXEL_ORDER_VRGB -> set_subpixel_order o SUBPIXEL_ORDER_VRGB
+      | `SUBPIXEL_ORDER_VBGR -> set_subpixel_order o SUBPIXEL_ORDER_VBGR
+      | `HINT_STYLE_DEFAULT -> set_hint_style o HINT_STYLE_DEFAULT
+      | `HINT_STYLE_NONE -> set_hint_style o HINT_STYLE_NONE
+      | `HINT_STYLE_SLIGHT -> set_hint_style o HINT_STYLE_SLIGHT
+      | `HINT_STYLE_MEDIUM -> set_hint_style o HINT_STYLE_MEDIUM
+      | `HINT_STYLE_FULL -> set_hint_style o HINT_STYLE_FULL
+      | `HINT_METRICS_DEFAULT -> set_hint_metrics o HINT_METRICS_DEFAULT
+      | `HINT_METRICS_OFF -> set_hint_metrics o HINT_METRICS_OFF
+      | `HINT_METRICS_ON -> set_hint_metrics o HINT_METRICS_ON)
+      l ;
+    o
+end
+
 external select_font_face : t -> string -> font_slant -> font_weight -> unit = "ml_cairo_select_font_face"
 external set_font_size : t -> float -> unit = "ml_cairo_set_font_size"
 external set_font_matrix : t -> matrix -> unit = "ml_cairo_set_font_matrix"
 external get_font_matrix : t -> matrix = "ml_cairo_get_font_matrix"
+external set_font_options : t -> Font_Options.t -> unit = "ml_cairo_set_font_matrix"
+external _get_font_options : t -> Font_Options.t -> unit = "ml_cairo_get_font_options"
+let merge_font_options cr o' =
+  let o = Font_Options.create () in
+  _get_font_options cr o ;
+  Font_Options.merge o o' ;
+  set_font_options cr o
+let get_font_options cr =
+  let o = Font_Options.create () in
+  _get_font_options cr o ;
+  o
 external show_text : t -> string -> unit = "ml_cairo_show_text"
 external show_glyphs : t -> glyph array -> unit = "ml_cairo_show_glyphs"
 external get_font_face : t -> [`Any] font_face = "ml_cairo_get_font_face"
@@ -169,6 +260,15 @@ external text_extents : t -> string -> text_extents = "ml_cairo_text_extents"
 external glyph_extents : t -> glyph array -> text_extents = "ml_cairo_glyph_extents"
 external text_path : t -> string -> unit = "ml_cairo_text_path"
 external glyph_path : t -> glyph array -> unit = "ml_cairo_glyph_path"
+
+(* scaled fonts *)
+module Scaled_Font = struct
+type -'a t
+
+external create : ([>`Any] as 'a) font_face -> matrix -> matrix -> Font_Options.t -> 'a t = "ml_cairo_scaled_font_create"
+external font_extents : [> `Any] t -> font_extents = "ml_cairo_scaled_font_extents"
+external glyph_extents : [> `Any] t -> glyph array -> text_extents = "ml_cairo_scaled_font_glyph_extents"
+end
 
 external get_operator : t -> operator = "ml_cairo_get_operator"
 external get_source : t -> [`Any] pattern = "ml_cairo_get_source"
@@ -199,7 +299,11 @@ let append_path cr = function
   | `CURVE_TO (p1, p2, p3) -> curve_to_point cr p1 p2 p3
 
 external status : t -> status = "ml_cairo_status"
+external surface_status : [> `Any] surface -> status = "ml_cairo_surface_status"
 external pattern_status : [> `Any] pattern -> status = "ml_cairo_pattern_status"
+external font_face_status : [> `Any] font_face -> status = "ml_cairo_font_face_status"
+external scaled_font_status : [> `Any] Scaled_Font.t -> status = "ml_cairo_scaled_font_status"
+external font_options_status : Font_Options.t -> status = "ml_cairo_font_options_status"
 external string_of_status : status -> string = "ml_cairo_status_to_string"
 
 
@@ -213,6 +317,12 @@ type content =
 external surface_create_similar : [> `Any] surface -> content -> width:int -> height:int -> [`Any] surface = "ml_cairo_surface_create_similar"
 
 external surface_finish : [> `Any] surface -> unit = "ml_cairo_surface_finish"
+
+external _surface_get_font_options : [> `Any] surface -> Font_Options.t -> unit = "ml_cairo_surface_get_font_options"
+let surface_get_font_options s =
+  let o = Font_Options.create () in
+  _surface_get_font_options s o ;
+  o
 
 external surface_set_device_offset : [> `Any] surface -> float -> float -> unit = "ml_cairo_surface_set_device_offset"
 
@@ -288,15 +398,4 @@ external multiply  : matrix -> matrix -> matrix = "ml_cairo_matrix_multiply"
 
 external transform_distance : matrix -> point -> point = "ml_cairo_matrix_transform_distance"
 external transform_point    : matrix -> point -> point = "ml_cairo_matrix_transform_point"
-end
-
-
-
-(* fonts *)
-module Scaled_Font = struct
-type -'a t
-
-external create : ([>`Any] as 'a) font_face -> matrix -> matrix -> 'a t = "ml_cairo_scaled_font_create"
-external font_extents : [> `Any] t -> font_extents = "ml_cairo_scaled_font_extents"
-external glyph_extents : [> `Any] t -> glyph array -> text_extents = "ml_cairo_scaled_font_glyph_extents"
 end

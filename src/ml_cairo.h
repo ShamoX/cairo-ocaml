@@ -43,6 +43,9 @@ value Val_cairo_font_face_t (cairo_font_face_t *);
 #define cairo_scaled_font_t_val(v)	wPointer_val(cairo_scaled_font_t, v)
 value Val_cairo_scaled_font_t (cairo_scaled_font_t *);
 
+#define cairo_font_options_t_val(v)	wPointer_val(cairo_font_options_t, v)
+value Val_cairo_font_options_t (cairo_font_options_t *);
+
 /* cairo_matrix */
 #ifdef ARCH_ALIGN_DOUBLE
 void	ml_convert_cairo_matrix_in	(value, cairo_matrix_t *);
@@ -63,7 +66,11 @@ value	Val_cairo_text_extents	(cairo_text_extents_t *);
 void ml_cairo_treat_status (cairo_status_t) Noreturn;
 #define cairo_treat_status(s)   if (s != CAIRO_STATUS_SUCCESS) ml_cairo_treat_status (s)
 #define check_cairo_status(cr)	cairo_treat_status (cairo_status (cairo_t_val (cr)))
+#define check_surface_status(cr)	cairo_treat_status (cairo_surface_status (cairo_surface_t_val (cr)))
 #define check_pattern_status(cr)	cairo_treat_status (cairo_pattern_status (cairo_pattern_t_val (cr)))
+#define check_font_face_status(cr)	cairo_treat_status (cairo_font_face_status (cairo_font_face_t_val (cr)))
+#define check_scaled_font_status(cr)	cairo_treat_status (cairo_scaled_font_status (cairo_scaled_font_t_val (cr)))
+#define check_font_options_status(cr)	cairo_treat_status (cairo_font_options_status (cairo_font_options_t_val (cr)))
 #define report_null_pointer()	ml_cairo_treat_status (CAIRO_STATUS_NULL_POINTER)
 
 /* stream callbacks */
