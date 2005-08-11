@@ -1,5 +1,11 @@
 2005-08-11  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
+	* src/* : adapt to cairo-0.9.0
+	
+	* configure.ac: bump version number to 0.9.0.0
+
+2005-08-11  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
 	* src/* : adapt to cairo-0.6.0
 	
 	* Makefile, config.make.in, configure.ac: 
