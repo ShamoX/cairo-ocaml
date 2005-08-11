@@ -27,18 +27,18 @@ value Val_cairo_t (cairo_t *);
 
 #define cairo_surface_t_val(v)	wPointer_val(cairo_surface_t, v)
 value Val_cairo_surface_t (cairo_surface_t *);
-#define Val_cairo_surface_ref(p)	Val_cairo_surface_t ((cairo_surface_reference(p), p))
+#define Val_cairo_surface_ref(p)	Val_cairo_surface_t (cairo_surface_reference(p))
 
 #define cairo_pattern_t_val(v)	wPointer_val(cairo_pattern_t, v)
 value Val_cairo_pattern_t (cairo_pattern_t *);
-#define Val_cairo_pattern_ref(p)	Val_cairo_pattern_t ((cairo_pattern_reference(p), p))
+#define Val_cairo_pattern_ref(p)	Val_cairo_pattern_t (cairo_pattern_reference(p))
 
 #define cairo_format_t_val(v) ((cairo_format_t) Int_val(v))
 #define Val_cairo_format_t(v) Val_int(v)
 
 #define cairo_font_face_t_val(v)	wPointer_val(cairo_font_face_t, v)
 value Val_cairo_font_face_t (cairo_font_face_t *);
-#define Val_cairo_font_face_ref(p)	Val_cairo_font_face_t ((cairo_font_face_reference(p), p))
+#define Val_cairo_font_face_ref(p)	Val_cairo_font_face_t (cairo_font_face_reference(p))
 
 #define cairo_scaled_font_t_val(v)	wPointer_val(cairo_scaled_font_t, v)
 value Val_cairo_scaled_font_t (cairo_scaled_font_t *);

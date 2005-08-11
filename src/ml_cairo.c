@@ -40,6 +40,11 @@ wML_3_cairo(set_source_surface, cairo_surface_t_val, Double_val, Double_val)
 
 wML_1_cairo(set_tolerance, Double_val)
 
+#define cairo_antialias_t_val(v) ((cairo_antialias_t) Int_val(v))
+#define Val_cairo_antialias_t(v) Val_int(v)
+
+wML_1_cairo(set_antialias, cairo_antialias_t_val)
+
 #define cairo_fill_rule_t_val(v) ((cairo_fill_rule_t) Int_val(v))
 #define Val_cairo_fill_rule_t(v) Val_int(v)
 
@@ -428,6 +433,8 @@ cairo_get(operator, Val_cairo_operator_t)
 cairo_get(source, Val_cairo_pattern_ref)
 
 cairo_get(tolerance, caml_copy_double)
+
+cairo_get(antialias, Val_cairo_antialias_t)
 
 CAMLprim value
 ml_cairo_get_current_point (value cr)

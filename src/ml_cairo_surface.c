@@ -87,4 +87,10 @@ ml_cairo_surface_set_image_data (cairo_surface_t *surf, value v)
 
 wML_2(cairo_surface_get_font_options, cairo_surface_t_val, cairo_font_options_t_val, Unit)
 
+wML_1(cairo_surface_flush, cairo_surface_t_val, Unit)
+
+wML_1(cairo_surface_mark_dirty, cairo_surface_t_val, Unit)
+
+wML_5(cairo_surface_mark_dirty_rectangle, cairo_surface_t_val, Int_val, Int_val, Int_val, Int_val, Unit)
+
 wML_3(cairo_surface_set_device_offset, cairo_surface_t_val, Double_val, Double_val, Unit)

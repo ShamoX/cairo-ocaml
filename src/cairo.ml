@@ -73,6 +73,13 @@ external set_source_surface : t -> [> `Any] surface -> float -> float -> unit = 
 
 external set_tolerance : t -> float -> unit = "ml_cairo_set_tolerance"
 
+type antialias =
+    ANTIALIAS_DEFAULT
+  | ANTIALIAS_NONE
+  | ANTIALIAS_GRAY
+  | ANTIALIAS_SUBPIXEL
+external set_antialias : t -> antialias -> unit = "ml_cairo_set_antialias"
+
 type fill_rule =
     FILL_RULE_WINDING
   | FILL_RULE_EVEN_ODD
@@ -160,11 +167,6 @@ type font_slant =
 type font_weight =
     FONT_WEIGHT_NORMAL
   | FONT_WEIGHT_BOLD
-type antialias =
-    ANTIALIAS_DEFAULT
-  | ANTIALIAS_NONE
-  | ANTIALIAS_GRAY
-  | ANTIALIAS_SUBPIXEL
 type subpixel_order =
     SUBPIXEL_ORDER_DEFAULT
   | SUBPIXEL_ORDER_RGB
@@ -273,6 +275,7 @@ end
 external get_operator : t -> operator = "ml_cairo_get_operator"
 external get_source : t -> [`Any] pattern = "ml_cairo_get_source"
 external get_tolerance : t -> float = "ml_cairo_get_tolerance"
+external get_antialias : t -> antialias = "ml_cairo_get_antialias"
 external get_current_point : t -> point = "ml_cairo_get_current_point"
 external get_fill_rule : t -> fill_rule = "ml_cairo_get_fill_rule"
 external get_line_width : t -> float = "ml_cairo_get_line_width"
@@ -323,6 +326,10 @@ let surface_get_font_options s =
   let o = Font_Options.create () in
   _surface_get_font_options s o ;
   o
+
+external surface_flush : [> `Any] surface -> unit = "ml_cairo_surface_flush"
+external mark_dirty    : [> `Any] surface -> unit = "ml_cairo_surface_mark_dirty"
+external mark_dirty_rectangle : [> `Any] surface -> int -> int -> int -> int -> unit = "ml_cairo_surface_mark_dirty_rectangle"
 
 external surface_set_device_offset : [> `Any] surface -> float -> float -> unit = "ml_cairo_surface_set_device_offset"
 
