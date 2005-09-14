@@ -108,7 +108,7 @@ doc: $(DOCFILES:%.mli=%.cmi)
 	ocamldoc -v -html -d ../doc/html -t Cairo-ocaml $(if $(LABLGTKDIR),-I $(LABLGTKDIR)) $(DOCFILES) 
 
 clean :
-	rm -f *.cm* *.o *.a *.so
+	rm -f *.cm* *.o *.a *.so .depend
 
 .depend : $(wildcard *.ml *.mli)
 	@echo "making deps"
