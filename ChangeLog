@@ -1,5 +1,11 @@
 2005-11-03  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
+	* configure.ac: require cairo 1.0, bump version number to 1.0
+	* src/cairo.ml, src/cairo.mli, src/ml_cairo.c: version information
+	APIs 
+
+2005-11-03  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
 	* src/ml_cairo_pattern.c, src/ml_cairo_matrix.c, src/ml_cairo.c:
 	fixes for archs with ARCH_ALIGN_DOUBLE (patch from Samuel
 	Mimram). 

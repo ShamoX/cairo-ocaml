@@ -30,8 +30,17 @@ type status =
   | INVALID_FORMAT
   | INVALID_VISUAL
   | FILE_NOT_FOUND
+  | INVALID_DASH
 exception Error of status
 val init : unit
+
+external version_encode : int -> int -> int -> int = "ml_CAIRO_VERSION_ENCODE"
+
+external run_time_version        : unit -> int    = "ml_cairo_version"
+external run_time_version_string : unit -> string = "ml_cairo_version_string"
+
+val compile_time_version        : int
+val compile_time_version_string : string
 
 (** {3 Types} *)
 

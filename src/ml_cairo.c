@@ -8,6 +8,27 @@
 
 #include "ml_cairo.h"
 
+wML_0(cairo_version_string, caml_copy_string)
+wML_0(cairo_version, Val_int)
+
+CAMLprim value
+ml_CAIRO_VERSION_STRING (value unit)
+{
+  return caml_copy_string (CAIRO_VERSION_STRING);
+}
+
+CAMLprim value
+ml_CAIRO_VERSION (value unit)
+{
+  return Val_int (CAIRO_VERSION);
+}
+
+CAMLprim value
+ml_CAIRO_VERSION_ENCODE (value maj, value min, value mic)
+{
+  return Val_int (CAIRO_VERSION_ENCODE (Int_val(maj), Int_val(min), Int_val(mic)));
+}
+
 wMake_Val_final_pointer(cairo_t, cairo_destroy, 0)
 
 CAMLprim value

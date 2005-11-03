@@ -1,4 +1,4 @@
-AC_INIT(CAIRO_OCAML, 0.9.0.0)
+AC_INIT(CAIRO_OCAML, 1.0.0)
 AC_CONFIG_SRCDIR(src/cairo.ml)
 AC_CONFIG_AUX_DIR(support)
 
@@ -6,7 +6,7 @@ AC_CONFIG_AUX_DIR(support)
 AC_PROG_OCAML()
 
 # Check for cairo
-PKG_CHECK_MODULES(CAIRO, cairo >= 0.6.0 freetype2)
+PKG_CHECK_MODULES(CAIRO, cairo >= 1.0.0 freetype2)
 
 # Optional GTK support (for the X11 backend)
 AC_ARG_WITH(gtk, 
@@ -25,19 +25,11 @@ if test $use_gtk = yes ; then
   fi
 fi
 
-dnl if test $use_gtk = yes ; then
-dnl  # Check for gtkcairo
-dnl  PKG_CHECK_MODULES(GTKCAIRO, gtkcairo, use_gtkcairo=yes, use_gtkcairo=no)
-dnl else
-dnl  use_gtkcairo=no
-dnl fi
-
 # Optional libsvg-cairo support
 PKG_CHECK_MODULES(LIBSVG_CAIRO, libsvg-cairo, use_libsvg_cairo=yes, use_libsvg_cairo=no)
 
 echo
 echo "  GTK+         support: $use_gtk"
-dnl echo "  GTKCairo     support: $use_gtkcairo"
 echo "  libsvg-cairo support: $use_libsvg_cairo"
 echo
 

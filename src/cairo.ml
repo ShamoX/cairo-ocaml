@@ -26,8 +26,17 @@ type status =
   | INVALID_FORMAT
   | INVALID_VISUAL
   | FILE_NOT_FOUND
+  | INVALID_DASH
 exception Error of status
 let init = Callback.register_exception "cairo_status_exn" (Error NULL_POINTER)
+
+external version_encode : int -> int -> int -> int = "ml_CAIRO_VERSION_ENCODE"
+external run_time_version        : unit -> int = "ml_cairo_version"
+external run_time_version_string : unit -> string = "ml_cairo_version_string"
+external _version        : unit -> int = "ml_CAIRO_VERSION"
+external _version_string : unit -> string = "ml_CAIRO_VERSION_STRING"
+let compile_time_version = _version ()
+let compile_time_version_string = _version_string ()
 
 type t
 type -'a surface
