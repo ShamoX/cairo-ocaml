@@ -85,7 +85,7 @@ ml_cairo_pattern_get_matrix (value p)
   cairo_matrix_t mat;
   cairo_pattern_get_matrix (cairo_pattern_t_val (p), &mat);
   check_pattern_status (p);
-  return ml_convert_cairo_matrix_out (m, &mat);
+  return ml_convert_cairo_matrix_out (&mat);
 #else
   CAMLparam1(p);
   value m = caml_alloc_small (6 * Double_wosize, Double_array_tag);

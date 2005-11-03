@@ -87,7 +87,7 @@ ml_cairo_matrix_rotate (value m, value a)
 #else
   cairo_matrix_t mat;
   ml_convert_cairo_matrix_in (m, &mat);
-  cairo_matrix_rotate (&mat, Double_val (a);
+  cairo_matrix_rotate (&mat, Double_val (a));
   return ml_convert_cairo_matrix_out (&mat);
 #endif
 }

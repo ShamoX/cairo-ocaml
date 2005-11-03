@@ -1,3 +1,9 @@
+2005-11-03  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/ml_cairo_pattern.c, src/ml_cairo_matrix.c, src/ml_cairo.c:
+	fixes for archs with ARCH_ALIGN_DOUBLE (patch from Samuel
+	Mimram). 
+
 2005-09-14  Carl Worth  <cworth@cworth.org>
 
 	* configure.ac: Add freetype2 to PKG_CHECK_MODULES call in

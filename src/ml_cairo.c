@@ -70,11 +70,11 @@ ml_cairo_set_dash (value cr, value d, value off)
 		  Double_array_length (d), Double_val (off));
 #else
   int i, ndash = Double_array_length (d);
-  double *dashes = stat_alloc (ndash * sizeof (double));
-  for (i = 0; i < ndash, i++)
+  double *dashes = caml_stat_alloc (ndash * sizeof (double));
+  for (i = 0; i < ndash; i++)
     dashes[i] = Double_field (d, i);
   cairo_set_dash (cairo_t_val (cr), dashes, ndash, Double_val (off));
-  stat_free (dashes);
+  caml_stat_free (dashes);
 #endif
   check_cairo_status (cr);
   return Val_unit;
