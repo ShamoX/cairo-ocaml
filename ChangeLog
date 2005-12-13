@@ -1,3 +1,8 @@
+2005-12-13  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/cairo_ps.mli, src/cairo_ps.mli, src/ml_cairo_ps.c: add
+	Cairo_ps.set_dpi 
+
 2005-11-03  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* configure.ac: require cairo 1.0, bump version number to 1.0

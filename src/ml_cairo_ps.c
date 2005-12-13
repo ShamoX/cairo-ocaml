@@ -39,12 +39,12 @@ ml_cairo_ps_surface_create_for_stream (value f, value w, value h)
   return _ml_cairo_ps_surface_create_for_stream (f, w, h, 0);
 }
 
-/* ML_3(cairo_ps_surface_set_dpi, cairo_surface_t_val, Double_val, Double_val, Unit) */
+wML_3(cairo_ps_surface_set_dpi, cairo_surface_t_val, Double_val, Double_val, Unit)
 
 #else
 
 Cairo_Unsupported(cairo_ps_surface_create_for_stream_unsafe,	"PS backend not supported");
 Cairo_Unsupported(cairo_ps_surface_create_for_stream,		"PS backend not supported");
-/* Cairo_Unsupported(cairo_ps_surface_set_dpi,			"PS backend not supported"); */
+Cairo_Unsupported(cairo_ps_surface_set_dpi,			"PS backend not supported");
 
 #endif
