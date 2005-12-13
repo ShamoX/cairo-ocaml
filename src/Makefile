@@ -6,9 +6,6 @@ CPPFLAGS = -g
 TARGETS = cairo
 ifdef LABLGTKDIR
 TARGETS += lablgtk
-ifdef GTKCAIRO_CFLAGS
-TARGETS += gtkcairo
-endif
 endif
 ifdef LIBSVG_CAIRO_CFLAGS
 TARGETS += svgcairo
@@ -53,15 +50,6 @@ cairo_lablgtk.cmxa : $(call mloptobjs,$(lablgtk_SRC))
 libmlcairo_lablgtk.a dllmlcairo_lablgtk.so : $(call cobjs,$(lablgtk_SRC))
 	$(OCAMLMKLIB) -o cairo_lablgtk -oc mlcairo_lablgtk $^
 
-gtkcairo_SRC = cairo_gtkcairo.mli cairo_gtkcairo.ml ml_cairo_gtkcairo.c
-
-gtkcairo.cma : $(call mlobjs,$(gtkcairo_SRC))
-	$(OCAMLMKLIB) -o gtkcairo -oc mlgtkcairo $^ $(GTKCAIRO_LIBS)
-gtkcairo.cmxa : $(call mloptobjs,$(gtkcairo_SRC))
-	$(OCAMLMKLIB) -o gtkcairo -oc mlgtkcairo $^ $(GTKCAIRO_LIBS)
-libmlgtkcairo.a dllmlgtkcairo.so : $(call cobjs,$(gtkcairo_SRC))
-	$(OCAMLMKLIB) -o gtkcairo -oc mlgtkcairo $^ $(GTKCAIRO_LIBS)
-
 svgcairo_SRC = svg_cairo.mli svg_cairo.ml ml_svg_cairo.c
 
 svg_cairo.cma : $(call mlobjs,$(svgcairo_SRC))
@@ -73,14 +61,10 @@ libmlsvgcairo.a dllmlsvgcairo.so : $(call cobjs,$(svgcairo_SRC))
 
 $(call cobjs,$(cairo_SRC))    : CPPFLAGS+=$(CAIRO_CFLAGS)
 $(call cobjs,$(lablgtk_SRC))  : CPPFLAGS+=$(GDK_CFLAGS) -I$(C_LABLGTKDIR)
-$(call cobjs,$(gtkcairo_SRC)) : CPPFLAGS+=$(GTKCAIRO_CFLAGS) -I$(C_LABLGTKDIR)
 $(call cobjs,$(svgcairo_SRC))  : CPPFLAGS+=$(LIBSVG_CAIRO_CFLAGS)
 $(call mlobjs,$(lablgtk_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
-$(call mlobjs,$(gtkcairo_SRC)) : INCFLAGS=-I $(LABLGTKDIR)
 $(call mlintfs,$(lablgtk_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
-$(call mlintfs,$(gtkcairo_SRC)) : INCFLAGS=-I $(LABLGTKDIR)
 $(call mloptobjs,$(lablgtk_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
-$(call mloptobjs,$(gtkcairo_SRC)) : INCFLAGS=-I $(LABLGTKDIR)
 
 install: all
 	mkdir -p $(DESTDIR)$(INSTALLDIR) $(DESTDIR)$(OCAMLLIB)/stublibs
@@ -96,9 +80,6 @@ endif
 DOCFILES = cairo.mli cairo_bigarray.mli cairo_png.mli cairo_pdf.mli cairo_ps.mli cairo_ft.mli
 ifdef LABLGTKDIR
 DOCFILES += cairo_lablgtk.mli
-ifdef GTKCAIRO_CFLAGS
-DOCFILES += cairo_gtkcairo.mli
-endif
 endif
 ifdef LIBSVG_CAIRO_CFLAGS
 DOCFILES += svg_cairo.mli
