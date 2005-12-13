@@ -103,7 +103,7 @@ let draw c width height =
   Cairo.paint c
 
 let expose d_area ev =
-  let c = Cairo.create (Cairo_lablgtk.surface_create d_area#misc#window) in
+  let c = Cairo_lablgtk.create d_area#misc#window in
   let allocation = d_area#misc#allocation in
   draw c allocation.Gtk.width allocation.Gtk.height ;
   true

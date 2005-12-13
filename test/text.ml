@@ -66,7 +66,7 @@ let draw cr w h =
 
   Cairo.select_font_face cr "serif" Cairo.FONT_SLANT_NORMAL Cairo.FONT_WEIGHT_NORMAL ;
   Cairo.set_font_size cr 40. ;
-  let { Cairo.font_height = height } as f_ext = 
+  let { Cairo.font_height = height } = 
     Cairo.font_extents cr in
   
   let glyphs =
@@ -125,8 +125,7 @@ let main () =
   w#connect#destroy GMain.quit ;
 
   let p = GDraw.pixmap ~width ~height ~window:w () in
-  let s = Cairo_lablgtk.surface_create p#pixmap in
-  let cr = Cairo.create s in
+  let cr = Cairo_lablgtk.create p#pixmap in
   draw cr (float width) (float height) ;
   GMisc.pixmap p ~packing:w#add () ;
 

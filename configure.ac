@@ -10,8 +10,9 @@ PKG_CHECK_MODULES(CAIRO, cairo >= 1.0.0 freetype2)
 
 # Optional GTK support (for the X11 backend)
 AC_ARG_WITH(gtk, 
-	    AS_HELP_STRING([--with-gtk],[X11 backend support via GTK+ and LablGTK]),
+	    AS_HELP_STRING([--with-gtk],[Cairo/GTK+ integration via LablGTK]),
 	    use_gtk=$withval, use_gtk=yes)
+AC_ARG_VAR(LABLGTKDIR,[Location of the LablGTK library])
 
 if test $use_gtk = yes ; then
   # Check for LablGTK

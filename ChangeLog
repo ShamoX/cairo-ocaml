@@ -4,6 +4,10 @@
 	Cairo_ps.set_dpi 
 
 	* src/Makefile, src*gtkcairo*: drop gtkcairo support.
+
+	* src/*lablgtk*: sync cairo_lablgtk module with the gdk_cairo_*
+	API of GTK+ 2.8.
+	* test/*: adapt
 	
 2005-11-03  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 

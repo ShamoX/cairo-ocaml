@@ -64,7 +64,7 @@ let redraw (px : GDraw.pixmap) =
     let width, height = px#size in
     px#rectangle ~x:0 ~y:0 ~width ~height ~filled:true ()
   end ;
-  let cr = Cairo.create (Cairo_lablgtk.surface_create px#pixmap) in
+  let cr = Cairo_lablgtk.create px#pixmap in
   Cairo.set_source_rgb cr 1. 1. 1. ;
 
   Cairo.save cr ; begin 
@@ -112,7 +112,7 @@ let main () =
   let px = GDraw.pixmap ~width:400 ~height:500 ~window:w () in
   begin try redraw px 
   with Cairo.Error _ -> prerr_endline "Cairo is unhappy" end ;
-  let img = GMisc.pixmap px ~packing:w#add () in
+  ignore (GMisc.pixmap px ~packing:w#add ()) ;
   
   w#show () ;
   GMain.main ()

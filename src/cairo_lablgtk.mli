@@ -6,16 +6,16 @@
 (*  GNU Lesser General Public License version 2.1 (the "LGPL").           *)
 (**************************************************************************)
 
-(** Xlib backend, via LablGTK *)
+(** GTK/Cairo integration *)
 
-type surface = [`Any|`Xlib] Cairo.surface
+(** These functions are available with GTK+ 2.8. 
+    For older versions of GTK+, an implementation is provided, except for [region].
 
-external image_of_pixbuf : GdkPixbuf.pixbuf -> Cairo.image_surface = "ml_cairo_lablgtk_of_pixbuf"
-external shuffle_pixels  : GdkPixbuf.pixbuf -> unit = "ml_cairo_lablgtk_shuffle_pixels"
+    cf. {{:"http://developer.gnome.org/doc/API/2.0/gdk/gdk-Cairo-Interaction.html"}Cairo Interaction} in the GDK Reference Manual. *)
 
-external surface_create : [> `drawable] Gobject.obj -> surface = "ml_cairo_xlib_surface_create"
-external surface_set_size : [> `Xlib] Cairo.surface -> int -> int -> unit = "ml_cairo_xlib_surface_set_size"
-external surface_set_drawable :
-  [> `Xlib] Cairo.surface -> 
-  [> `drawable] Gobject.obj -> 
-  int -> int -> unit = "ml_cairo_xlib_surface_set_drawable"
+external create           : [> `drawable] Gobject.obj -> Cairo.t = "ml_gdk_cairo_create"
+external set_source_color : Cairo.t -> Gdk.color -> unit = "ml_gdk_cairo_set_source_color"
+external rectangle        : Cairo.t -> Gdk.Rectangle.t -> unit = "ml_gdk_cairo_rectangle"
+external region           : Cairo.t -> Gdk.region -> unit = "ml_gdk_cairo_region"
+
+external set_source_pixbuf : Cairo.t -> GdkPixbuf.pixbuf -> float -> float -> unit = "ml_gdk_cairo_set_source_pixbuf"

@@ -115,7 +115,7 @@ let draw_spline cr spl =
 	  
 
 let paint spl =
-  let cr = Cairo.create (Cairo_lablgtk.surface_create spl.pm#pixmap) in
+  let cr = Cairo_lablgtk.create spl.pm#pixmap in
   spl.pm#rectangle ~x:0 ~y:0 
     ~width:spl.width ~height:spl.height ~filled:true () ;
   Cairo.set_source_rgb cr 0. 0. 0. ;
