@@ -11,7 +11,7 @@
 (** These functions are available with GTK+ 2.8. 
     For older versions of GTK+, an implementation is provided, except for [region].
 
-    cf. {{:"http://developer.gnome.org/doc/API/2.0/gdk/gdk-Cairo-Interaction.html"}Cairo Interaction} in the GDK Reference Manual. *)
+    cf. {{:http://developer.gnome.org/doc/API/2.0/gdk/gdk-Cairo-Interaction.html}Cairo Interaction} in the GDK Reference Manual. *)
 
 external create           : [> `drawable] Gobject.obj -> Cairo.t = "ml_gdk_cairo_create"
 external set_source_color : Cairo.t -> Gdk.color -> unit = "ml_gdk_cairo_set_source_color"
