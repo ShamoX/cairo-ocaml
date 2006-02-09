@@ -56,29 +56,36 @@ let do_file_out fname f =
 let x_inches = 8.
 let y_inches = 3.
 
+
+let file_backend ?(verbose=false) ~backend_name ~filename surface_create =
+  prerr_endline backend_name ;
+  do_file_out filename
+    (fun oc ->
+      let width_in_points  = x_inches *. 72. in
+      let height_in_points = y_inches *. 72. in
+      let s = surface_create oc ~width_in_points ~height_in_points in
+      let c = Cairo.create s in
+      draw ~print:verbose c ;
+      Cairo.show_page c ;
+      Cairo.surface_finish s)
+
 let main () =
 
-  begin
-    prerr_endline "PS" ;
-    do_file_out "basket.ps"
-      (fun oc ->
-	let s = Cairo_ps.surface_create_for_channel oc (x_inches *. 72.) (y_inches *. 72.) in
-	let c = Cairo.create s in
-	draw ~print:true c ;
-	Cairo.show_page c ;
-	Cairo.surface_finish s)
-  end ;
+  file_backend
+    ~verbose:true
+    ~backend_name:"PS"
+    ~filename:"basket.ps"
+    Cairo_ps.surface_create_for_channel ;
 
-  begin
-    prerr_endline "PDF" ;
-    do_file_out "basket.pdf"
-      (fun oc ->
-	let s = Cairo_pdf.surface_create_for_channel oc (x_inches *. 72.) (y_inches *. 72.) in
-	let c = Cairo.create s in
-	draw c ;
-	Cairo.show_page c ;
-	Cairo.surface_finish s)
-  end ;
+  file_backend
+    ~backend_name:"PDF"
+    ~filename:"basket.pdf"
+    Cairo_pdf.surface_create_for_channel ;
+
+  file_backend
+    ~backend_name:"SVG"
+    ~filename:"basket.svg"
+    Cairo_svg.surface_create_for_channel ;
 
   begin
     prerr_endline "Bigarray, PPM and PNG (ARGB32) " ;

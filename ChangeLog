@@ -1,3 +1,10 @@
+2006-02-09  Olivier Andrieu  <oliv__a@users.sourceforge.net>
+
+	* src/cairo_svg.mli, src/cairo_svg.mli, src/ml_cairo_svg.c:
+	support for the SVG backend.
+
+	* test/basket.ml: test SVG output.
+
 2005-12-13  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/cairo_ps.mli, src/cairo_ps.mli, src/ml_cairo_ps.c: add

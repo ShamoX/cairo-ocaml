@@ -27,12 +27,13 @@ cairo_SRC = cairo.mli cairo.ml \
 	    cairo_png.mli cairo_png.ml \
 	    cairo_pdf.mli cairo_pdf.ml \
 	    cairo_ps.mli cairo_ps.ml \
+            cairo_svg.mli cairo_svg.ml \
             cairo_ft.mli cairo_ft.ml \
             ml_cairo_wrappers.c \
             ml_cairo.c ml_cairo_status.c ml_cairo_bigarr.c ml_cairo_path.c \
 	    ml_cairo_surface.c ml_cairo_pattern.c ml_cairo_matrix.c \
 	    ml_cairo_font.c ml_cairo_ft.c \
-	    ml_cairo_png.c ml_cairo_pdf.c ml_cairo_ps.c
+	    ml_cairo_png.c ml_cairo_pdf.c ml_cairo_ps.c ml_cairo_svg.c
 
 cairo.cma : $(call mlobjs,$(cairo_SRC))
 	$(OCAMLMKLIB) -o cairo -oc mlcairo $^ $(CAIRO_LIBS)
