@@ -61,6 +61,9 @@ wML_bc6(cairo_pattern_create_radial)
 /* pattern_reference */
 /* pattern_destroy */
 
+#define Val_cairo_pattern_type_t(v) Val_int(v)
+wML_1(cairo_pattern_get_type, cairo_pattern_t_val, Val_cairo_pattern_type_t)
+
 wML_4_cairo(pattern_add_color_stop_rgb,  Double_val, Double_val, Double_val, Double_val)
 wML_5_cairo(pattern_add_color_stop_rgba, Double_val, Double_val, Double_val, Double_val, Double_val)
 

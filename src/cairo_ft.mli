@@ -29,6 +29,7 @@ external fc_name_parse :
     cairo_ft_font_options_substitute,
     FcDefaultSubstitute and FcFontMatch *)
 external fc_name_unparse : fc_pattern -> string = "ml_FcNameUnparse"
+(* font_options_substitute *)
 
 type font_face = [`Any|`FT] Cairo.font_face
 
@@ -36,6 +37,9 @@ external font_face_create_for_pattern : fc_pattern -> font_face
   = "ml_cairo_ft_font_face_create_for_pattern"
 external font_face_create_for_ft_face : ft_face -> int -> font_face
   = "ml_cairo_ft_font_face_create_for_ft_face"
+
+val downcast_font_face   : [> `Any] Cairo.font_face -> font_face
+val downcast_scaled_font : [> `Any] Cairo.Scaled_Font.t -> [`Any|`FT] Cairo.Scaled_Font.t
 
 external font_lock_face   : [>`FT] Cairo.Scaled_Font.t -> ft_face = "ml_cairo_ft_scaled_font_lock_face"
 external font_unlock_face : [>`FT] Cairo.Scaled_Font.t -> unit    = "ml_cairo_ft_scaled_font_unlock_face"

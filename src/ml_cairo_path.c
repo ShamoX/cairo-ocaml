@@ -8,10 +8,10 @@
 
 #include "ml_cairo.h"
 
-#define CAML_MOVE_TO_TAG  0x95006a53L
-#define CAML_LINE_TO_TAG  0x3f23e04dL
-#define CAML_CLOSE_TAG    0x8ca29f31L
-#define CAML_CURVE_TO_TAG 0x84e3bcd7L
+#define CAML_MOVE_TO_TAG  -1795134893L
+#define CAML_LINE_TO_TAG   1059315789L
+#define CAML_CLOSE_TAG    -1110065659L
+#define CAML_CURVE_TO_TAG -2065449769L
 
 static value
 ml_cairo_fold_path (cairo_path_t *path, value f, value acc)

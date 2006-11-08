@@ -27,5 +27,11 @@ external surface_create_for_stream :
   width_in_points:float -> 
   height_in_points:float -> surface = "ml_cairo_svg_surface_create_for_stream"
 
-external set_dpi :
-  [> `SVG] Cairo.surface -> x_dpi:float -> y_dpi:float -> unit = "ml_cairo_svg_surface_set_dpi"
+type version =
+  | VERSION_1_1
+  | VERSION_1_2
+
+external restrict_to_version :
+  [> `SVG] Cairo.surface -> version -> unit = "ml_cairo_svg_surface_restrict_to_version"
+
+external string_of_version : version -> string = "ml_cairo_svg_version_to_string"

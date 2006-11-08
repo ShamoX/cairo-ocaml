@@ -1,3 +1,9 @@
+2006-11-09  Olivier Andrieu  <oandrieu@gmail.com>
+
+	* configure.ac: require cairo 1.2, bump version number to 1.2
+	* src/*: syc with cairo 1.2 
+	* src/ml_cairo_lablgtk.c: require GTK+ 2.8 now
+
 2006-02-09  Olivier Andrieu  <oliv__a@users.sourceforge.net>
 
 	* src/cairo_svg.mli, src/cairo_svg.mli, src/ml_cairo_svg.c:

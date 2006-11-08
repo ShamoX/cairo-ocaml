@@ -21,7 +21,7 @@ ml_convert_cairo_matrix_in (value v, cairo_matrix_t *mat)
 }
 
 value
-ml_convert_cairo_matrix_out (cairo_matrix_t *mat)
+ml_convert_cairo_matrix_out (const cairo_matrix_t *mat)
 {
   value v;
   v = caml_alloc_small (6 * Double_wosize, Double_array_tag);

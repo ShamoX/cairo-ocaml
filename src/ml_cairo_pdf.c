@@ -39,12 +39,12 @@ ml_cairo_pdf_surface_create_for_stream (value f, value w, value h)
   return _ml_cairo_pdf_surface_create_for_stream (f, w, h, 0);
 }
 
-wML_3(cairo_pdf_surface_set_dpi, cairo_surface_t_val, Double_val, Double_val, Unit)
+wML_3(cairo_pdf_surface_set_size, cairo_surface_t_val, Double_val, Double_val, Unit)
 
 #else
 
 Cairo_Unsupported(cairo_pdf_surface_create_for_stream_unsafe,	"PDF backend not supported");
 Cairo_Unsupported(cairo_pdf_surface_create_for_stream, 		"PDF backend not supported");
-Cairo_Unsupported(cairo_pdf_surface_set_dpi,			"PDF backend not supported");
+Cairo_Unsupported(cairo_pdf_surface_set_size,			"PDF backend not supported");
 
 #endif

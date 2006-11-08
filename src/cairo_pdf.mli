@@ -20,5 +20,5 @@ external surface_create_for_stream :
   width_in_points:float -> 
   height_in_points:float -> surface = "ml_cairo_pdf_surface_create_for_stream"
 
-external set_dpi :
-  [> `PDF] Cairo.surface -> x_dpi:float -> y_dpi:float -> unit = "ml_cairo_pdf_surface_set_dpi"
+external set_size :
+  [> `PDF] Cairo.surface -> width_in_points:float -> height_in_points:float -> unit = "ml_cairo_pdf_surface_set_size"

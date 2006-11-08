@@ -1,4 +1,4 @@
-AC_INIT(CAIRO_OCAML, 1.0.0)
+AC_INIT(CAIRO_OCAML, 1.2.0)
 AC_CONFIG_SRCDIR(src/cairo.ml)
 AC_CONFIG_AUX_DIR(support)
 
@@ -6,7 +6,7 @@ AC_CONFIG_AUX_DIR(support)
 AC_PROG_OCAML()
 
 # Check for cairo
-PKG_CHECK_MODULES(CAIRO, cairo >= 1.0.0 freetype2)
+PKG_CHECK_MODULES(CAIRO, cairo >= 1.2 freetype2)
 
 # Optional GTK support (for the X11 backend)
 AC_ARG_WITH(gtk, 

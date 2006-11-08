@@ -39,12 +39,18 @@ ml_cairo_svg_surface_create_for_stream (value f, value w, value h)
   return _ml_cairo_svg_surface_create_for_stream (f, w, h, 0);
 }
 
-wML_3(cairo_svg_surface_set_dpi, cairo_surface_t_val, Double_val, Double_val, Unit)
+#define cairo_svg_version_t_val(v) ((cairo_svg_version_t) Int_val(v))
+#define Val_cairo_svg_version_t(v) Val_int(v)
+
+wML_2(cairo_svg_surface_restrict_to_version, cairo_surface_t_val, cairo_svg_version_t_val, Unit)
+/* cairo_svg_get_versions */
+wML_1(cairo_svg_version_to_string, cairo_svg_version_t_val, caml_copy_string)
 
 #else
 
 Cairo_Unsupported(cairo_svg_surface_create_for_stream_unsafe,	"SVG backend not supported");
 Cairo_Unsupported(cairo_svg_surface_create_for_stream, 		"SVG backend not supported");
-Cairo_Unsupported(cairo_svg_surface_set_dpi,			"SVG backend not supported");
+Cairo_Unsupported(cairo_svg_surface_restrict_to_version,	"SVG backend not supported");
+Cairo_Unsupported(cairo_svg_version_to_string,			"SVG backend not supported");
 
 #endif

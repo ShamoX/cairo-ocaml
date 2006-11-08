@@ -31,6 +31,9 @@ type status =
   | INVALID_VISUAL
   | FILE_NOT_FOUND
   | INVALID_DASH
+  | INVALID_DSC_COMMENT
+  | INVALID_INDEX
+  | CLIP_NOT_REPRESENTABLE
 exception Error of status
 val init : unit
 
@@ -49,6 +52,26 @@ type -'a surface
 type -'a pattern
 type -'a font_face
 
+type surface_type = [
+  | `Image 
+  | `PDF | `PS | `SVG
+  | `Xlib | `XCB
+  | `Glitz | `Quartz | `Win32 | `BeOS | `DirectFB ]
+type pattern_type = [
+  | `Solid
+  | `Surface
+  | `Linear | `Radial ]
+type font_type = [
+  | `TOY
+  | `FT
+  | `Win32
+  | `ATSUI ]
+
+type content =
+    CONTENT_COLOR
+  | CONTENT_ALPHA
+  | CONTENT_COLOR_ALPHA
+
 type point = { x : float ; y : float }
 type matrix = {
     xx : float ; yx : float ;
@@ -61,6 +84,10 @@ type matrix = {
 val create : [> `Any] surface -> t
 external save    : t -> unit = "ml_cairo_save"
 external restore : t -> unit = "ml_cairo_restore"
+
+val push_group : ?content:content -> t -> unit
+external pop_group : t -> [`Any] pattern = "ml_cairo_pop_group"
+external pop_group_to_source : t -> unit = "ml_cairo_pop_group_to_source"
 
 external status : t -> status = "ml_cairo_status"
 external surface_status : [> `Any] surface -> status = "ml_cairo_surface_status"
@@ -91,9 +118,9 @@ type operator =
 
 external set_operator : t -> operator -> unit = "ml_cairo_set_operator"
 
+external set_source : t -> [> `Any] pattern -> unit = "ml_cairo_set_source"
 external set_source_rgb  : t -> red:float -> green:float -> blue:float -> unit = "ml_cairo_set_source_rgb"
 external set_source_rgba : t -> red:float -> green:float -> blue:float -> alpha:float ->unit = "ml_cairo_set_source_rgba"
-external set_source : t -> [> `Any] pattern -> unit = "ml_cairo_set_source"
 external set_source_surface : t -> [> `Any] surface -> float -> float -> unit = "ml_cairo_set_source_surface"
 
 external set_tolerance : t -> float -> unit = "ml_cairo_set_tolerance"
@@ -142,6 +169,7 @@ external device_to_user_distance : t -> point -> point = "ml_cairo_device_to_use
 external new_path : t -> unit = "ml_cairo_new_path"
 external move_to : t -> x:float -> y:float -> unit = "ml_cairo_move_to"
 val move_to_point : t -> point -> unit
+external new_sub_path : t -> unit = "ml_cairo_new_sub_path"
 external line_to : t -> x:float -> y:float -> unit = "ml_cairo_line_to"
 val line_to_point : t -> point -> unit
 external curve_to : t -> x1:float -> y1:float -> x2:float -> y2:float -> x3:float -> y3:float -> unit = "ml_cairo_curve_to_bc" "ml_cairo_curve_to"
@@ -173,9 +201,9 @@ external in_fill : t -> point -> bool = "ml_cairo_in_fill"
 external stroke_extents : t -> float * float * float * float = "ml_cairo_stroke_extents"
 external fill_extents : t -> float * float * float * float = "ml_cairo_fill_extents"
 
+external reset_clip : t -> unit = "ml_cairo_reset_clip"
 external clip : t -> unit = "ml_cairo_clip"
 external clip_preserve : t -> unit = "ml_cairo_clip_preserve"
-external reset_clip : t -> unit = "ml_cairo_reset_clip"
 
 (** {3 Text API} *)
 
@@ -219,6 +247,9 @@ type hint_metrics =
   | HINT_METRICS_OFF
   | HINT_METRICS_ON
 
+val font_face_get_type : [> `Any] font_face -> [font_type|`Any]
+val font_face_downcast_to_toy : [> `Any] font_face -> [`Any|`TOY] font_face
+
 (** {4 Font options} *)
 
 (** Font options functions *)
@@ -256,6 +287,25 @@ module Font_Options : sig
   val make : [< all] list -> t
 end
 
+(** {4 Scaled Fonts API} *)
+
+(** Scaled fonts functions *)
+module Scaled_Font : sig
+type -'a t
+
+external create : ([>`Any] as 'a) font_face -> matrix -> matrix -> Font_Options.t -> 'a t = "ml_cairo_scaled_font_create"
+val get_type : [> `Any] t -> [font_type|`Any]
+val downcast_to_toy : [> `Any] t -> [`Any|`TOY] t
+external font_extents : [> `Any] t -> font_extents = "ml_cairo_scaled_font_extents"
+external text_extents : [> `Any] t -> string -> text_extents = "ml_cairo_scaled_text_extents"
+external glyph_extents : [>`Any] t -> glyph array -> text_extents = "ml_cairo_scaled_font_glyph_extents"
+external get_font_face : ([>`Any] as 'a) t -> 'a font_face = "ml_cairo_scaled_font_get_font_face"
+external get_font_matrix : ([>`Any] as 'a) t -> matrix = "ml_cairo_scaled_font_get_font_matrix"
+external get_ctm : ([>`Any] as 'a) t -> matrix = "ml_cairo_scaled_font_get_ctm"
+val get_font_options : ([>`Any] as 'a) t -> Font_Options.t
+end
+
+
 external select_font_face : t -> string -> font_slant -> font_weight -> unit = "ml_cairo_select_font_face"
 external set_font_size : t -> float -> unit = "ml_cairo_set_font_size"
 external set_font_matrix : t -> matrix -> unit = "ml_cairo_set_font_matrix"
@@ -263,6 +313,7 @@ external get_font_matrix : t -> matrix = "ml_cairo_get_font_matrix"
 external set_font_options : t -> Font_Options.t -> unit = "ml_cairo_set_font_matrix"
 val merge_font_options : t -> Font_Options.t -> unit
 val get_font_options : t -> Font_Options.t
+external set_scaled_font : t -> [> `Any] Scaled_Font.t -> unit = "ml_cairo_set_scaled_font"
 external show_text : t -> string -> unit = "ml_cairo_show_text"
 external show_glyphs : t -> glyph array -> unit = "ml_cairo_show_glyphs"
 external get_font_face : t -> [`Any] font_face = "ml_cairo_get_font_face"
@@ -272,17 +323,6 @@ external text_extents : t -> string -> text_extents = "ml_cairo_text_extents"
 external glyph_extents : t -> glyph array -> text_extents = "ml_cairo_glyph_extents"
 external text_path : t -> string -> unit = "ml_cairo_text_path"
 external glyph_path : t -> glyph array -> unit = "ml_cairo_glyph_path"
-
-(** {4 Scaled Fonts API} *)
-
-(** Scaled fonts functions *)
-module Scaled_Font : sig
-type -'a t
-
-external create : ([>`Any] as 'a) font_face -> matrix -> matrix -> Font_Options.t -> 'a t = "ml_cairo_scaled_font_create"
-external font_extents : [> `Any] t -> font_extents = "ml_cairo_scaled_font_extents"
-external glyph_extents : [>`Any] t -> glyph array -> text_extents = "ml_cairo_scaled_font_glyph_extents"
-end
 
 (** {3 Renderer state querying} *)
 
@@ -298,6 +338,7 @@ external get_line_join : t -> line_join = "ml_cairo_get_line_join"
 external get_miter_limit : t -> float = "ml_cairo_get_miter_limit"
 external get_matrix : t -> matrix = "ml_cairo_get_matrix"
 external get_target : t -> [`Any] surface = "ml_cairo_get_target"
+external get_group_target : t -> [`Any] surface = "ml_cairo_get_group_target"
 
 type flat_path = [
   | `MOVE_TO of point
@@ -313,14 +354,12 @@ val append_path : t -> [< path] -> unit
 
 (** {3 Surface API} *)
 
-type content =
-    CONTENT_COLOR
-  | CONTENT_ALPHA
-  | CONTENT_COLOR_ALPHA
-
 external surface_create_similar : [> `Any] surface -> content -> width:int -> height:int -> [`Any] surface = "ml_cairo_surface_create_similar"
 
 external surface_finish : [> `Any] surface -> unit = "ml_cairo_surface_finish"
+
+val surface_get_type : [> `Any] surface -> [surface_type | `Any]
+external surface_get_content : [> `Any] surface -> content = "ml_cairo_surface_get_content"
 
 val surface_get_font_options : [> `Any] surface -> Font_Options.t
 
@@ -329,6 +368,9 @@ external mark_dirty    : [> `Any] surface -> unit = "ml_cairo_surface_mark_dirty
 external mark_dirty_rectangle : [> `Any] surface -> int -> int -> int -> int -> unit = "ml_cairo_surface_mark_dirty_rectangle"
 
 external surface_set_device_offset : [> `Any] surface -> float -> float -> unit = "ml_cairo_surface_set_device_offset"
+external surface_get_device_offset : [> `Any] surface -> float * float = "ml_cairo_surface_get_device_offset"
+
+external surface_set_fallback_resolution : [> `Any] surface -> float -> float -> unit = "ml_cairo_surface_set_fallback_resolution"
 
 (** {4 Image surface} *)
 
@@ -341,8 +383,10 @@ type format =
   | FORMAT_A1
 
 external image_surface_create : format -> width:int -> height:int -> image_surface = "ml_cairo_image_surface_create"
-external image_surface_get_width  : [>`Image] surface -> int = "ml_cairo_image_surface_get_width"
-external image_surface_get_height : [>`Image] surface -> int = "ml_cairo_image_surface_get_height"
+external image_surface_get_format  : [>`Image] surface -> format = "ml_cairo_image_surface_get_format"
+external image_surface_get_width   : [>`Image] surface -> int = "ml_cairo_image_surface_get_width"
+external image_surface_get_height  : [>`Image] surface -> int = "ml_cairo_image_surface_get_height"
+external image_surface_get_stride  : [>`Image] surface -> int = "ml_cairo_image_surface_get_stride"
 
 (** {3 Patterns} *)
 
@@ -365,6 +409,10 @@ type filter =
 
 (** Patterns functions *)
 module Pattern : sig
+val get_type : [> `Any] pattern -> [pattern_type|`Any]
+val downcast_to_solid : [> `Any] pattern -> solid_pattern
+val downcast_to_surface : [> `Any] pattern -> surface_pattern
+val downcast_to_gradient : [> `Any] pattern -> gradient_pattern
 external create_rgb  : red:float -> green:float -> blue:float -> solid_pattern = "ml_cairo_pattern_create_rgb"
 external create_rgba : red:float -> green:float -> blue:float -> alpha:float -> solid_pattern = "ml_cairo_pattern_create_rgba"
 external create_for_surface : [> `Any] surface -> surface_pattern = "ml_cairo_pattern_create_for_surface"

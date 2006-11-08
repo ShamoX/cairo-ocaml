@@ -11,13 +11,13 @@
 int ml_pointer_compare (value, value);
 long ml_pointer_hash (value);
 
-#define wMake_Val_final_pointer(type, final, adv) \
+#define wMake_Val_final_pointer_full(type, final, adv, cmp_method, hash_method) \
 static void ml_final_##type (value val) \
 { type **p = Data_custom_val(val); \
   if (*p) final (*p); } \
 static struct custom_operations ml_custom_##type = \
 { #type "/001", ml_final_##type, \
-  ml_pointer_compare, ml_pointer_hash, \
+  cmp_method, hash_method, \
   custom_serialize_default, custom_deserialize_default }; \
 value Val_##type (type *p) \
 { type **store; value ret; \
@@ -25,6 +25,8 @@ value Val_##type (type *p) \
   ret = caml_alloc_custom (&ml_custom_##type, sizeof p, adv, 100); \
   store = Data_custom_val(ret); \
   *store = p; return ret; }
+
+#define wMake_Val_final_pointer(type, final, adv) wMake_Val_final_pointer_full(type, final, adv, ml_pointer_compare, ml_pointer_hash)
 
 #ifndef ARCH_ALIGN_DOUBLE
 #define Double_array_val(v)    ((double *)(v))

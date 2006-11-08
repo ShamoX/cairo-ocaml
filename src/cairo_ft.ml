@@ -27,5 +27,14 @@ type font_face = [`Any|`FT] Cairo.font_face
 external font_face_create_for_pattern : fc_pattern -> font_face     = "ml_cairo_ft_font_face_create_for_pattern"
 external font_face_create_for_ft_face : ft_face -> int -> font_face = "ml_cairo_ft_font_face_create_for_ft_face"
 
+let downcast_font_face f =
+  match Cairo.font_face_get_type f with
+  | `FT -> (Obj.magic f : font_face)
+  | _ -> invalid_arg "Cairo_ft: font face downcast"
+let downcast_scaled_font sf =
+  match Cairo.Scaled_Font.get_type sf with
+  | `FT -> (Obj.magic sf : [`Any|`FT] Cairo.Scaled_Font.t)
+  | _ -> invalid_arg "Cairo_ft: scaled font downcast"
+
 external font_lock_face   : [> `FT] Cairo.Scaled_Font.t -> ft_face = "ml_cairo_ft_scaled_font_lock_face"
 external font_unlock_face : [> `FT] Cairo.Scaled_Font.t -> unit    = "ml_cairo_ft_scaled_font_unlock_face"

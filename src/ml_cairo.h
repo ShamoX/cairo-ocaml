@@ -36,6 +36,10 @@ value Val_cairo_pattern_t (cairo_pattern_t *);
 #define cairo_format_t_val(v) ((cairo_format_t) Int_val(v))
 #define Val_cairo_format_t(v) Val_int(v)
 
+#define cairo_antialias_t_val(v) ((cairo_antialias_t) Int_val(v))
+#define Val_cairo_antialias_t(v) Val_int(v)
+
+/* cairo_font */
 #define cairo_font_face_t_val(v)	wPointer_val(cairo_font_face_t, v)
 value Val_cairo_font_face_t (cairo_font_face_t *);
 #define Val_cairo_font_face_ref(p)	Val_cairo_font_face_t (cairo_font_face_reference(p))
@@ -46,10 +50,14 @@ value Val_cairo_scaled_font_t (cairo_scaled_font_t *);
 #define cairo_font_options_t_val(v)	wPointer_val(cairo_font_options_t, v)
 value Val_cairo_font_options_t (cairo_font_options_t *);
 
+/* cairo_surface */
+cairo_content_t cairo_content_t_val (value);
+
+
 /* cairo_matrix */
 #ifdef ARCH_ALIGN_DOUBLE
 void	ml_convert_cairo_matrix_in	(value, cairo_matrix_t *);
-value	ml_convert_cairo_matrix_out	(cairo_matrix_t *);
+value	ml_convert_cairo_matrix_out	(const cairo_matrix_t *);
 #else
 # define cairo_matrix_t_val(v)	(cairo_matrix_t *)(v)
 # define cairo_matrix_alloc()	caml_alloc_small (6 * Double_wosize, Double_array_tag)

@@ -48,3 +48,5 @@ ml_cairo_image_surface_create_for_data (value img, value fmt, value w, value h, 
 
   return Val_cairo_surface_t (surf);
 }
+
+/* cairo_image_surface_get_data */

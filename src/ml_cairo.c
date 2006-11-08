@@ -46,23 +46,32 @@ wML_0_cairo(save)
 
 wML_0_cairo(restore)
 
+wML_0_cairo(push_group)
+wML_1_cairo(push_group_with_content, cairo_content_t_val)
+CAMLprim value
+ml_cairo_pop_group (value cr)
+{
+  cairo_pattern_t *p = cairo_pop_group (cairo_t_val (cr));
+  check_cairo_status (cr);
+  return Val_cairo_pattern_t (p);
+}
+wML_0_cairo(pop_group_to_source)
+
+
 #define cairo_operator_t_val(v) ((cairo_operator_t) Int_val(v))
 #define Val_cairo_operator_t(v) Val_int(v)
 
 wML_1_cairo(set_operator, cairo_operator_t_val)
 
+wML_1_cairo(set_source, cairo_pattern_t_val)
+
 wML_3_cairo(set_source_rgb, Double_val, Double_val, Double_val)
 
 wML_4_cairo(set_source_rgba, Double_val, Double_val, Double_val, Double_val)
 
-wML_1_cairo(set_source, cairo_pattern_t_val)
-
 wML_3_cairo(set_source_surface, cairo_surface_t_val, Double_val, Double_val)
 
 wML_1_cairo(set_tolerance, Double_val)
-
-#define cairo_antialias_t_val(v) ((cairo_antialias_t) Int_val(v))
-#define Val_cairo_antialias_t(v) Val_int(v)
 
 wML_1_cairo(set_antialias, cairo_antialias_t_val)
 
@@ -197,6 +206,8 @@ wML_0_cairo(new_path)
 
 wML_2_cairo(move_to, Double_val, Double_val)
 
+wML_0_cairo(new_sub_path)
+
 wML_2_cairo(line_to, Double_val, Double_val)
 
 wML_6_cairo(curve_to, Double_val, Double_val, Double_val, Double_val, Double_val, Double_val)
@@ -291,12 +302,11 @@ ml_cairo_fill_extents (value v_cr)
   }
 }
 
+wML_0_cairo(reset_clip)
+
 wML_0_cairo(clip)
 
 wML_0_cairo(clip_preserve)
-
-wML_0_cairo(reset_clip)
-
 
 
 #define cairo_font_weight_t_val(v) ((cairo_font_weight_t) Int_val(v))
@@ -341,6 +351,8 @@ ml_cairo_get_font_matrix (value v_cr)
 
 wML_1_cairo (set_font_options, cairo_font_options_t_val)
 wML_1_cairo (get_font_options, cairo_font_options_t_val)
+
+wML_1_cairo (set_scaled_font, cairo_scaled_font_t_val)
 
 wML_1_cairo(show_text, String_val)
 
@@ -492,6 +504,8 @@ ml_cairo_get_matrix (value v_cr)
 
 cairo_get(target, Val_cairo_surface_ref)
 
+cairo_get(group_target, Val_cairo_surface_ref)
+
 /* ml_cairo_path */
 /* ml_cairo_status */
 
@@ -571,12 +585,3 @@ ml_cairo_unsafe_read_func (void *closure, unsigned char *data, unsigned int leng
     }
   return CAIRO_STATUS_SUCCESS;
 }
-
-
-
-wML_3(cairo_image_surface_create, cairo_format_t_val, Int_val, Int_val, Val_cairo_surface_t)
-
-/* image_surface_create_for_data */
-
-wML_1 (cairo_image_surface_get_width, cairo_surface_t_val, Val_int)
-wML_1 (cairo_image_surface_get_height, cairo_surface_t_val, Val_int)
