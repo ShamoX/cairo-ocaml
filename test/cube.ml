@@ -11,23 +11,28 @@ let animate_frame_delay = 40
 let rotate_max = 8. *. atan 1.
 let initial_size = 200
 
-let redraw w range cr =
+let get_cairo w =
+  Cairo_lablgtk.create w#misc#window
+
+let redraw w range _ =
+  let cr = get_cairo w in
   let { Gtk.width = width ; Gtk.height = height } =
     w#misc#allocation in
   let box_size = float (width + height) /. 6. in
 
   Cairo.save cr ; begin
-    Cairo.default_matrix cr ;
+    Cairo.identity_matrix cr ;
     let off = float width /. 2. in
     Cairo.translate cr off off ;
     Cairo.rotate cr range#adjustment#value ;
     Cairo.rectangle cr (~-. box_size) (~-. box_size) box_size box_size ;
-    Cairo.set_rgb_color cr 1. 0. 0. ;
+    Cairo.set_source_rgb cr 1. 0. 0. ;
     Cairo.fill cr end ;
-  Cairo.restore cr
+  Cairo.restore cr ;
+  true
 
-let slider_changed cr () =
-  cr#queue_draw
+let slider_changed w () =
+  GtkBase.Widget.queue_draw w#as_widget
 
 let animate_step range () =
   let nv = range#adjustment#value +. animate_rotate_step in
@@ -47,11 +52,9 @@ let animate_toggled button range =
 	timeout := None
     | _ -> ()
 
-
-
 let main =
   let w = GWindow.window ~title:"GtkCairo Demo" () in
-  w#connect#destroy GMain.quit ;
+  ignore (w#connect#destroy GMain.quit) ;
   
   let b = GPack.vbox ~spacing:6 ~border_width:12 
       ~packing:w#add () in
@@ -59,7 +62,7 @@ let main =
   let f = GBin.frame ~shadow_type:`IN 
       ~packing:(b#pack ~expand:true ~fill:true) () in
 
-  let cairo = Cairo_gtkcairo.cairo 
+  let area = GMisc.drawing_area
       ~width:initial_size ~height:initial_size 
       ~packing:f#add () in
   let slider = GRange.scale `HORIZONTAL 
@@ -70,10 +73,12 @@ let main =
   let button = GButton.check_button ~label:"Animate" 
       ~packing:b#pack () in
 
-  cairo#connect#paint (redraw cairo slider) ;
-  slider#connect#value_changed 
-    (slider_changed cairo) ;
-  button#connect#toggled (animate_toggled button slider) ;
+  ignore (area#event#connect#expose
+	    (redraw area slider)) ;
+  ignore (slider#connect#value_changed 
+	    (slider_changed area)) ;
+  ignore (button#connect#toggled
+	    (animate_toggled button slider)) ;
 
   w#show () ;
   GMain.main ()

@@ -3,10 +3,7 @@ include ../config.make
 
 TARGETS = basket kapow
 ifdef LABLGTKDIR
-TARGETS += text demo spline knockout font
-ifdef GTKCAIRO_CFLAGS
-TARGETS += cube
-endif
+TARGETS += text demo spline knockout font cube
 endif
 ifdef LIBSVG_CAIRO_CFLAGS
 TARGETS += svg2png 
@@ -30,7 +27,7 @@ demo : demo.ml
 	$(OCAMLOPT) -w s -o $@ -I ../src -I $(LABLGTKDIR) lablgtk.cmxa cairo.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
 
 cube : cube.ml
-	$(OCAMLOPT) -w s -o $@ -I ../src -I $(LABLGTKDIR) lablgtk.cmxa cairo.cmxa gtkcairo.cmxa gtkInit.cmx $^
+	$(OCAMLOPT) -o $@ -I ../src -I $(LABLGTKDIR) lablgtk.cmxa cairo.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
 
 spline : spline.ml
 	$(OCAMLOPT) -w s -o $@ -I ../src -I $(LABLGTKDIR) lablgtk.cmxa cairo.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
