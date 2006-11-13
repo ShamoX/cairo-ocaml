@@ -9,7 +9,6 @@
 (** GTK/Cairo integration *)
 
 (** These functions are available with GTK+ 2.8. 
-    For older versions of GTK+, an implementation is provided, except for [region].
 
     cf. {{:http://developer.gnome.org/doc/API/2.0/gdk/gdk-Cairo-Interaction.html}Cairo Interaction} in the GDK Reference Manual. *)
 

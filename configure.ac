@@ -20,7 +20,7 @@ if test $use_gtk = yes ; then
 
   if test "$LABLGTKDIR" ; then
     # Check for gdk-pixbuf
-    PKG_CHECK_MODULES(GDK, cairo gdk-2.0 gdk-pixbuf-2.0, :, use_gtk=no)
+    PKG_CHECK_MODULES(GDK, cairo gdk-2.0 >= 2.8 gdk-pixbuf-2.0, :, use_gtk=no)
   else
     use_gtk=no
   fi
