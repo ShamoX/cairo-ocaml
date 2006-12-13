@@ -113,23 +113,21 @@ ml_FcNameUnparse (value patt)
 
 /* cairo Fontconfig/Freetype font backend */
 wML_1 (cairo_ft_font_face_create_for_pattern, FcPattern_val, Val_cairo_font_face_t)
-wML_2 (cairo_ft_font_options_substitute, cairo_font_options_t_val, FcPattern_val, Unit)
 wML_2 (cairo_ft_font_face_create_for_ft_face, FT_Face_val, Int_val, Val_cairo_font_face_t)
 wML_1 (cairo_ft_scaled_font_lock_face, cairo_scaled_font_t_val, Val_ptr)
 wML_1 (cairo_ft_scaled_font_unlock_face, cairo_scaled_font_t_val, Unit)
 
 #else
 
-Unsupported (ml_FT_Init_FreeType)
-Unsupported (ml_FT_Done_FreeType)
-Unsupported (ml_FT_New_Face)
-Unsupported (ml_FT_Done_Face)
-Unsupported (ml_FcNameParse)
-Unsupported (ml_FcNameUnparse)
-Unsupported (ml_cairo_ft_font_create_for_pattern)
-Unsupported (ml_cairo_ft_font_options_substitute)
-Unsupported (ml_cairo_ft_font_create_for_ft_face)
-Unsupported (ml_cairo_ft_scaled_font_lock_face)
-Unsupported (ml_cairo_ft_scaled_font_unlock_face)
+Cairo_Unsupported (FT_Init_FreeType, "FT backend not supported")
+Cairo_Unsupported (FT_Done_FreeType, "FT backend not supported")
+Cairo_Unsupported (FT_New_Face, "FT backend not supported")
+Cairo_Unsupported (FT_Done_Face, "FT backend not supported")
+Cairo_Unsupported (FcNameParse, "FT backend not supported")
+Cairo_Unsupported (FcNameUnparse, "FT backend not supported")
+Cairo_Unsupported (cairo_ft_font_create_for_pattern, "FT backend not supported")
+Cairo_Unsupported (cairo_ft_font_create_for_ft_face, "FT backend not supported")
+Cairo_Unsupported (cairo_ft_scaled_font_lock_face, "FT backend not supported")
+Cairo_Unsupported (cairo_ft_scaled_font_unlock_face, "FT backend not supported")
 
 #endif /* CAIRO_HAS_FT_FONT */
