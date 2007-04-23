@@ -137,7 +137,7 @@ ml_cairo_scaled_font_get_font_matrix (value sf)
 #else
   cairo_matrix_t c_m;
   cairo_scaled_font_get_font_matrix (cairo_scaled_font_t_val (sf), &c_m);
-  m = ml_convert_cairo_matrix_out (c_m);
+  m = ml_convert_cairo_matrix_out (&c_m);
 #endif
   cairo_treat_status (cairo_scaled_font_status (cairo_scaled_font_t_val (sf)));
   CAMLreturn(m);
@@ -155,7 +155,7 @@ ml_cairo_scaled_font_get_ctm (value sf)
 #else
   cairo_matrix_t c_m;
   cairo_scaled_font_get_ctm (cairo_scaled_font_t_val (sf), &c_m);
-  m = ml_convert_cairo_matrix_out (c_m);
+  m = ml_convert_cairo_matrix_out (&c_m);
 #endif
   cairo_treat_status (cairo_scaled_font_status (cairo_scaled_font_t_val (sf)));
   CAMLreturn(m);
