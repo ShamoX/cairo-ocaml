@@ -6,9 +6,9 @@
 /*  GNU Lesser General Public License version 2.1 (the "LGPL").           */
 /**************************************************************************/
 
-#include "ml_cairo.h"
-
 #include <caml/bigarray.h>
+
+#include "ml_cairo.h"
 
 unsigned long bigarray_byte_size (struct caml_bigarray *);
 
