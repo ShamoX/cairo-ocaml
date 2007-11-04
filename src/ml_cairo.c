@@ -523,11 +523,16 @@ value *
 ml_cairo_make_closure (value f)
 {
   CAMLparam1(f);
-  value c;
+  value c, *r;
   c = caml_alloc_small (2, 0);
   Field (c, 0) = f;
   Field (c, 1) = Val_unit;
-  CAMLreturn (ml_cairo_make_root (c));
+  r = ml_cairo_make_root (c);
+#ifdef CAMLreturnT
+  CAMLreturnT (value*, r);
+#else
+  CAMLreturn (r);
+#endif
 }
 
 cairo_status_t

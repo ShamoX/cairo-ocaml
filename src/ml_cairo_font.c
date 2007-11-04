@@ -101,7 +101,7 @@ ml_cairo_scaled_font_extents (value sf)
 }
 
 CAMLprim value
-ml_scaled_font_text_extents (value sf, value v_utf8)
+ml_cairo_scaled_font_text_extents (value sf, value v_utf8)
 {
   cairo_text_extents_t c_extents;
   cairo_scaled_font_text_extents (cairo_scaled_font_t_val (sf), String_val (v_utf8), &c_extents);

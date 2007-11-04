@@ -1,3 +1,8 @@
+2007-11-04  Olivier Andrieu  <oandrieu@gmail.com>
+
+	* src/ml_cairo.c: fix a C compiler warning
+	* src/cairo.ml, src/ml_cairo_font.c: fix typos
+
 2007-08-27  Olivier Andrieu  <oandrieu@gmail.com>
 
 	* src/ml_cairo_bigarr.c: fix compilation with OCaml 3.10

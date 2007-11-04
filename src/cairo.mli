@@ -155,7 +155,7 @@ external set_miter_limit : t -> float -> unit = "ml_cairo_set_miter_limit"
 external translate : t -> tx:float -> ty:float -> unit = "ml_cairo_translate"
 external scale : t -> sx:float -> sy:float -> unit = "ml_cairo_scale"
 external rotate : t -> angle:float -> unit = "ml_cairo_rotate"
-external transform : t -> matrix -> unit = "ml_cairo_trasnform"
+external transform : t -> matrix -> unit = "ml_cairo_transform"
 external set_matrix : t -> matrix -> unit = "ml_cairo_set_matrix"
 external identity_matrix : t -> unit = "ml_cairo_identity_matrix"
 
@@ -297,7 +297,7 @@ external create : ([>`Any] as 'a) font_face -> matrix -> matrix -> Font_Options.
 val get_type : [> `Any] t -> [font_type|`Any]
 val downcast_to_toy : [> `Any] t -> [`Any|`TOY] t
 external font_extents : [> `Any] t -> font_extents = "ml_cairo_scaled_font_extents"
-external text_extents : [> `Any] t -> string -> text_extents = "ml_cairo_scaled_text_extents"
+external text_extents : [> `Any] t -> string -> text_extents = "ml_cairo_scaled_font_text_extents"
 external glyph_extents : [>`Any] t -> glyph array -> text_extents = "ml_cairo_scaled_font_glyph_extents"
 external get_font_face : ([>`Any] as 'a) t -> 'a font_face = "ml_cairo_scaled_font_get_font_face"
 external get_font_matrix : ([>`Any] as 'a) t -> matrix = "ml_cairo_scaled_font_get_font_matrix"
