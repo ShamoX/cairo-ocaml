@@ -1,0 +1,17 @@
+# ignore build-related files
+src/.depend
+
+# ignore object files
+*.[oa]
+*.so
+*.cm[iox]
+*.cma
+*.cmxa
+
+# ignore autoconf-related files
+aclocal.m4
+autom4te.cache
+config.log
+config.make
+config.status
+configure
