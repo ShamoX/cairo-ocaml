@@ -95,16 +95,19 @@ ml_cairo_matrix_rotate (value m, value a)
 CAMLprim value
 ml_cairo_matrix_invert (value m)
 {
+  cairo_status_t st;
 #ifndef ARCH_ALIGN_DOUBLE
   CAMLparam1(m);
   value v = cairo_matrix_alloc();
   cairo_copy_matrix (v, m);
-  cairo_matrix_invert (cairo_matrix_t_val (v));
+  st = cairo_matrix_invert (cairo_matrix_t_val (v));
+  cairo_treat_status (st);
   CAMLreturn (v);
 #else
   cairo_matrix_t mat;
   ml_convert_cairo_matrix_in (m, &mat);
-  cairo_matrix_invert (&mat);
+  st = cairo_matrix_invert (&mat);
+  cairo_treat_status (st);
   return ml_convert_cairo_matrix_out (&mat);
 #endif
 }
