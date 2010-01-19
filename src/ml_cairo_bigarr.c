@@ -11,7 +11,7 @@
 #include <caml/bigarray.h>
 
 /* This prototype is only exported since OCaml 3.11 */
-unsigned long caml_ba_byte_size (struct caml_ba_array *);
+uintnat caml_ba_byte_size (struct caml_ba_array *);
 
 CAMLprim value
 ml_bigarray_byte_size (value b)
