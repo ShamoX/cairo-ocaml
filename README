@@ -20,7 +20,7 @@ If you want to disable LablGTK support, run configure with
 Dependencies
 ============
 
- ocaml          >= 3.08
+ ocaml          >= 3.11
  cairo          >= 1.2.0
  libsvg-cairo   optional >= 0.1.5
  LablGTK	optional, GTK+ >= 2.8

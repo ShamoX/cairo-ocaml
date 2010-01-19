@@ -173,26 +173,26 @@ AC_DEFUN([AC_CHECK_OCAML_PKG],
 
 AC_DEFUN([AC_CHECK_OCAML_MODULE],
 [dnl
-  AC_MSG_CHECKING([for OCaml module $2])
+  AC_MSG_CHECKING([for OCaml module $1])
 
   cat > conftest.ml <<EOF
 open $3
 EOF
   unset found
-  for $1 in $$1 $4 ; do
-    if $OCAMLC -c -I "$$1" conftest.ml >&5 2>&5 ; then
+  for $2 in $$2 $4 ; do
+    if $OCAMLC -c -I "$$2" conftest.ml >&5 2>&5 ; then
       found=yes
       break
     fi
   done
 
   if test "$found" ; then
-    AC_MSG_RESULT([$$1])
+    AC_MSG_RESULT([$$2])
   else
     AC_MSG_RESULT([not found])
     $1=no
   fi
-  AC_SUBST([$1])
+  AC_SUBST([$2])
 ])
 
 
