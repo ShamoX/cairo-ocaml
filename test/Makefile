@@ -8,11 +8,17 @@ endif
 ifdef LIBSVG_CAIRO_CFLAGS
 TARGETS += svg2png 
 endif
+ifdef LIBPANGOCAIRO_CFLAGS
+TARGETS += pangocairo
+endif
 
 all : $(TARGETS)
 
 svg2png : svg2png.ml
 	$(OCAMLOPT) -o $@ -I ../src cairo.cmxa svg_cairo.cmxa $^
+
+pangocairo : pangocairo.ml
+	$(OCAMLOPT) -o $@ -I ../src -I $(LABLGTKDIR) lablgtk.cmxa cairo.cmxa pango_cairo.cmxa gtkInit.cmx $^
 
 kapow : kapow.ml
 	$(OCAMLOPT) -o $@ -I ../src cairo.cmxa $^
@@ -42,6 +48,6 @@ knockout : knockout.ml
 	$(OCAMLOPT) -o $@ -I ../src -I $(LABLGTKDIR) cairo.cmxa lablgtk.cmxa cairo_lablgtk.cmxa gtkInit.cmx $^
 
 clean :
-	rm -f *.cm* *.o $(TARGETS) *.ps *.ppm *.png
+	rm -f *.cm* *.o $(TARGETS) *.ps *.ppm *.png *.svg *.pdf
 
 include ../Makefile.rules

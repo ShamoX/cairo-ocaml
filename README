@@ -23,6 +23,7 @@ Dependencies
  ocaml          >= 3.10
  cairo          >= 1.2.0
  libsvg-cairo   optional >= 0.1.5
+ libpangocairo  optional
  LablGTK	optional, GTK+ >= 2.8
 
 
@@ -39,3 +40,6 @@ and is also available here:
 Author
 ======
 Olivier Andrieu <oandrieu@gmail.com>
+
+Pango_cairo support started by:
+  Richard Jones <rich at annexia.org> or <rich at merjis.com>

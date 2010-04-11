@@ -10,6 +10,10 @@ endif
 ifdef LIBSVG_CAIRO_CFLAGS
 TARGETS += svgcairo
 endif
+ifdef LIBPANGOCAIRO_CFLAGS
+TARGETS += pangocairo
+endif
+
 all : $(TARGETS) $(if $(OCAMLOPT),opt)
 opt : $(addsuffix .opt,$(TARGETS))
 
@@ -21,6 +25,8 @@ gtkcairo     : gtkcairo.cma  libmlgtkcairo.a
 gtkcairo.opt : gtkcairo.cmxa dllmlgtkcairo.so
 svgcairo     : svg_cairo.cma libmlsvgcairo.a
 svgcairo.opt : svg_cairo.cmxa dllmlsvgcairo.so
+pangocairo     : pango_cairo.cma libmlpangocairo.a
+pangocairo.opt : pango_cairo.cmxa dllmlpangocairo.so
 
 cairo_SRC = cairo.mli cairo.ml \
             cairo_bigarray.mli cairo_bigarray.ml \
@@ -60,12 +66,25 @@ svg_cairo.cmxa : $(call mloptobjs,$(svgcairo_SRC))
 libmlsvgcairo.a dllmlsvgcairo.so : $(call cobjs,$(svgcairo_SRC))
 	$(OCAMLMKLIB) -o svg_cairo -oc mlsvgcairo $^ $(LIBSVG_CAIRO_LIBS)
 
+pangocairo_SRC = pango_cairo.mli pango_cairo.ml ml_pango_cairo.c
+
+pango_cairo.cma : $(call mlobjs,$(pangocairo_SRC))
+	$(OCAMLMKLIB) -o pango_cairo -oc mlpangocairo $^ $(LIBPANGOCAIRO_LIBS)
+pango_cairo.cmxa : $(call mloptobjs,$(pangocairo_SRC))
+	$(OCAMLMKLIB) -o pango_cairo -oc mlpangocairo $^ $(LIBPANGO_CAIRO_LIBS)
+libmlpangocairo.a dllmlpangocairo.so : $(call cobjs,$(pangocairo_SRC))
+	$(OCAMLMKLIB) -o pango_cairo -oc mlpangocairo $^ $(LIBPANGOCAIRO_LIBS)
+
 $(call cobjs,$(cairo_SRC))    : CPPFLAGS+=$(CAIRO_CFLAGS)
 $(call cobjs,$(lablgtk_SRC))  : CPPFLAGS+=$(GDK_CFLAGS) -I$(C_LABLGTKDIR)
 $(call cobjs,$(svgcairo_SRC))  : CPPFLAGS+=$(LIBSVG_CAIRO_CFLAGS)
+$(call cobjs,$(pangocairo_SRC))  : CPPFLAGS+=$(LIBPANGOCAIRO_CFLAGS) $(GDK_CFLAGS) -I$(C_LABLGTKDIR)
 $(call mlobjs,$(lablgtk_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
 $(call mlintfs,$(lablgtk_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
 $(call mloptobjs,$(lablgtk_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
+$(call mlobjs,$(pangocairo_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
+$(call mlintfs,$(pangocairo_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
+$(call mloptobjs,$(pangocairo_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
 
 install: all
 	mkdir -p $(DESTDIR)$(INSTALLDIR) $(DESTDIR)$(OCAMLLIB)/stublibs
@@ -85,6 +104,10 @@ endif
 ifdef LIBSVG_CAIRO_CFLAGS
 DOCFILES += svg_cairo.mli
 endif
+ifdef LIBPANGOCAIRO_CFLAGS
+DOCFILES += pango_cairo.mli
+endif
+
 doc: $(DOCFILES:%.mli=%.cmi)
 	mkdir -p ../doc/html
 	ocamldoc -v -html -d ../doc/html -t Cairo-ocaml $(if $(LABLGTKDIR),-I $(LABLGTKDIR)) $(DOCFILES) 
@@ -94,7 +117,7 @@ clean :
 
 .depend : $(wildcard *.ml *.mli)
 	@echo "making deps"
-	@$(OCAMLDEP) $^ > $@
+	@$(OCAMLDEP) $(if $(LABLGTKDIR),-I $(LABLGTKDIR)) $^ > $@
 
 -include .depend
 -include .depend_c
