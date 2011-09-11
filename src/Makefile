@@ -14,7 +14,11 @@ ifdef LIBPANGOCAIRO_CFLAGS
 TARGETS += pangocairo
 endif
 
-all : $(TARGETS) $(if $(OCAMLOPT),opt)
+ifneq ($(OCAMLOPT),no)
+OPT_TARGET = opt
+endif
+
+all : $(TARGETS) $(OPT_TARGET)
 opt : $(addsuffix .opt,$(TARGETS))
 
 cairo     : cairo.cma  libmlcairo.a
@@ -89,7 +93,7 @@ $(call mloptobjs,$(pangocairo_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
 install: all
 	mkdir -p $(DESTDIR)$(INSTALLDIR) $(DESTDIR)$(OCAMLLIB)/stublibs
 	install -m 644 *.mli *.cmi *.cma lib*.a $(DESTDIR)$(INSTALLDIR)
-ifdef OCAMLOPT
+ifneq ($(OCAMLOPT),no)
 	install -m644 *.cmxa *.a *.cmx $(DESTDIR)$(INSTALLDIR)
 endif
 	install -m 755 dll*.so $(DESTDIR)$(INSTALLDIR)
