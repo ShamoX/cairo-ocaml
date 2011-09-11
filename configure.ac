@@ -18,10 +18,11 @@ if test $use_gtk = yes ; then
   # Check for LablGTK
   AC_CHECK_OCAML_MODULE(lablgtk, LABLGTKDIR, Gobject, +lablgtk2 +lablgtk)
 
-  if test "$LABLGTKDIR" ; then
+  if test "$lablgtk" != no ; then
     # Check for gdk-pixbuf
     PKG_CHECK_MODULES(GDK, cairo gdk-2.0 >= 2.8 gdk-pixbuf-2.0, :, use_gtk=no)
   else
+    unset LABLGTKDIR
     use_gtk=no
   fi
 fi
@@ -30,7 +31,11 @@ fi
 PKG_CHECK_MODULES(LIBSVG_CAIRO, libsvg-cairo, use_libsvg_cairo=yes, use_libsvg_cairo=no)
 
 # Optional pango-cairo support
-PKG_CHECK_MODULES(LIBPANGOCAIRO, pangocairo, use_libpangocairo=yes, use_libpangocairo=no)
+if test "$use_gtk" != no ; then
+  PKG_CHECK_MODULES(LIBPANGOCAIRO, pangocairo, use_libpangocairo=yes, use_libpangocairo=no)
+else
+  use_libpangocairo=no
+fi
 
 echo
 echo "  GTK+         support: $use_gtk"
