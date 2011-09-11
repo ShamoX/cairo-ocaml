@@ -117,7 +117,7 @@ clean :
 
 .depend : $(wildcard *.ml *.mli)
 	@echo "making deps"
-	@$(OCAMLDEP) $(if $(LABLGTKDIR),-I $(LABLGTKDIR)) $^ > $@
+	@$(OCAMLDEP) $^ > $@
 
 -include .depend
 -include .depend_c
