@@ -17,7 +17,7 @@ module FontMap = struct
   external get_default : unit -> font_map
     = "ml_pango_cairo_font_map_get_default"
   external create_context : font_map -> Pango.context
-    = "ml_pango_cairo_font_map_create_context"
+    = "ml_pango_font_map_create_context"
 end
 
 external update_context : Cairo.t -> Pango.context -> unit
