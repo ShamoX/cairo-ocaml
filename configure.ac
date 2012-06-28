@@ -16,7 +16,7 @@ AC_ARG_VAR(LABLGTKDIR,[Location of the LablGTK library])
 
 if test $use_gtk = yes ; then
   # Check for LablGTK
-  AC_CHECK_OCAML_MODULE(lablgtk, LABLGTKDIR, Gobject, +lablgtk2 +lablgtk)
+  AC_CHECK_OCAML_MODULE(lablgtk, LABLGTKDIR, Gobject, +lablgtk2 +site-lib/lablgtk2 +lablgtk)
 
   if test "$lablgtk" != no ; then
     # Check for gdk-pixbuf
