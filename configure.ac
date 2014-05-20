@@ -2,14 +2,16 @@ AC_INIT(CAIRO_OCAML, 1.2.0)
 AC_CONFIG_SRCDIR(src/cairo.ml)
 AC_CONFIG_AUX_DIR(support)
 
-# Check for OCaml programs 
+# Check for OCaml programs
 AC_PROG_OCAML()
+# Check for OCaml findlib programs
+AC_PROG_FINDLIB()
 
 # Check for cairo
 PKG_CHECK_MODULES(CAIRO, cairo >= 1.2 cairo-ft cairo-fc cairo-ps cairo-pdf freetype2)
 
 # Optional GTK support (for the X11 backend)
-AC_ARG_WITH(gtk, 
+AC_ARG_WITH(gtk,
 	    AS_HELP_STRING([--with-gtk],[Cairo/GTK+ integration via LablGTK]),
 	    use_gtk=$withval, use_gtk=yes)
 AC_ARG_VAR(LABLGTKDIR,[Location of the LablGTK library])

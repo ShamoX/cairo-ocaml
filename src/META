@@ -1,0 +1,5 @@
+# Specification for the "cairo-ocaml" library:
+requires = ""
+version = "[internal]"
+description = "Objective Caml bindings for Cairo"
+directory = "^"

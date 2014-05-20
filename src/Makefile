@@ -91,15 +91,8 @@ $(call mlintfs,$(pangocairo_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
 $(call mloptobjs,$(pangocairo_SRC))  : INCFLAGS=-I $(LABLGTKDIR)
 
 install: all
-	mkdir -p $(DESTDIR)$(INSTALLDIR) $(DESTDIR)$(OCAMLLIB)/stublibs
-	install -m 644 *.mli *.cmi *.cma lib*.a $(DESTDIR)$(INSTALLDIR)
-ifneq ($(OCAMLOPT),no)
-	install -m644 *.cmxa *.a *.cmx $(DESTDIR)$(INSTALLDIR)
-endif
-	install -m 755 dll*.so $(DESTDIR)$(INSTALLDIR)
-	if test -w $(DESTDIR)$(OCAMLLIB)/stublibs ; then \
-          for lib in dll*.so ; do \
-            ln -s $(INSTALLDIR)/$$lib $(DESTDIR)$(OCAMLLIB)/stublibs ; done ; fi
+	ocamlfind install cairo META *.mli *.cmi *.cma *.cmxa *.a *.cmx
+	ocamlfind install -add -dll cairo dll*.so
 
 DOCFILES = cairo.mli cairo_bigarray.mli cairo_png.mli cairo_pdf.mli cairo_ps.mli cairo_ft.mli
 ifdef LABLGTKDIR
@@ -114,7 +107,7 @@ endif
 
 doc: $(DOCFILES:%.mli=%.cmi)
 	mkdir -p ../doc/html
-	ocamldoc -v -html -d ../doc/html -t Cairo-ocaml $(if $(LABLGTKDIR),-I $(LABLGTKDIR)) $(DOCFILES) 
+	ocamldoc -v -html -d ../doc/html -t Cairo-ocaml $(if $(LABLGTKDIR),-I $(LABLGTKDIR)) $(DOCFILES)
 
 clean :
 	rm -f *.cm* *.o *.a *.so .depend
